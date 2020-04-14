@@ -12,6 +12,18 @@
 #ifndef _DATA_STRUCT_H_
 #define _DATA_STRUCT_H_
 
+
+/*
+ * 透传功能类型枚举
+ */
+typedef enum TagUartToNetworkType
+{
+	UDP_TO_UART = 0,
+	TCP_SERVER_TO_UART,
+	TCP_CLIENT_TO_UART
+}UartToNetworkType;
+
+
 /*
  * 串口的电气接口类型枚举
  */
@@ -25,12 +37,12 @@ typedef enum TagSerialInterface
 /*
  * 串口信息结构体
  */
-typedef struct TagSerialInfo
+typedef struct TagUartInfo
 {
-	char serialName[20];
+	char uartName[20];
 	int bandrate;
-	SerialInterface serialType;
-}SerialInfo;
+	SerialInterface uartType;
+}UartInfo;
 
 
 /*
