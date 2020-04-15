@@ -41,7 +41,6 @@ int main(int argc, char *argv[])
 			prctl(PR_SET_PDEATHSIG, SIGHUP);
 
 			TransparentTransmission(type, &uart1, &eth1);
-			printf("exit\n");
 			return 0;
 		}
 		else
