@@ -11,13 +11,10 @@
 
 #include <stdio.h>
 #include <unistd.h>
-#include <signal.h>
-#include <sys/prctl.h>
 #include "TransparentTransmission/TransparentTransmission.h"
+#include "ProcessSignal/ProcessSignal.h"
 #include "DataStruct.h"
 
-static int do_abort = 0;
-void HandleSignal(int signo);
 
 
 /**
@@ -37,17 +34,12 @@ int main(int argc, char *argv[])
 		if((pid = fork()) == 0)
 		{
 			/* 父进程关闭之后，子进程也全部关闭 */
-			signal(SIGHUP, HandleSignal);
-			prctl(PR_SET_PDEATHSIG, SIGHUP);
+			SetProcessCloseSignal();
 
 			TransparentTransmission(type, &uart1, &eth1);
+			printf("TransparentTransmission (pid:%d) exit\n", getpid());
 			return 0;
 		}
-		else
-		{
-			printf("parent\n");
-		}
-
 	}
 
 	while(1)
@@ -55,19 +47,12 @@ int main(int argc, char *argv[])
 		printf("pid = %d, parent\n", getpid());
 		sleep(1);
 	}
-	printf("pid = %d, exit\n", getpid());
+	printf("EdgeGateway (pid:%d) exit\n", getpid());
 	return 0;
 }
 
 
-void HandleSignal(int signo)
-{
-	if(signo == SIGHUP)
-	{
-		printf("chile recv SIGHUP\n");
-		do_abort = 1;
-	}
-}
+
 
 
 
