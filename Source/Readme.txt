@@ -11,7 +11,6 @@
 	
 信号处理相关：ProcessSignal/
 	1.接口函数：头文件包含ProcessSignal.h，函数调用SetProcessCloseSignal()
-	2.外部联系：ProcessSignal.c中包含了头文件Led.h，使用了指示灯关闭函数IndicatorLedOnOrOff()
 
 
 

@@ -15,7 +15,6 @@
 #include <signal.h>
 #include <sys/prctl.h>
 #include "ProcessSignal.h"
-#include "../Led/Led.h"
 
 
 static void HandleSignal(int signalNum);
@@ -44,7 +43,6 @@ static void HandleSignal(int signalNum)
 {
 	if(signalNum == SIGINT || signalNum == SIGHUP)
 	{
-		IndicatorLedOnOrOff(LED_OFF);	//程序退出，灯关闭
 		printf("Process (pid:%d) recv SIGHUP or SIGINT, exit\n", getpid());
 		exit(0);
 	}

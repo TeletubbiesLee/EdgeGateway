@@ -24,10 +24,10 @@
 int main(int argc, char *argv[])
 {
 	pid_t pid = 0;
-	int processNum = 1;
-	int type = TCP_SERVER_TO_UART;
-	UartInfo uart1 = {"/dev/ttymxc1", 9600, RS232_TYPE};
-	NetworkInfo eth1 = {"192.168.10.10", 5555, "192.168.10.11", 3333};
+	int processNum = 2;
+	int type[2] = {TCP_SERVER_TO_UART, UDP_TO_UART};
+	UartInfo uart[2] = {{"/dev/ttymxc1", 9600, RS232_TYPE}, {"/dev/ttymxc2", 115200, RS232_TYPE}};
+	NetworkInfo eth[2] = {{"192.168.10.10", 5555, "192.168.10.11", 3333}, {"192.168.10.10", 6666, "192.168.10.11", 4444}};
 
 
 	/* 解析配置文件，获取配置信息  */
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 			/* 父进程关闭之后，子进程也全部关闭 */
 			SetProcessCloseSignal();
 
-			TransparentTransmission(type, &uart1, &eth1);
+			TransparentTransmission(type[i], &uart[i], &eth[i]);
 			printf("TransparentTransmission (pid:%d) exit\n", getpid());
 			return 0;
 		}
