@@ -25,13 +25,13 @@ int TransparentTransmission(int type, UartInfo *uartInfo, NetworkInfo *networkIn
 	{
 		UDP2Uart(uartInfo, networkInfo);
 	}
-	else if(type == TCP_CLIENT_TO_UART)
-	{
-		TCP_Server2Uart(uartInfo, networkInfo);		//设备外接TCP客户端和串口，嵌入式设备对应内部程序为TCP服务器端转串口
-	}
 	else if(type == TCP_SERVER_TO_UART)
 	{
 		TCP_Client2Uart(uartInfo, networkInfo);		//设备外接TCP服务器端和串口，嵌入式设备对应内部程序为TCP客户端转串口
+	}
+	else if(type == TCP_CLIENT_TO_UART)
+	{
+		TCP_Server2Uart(uartInfo, networkInfo);		//设备外接TCP客户端和串口，嵌入式设备对应内部程序为TCP服务器端转串口
 	}
 	else
 	{

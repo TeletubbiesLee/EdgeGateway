@@ -18,7 +18,8 @@
  */
 typedef enum TagUartToNetworkType
 {
-	UDP_TO_UART = 0,
+	NO_UART_NET_TYPE	= 0,
+	UDP_TO_UART	= 1,
 	TCP_SERVER_TO_UART,
 	TCP_CLIENT_TO_UART
 }UartToNetworkType;
@@ -29,7 +30,7 @@ typedef enum TagUartToNetworkType
  */
 typedef enum TagSerialInterface
 {
-	RS232_TYPE = 0,
+	RS232_TYPE = 1,
 	RS485_TYPE
 }SerialInterface;
 

@@ -49,11 +49,15 @@ int TCP_NetConnect(char *ipAddress, int serverPort)
 	serverAddr.sin_port = htons(serverPort);
 	serverAddr.sin_addr = *((struct in_addr *)host->h_addr);
 	bzero(&(serverAddr.sin_zero), 8);
-	while(connect(socketFd, (struct sockaddr *)&serverAddr, sizeof(struct sockaddr)) == -1)
+	printf("11111\n");
+	int ret = connect(socketFd, (struct sockaddr *)&serverAddr, sizeof(struct sockaddr));
+	printf("22222\n");
+	while(ret == -1)
 	{
 		printf_debug("TCP_NetConnect:connect error!\n");
 		sleep(1);
 	}
+	printf("connect success!\n");
 
     return socketFd;
 }

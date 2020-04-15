@@ -19,6 +19,7 @@
 static int do_abort = 0;
 void HandleSignal(int signo);
 
+
 /**
  * 	@brief: main函数
  */
@@ -26,7 +27,7 @@ int main(int argc, char *argv[])
 {
 	pid_t pid = 0;
 	int processNum = 1;
-	int type = 1;
+	int type = TCP_SERVER_TO_UART;
 	UartInfo uart1 = {"/dev/ttymxc1", 9600, RS232_TYPE};
 	NetworkInfo eth1 = {"192.168.10.10", 5555, "192.168.10.11", 3333};
 
@@ -40,6 +41,7 @@ int main(int argc, char *argv[])
 			prctl(PR_SET_PDEATHSIG, SIGHUP);
 
 			TransparentTransmission(type, &uart1, &eth1);
+			printf("exit\n");
 			return 0;
 		}
 		else
