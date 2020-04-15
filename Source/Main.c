@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include "Led/Led.h"
 #include "TransparentTransmission/TransparentTransmission.h"
 #include "ProcessSignal/ProcessSignal.h"
 #include "DataStruct.h"
@@ -28,7 +29,13 @@ int main(int argc, char *argv[])
 	UartInfo uart1 = {"/dev/ttymxc1", 9600, RS232_TYPE};
 	NetworkInfo eth1 = {"192.168.10.10", 5555, "192.168.10.11", 3333};
 
-	/* 根据配置，建立多个透传功能进程 */
+
+	/* 解析配置文件，获取配置信息  */
+
+	/*********END***********/
+
+
+	/* 创建透传功能进程 */
 	for(int i = 0; i < processNum; i++)
 	{
 		if((pid = fork()) == 0)
@@ -42,12 +49,21 @@ int main(int argc, char *argv[])
 		}
 	}
 
+
+	/* 创建其他功能的进程 */
+
+	/****************/
+
+
+	/* 父进程创建完子进程后，执行的任务 */
 	while(1)
 	{
-		printf("pid = %d, parent\n", getpid());
-		sleep(1);
+		IndicatorLedRunning();		//程序运行指示灯
 	}
+
+	IndicatorLedOnOrOff(LED_OFF);	//程序退出，灯关闭
 	printf("EdgeGateway (pid:%d) exit\n", getpid());
+
 	return 0;
 }
 

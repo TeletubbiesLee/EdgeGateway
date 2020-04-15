@@ -15,6 +15,7 @@
 #include <signal.h>
 #include <sys/prctl.h>
 #include "ProcessSignal.h"
+#include "../Led/Led.h"
 
 
 static void HandleSignal(int signalNum);
@@ -27,9 +28,9 @@ static void HandleSignal(int signalNum);
  */
 void SetProcessCloseSignal(void)
 {
-	signal(SIGINT, HandleSignal);
+	signal(SIGINT, HandleSignal);			//父进程收到Ctrl C时，子进程会收到此信号
 	prctl(PR_SET_PDEATHSIG, SIGINT);
-	signal(SIGHUP, HandleSignal);
+	signal(SIGHUP, HandleSignal);			//父进程退出时，子进程会收到此信号
 	prctl(PR_SET_PDEATHSIG, SIGHUP);
 }
 
@@ -43,6 +44,7 @@ static void HandleSignal(int signalNum)
 {
 	if(signalNum == SIGINT || signalNum == SIGHUP)
 	{
+		IndicatorLedOnOrOff(LED_OFF);	//程序退出，灯关闭
 		printf("Process (pid:%d) recv SIGHUP or SIGINT, exit\n", getpid());
 		exit(0);
 	}
