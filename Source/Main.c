@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 	pid_t pid = 0;
 	int processNum = 2;
 	int type[2] = {UDP_TO_UART, TCP_SERVER_TO_UART};
-	UartInfo uart[2] = {{"/dev/ttymxc2", 9600, RS232_TYPE}, {"/dev/ttymxc1", 115200, RS232_TYPE}};
+	UartInfo uart[2] = {{"/dev/ttymxc3", 9600, RS485_TYPE}, {"/dev/ttymxc4", 9600, RS485_TYPE}};
 	NetworkInfo eth[2] = {{"192.168.10.10", 5555, "192.168.10.11", 3333}, {"192.168.10.10", 6666, "192.168.10.11", 4444}};
 
 
@@ -66,6 +66,8 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+
+
 
 
 
