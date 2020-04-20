@@ -23,9 +23,9 @@
 void IndicatorLedRunning(void)
 {
 	IndicatorLedOnOrOff(LED_ON);
-	usleep(500 * 1000);
+	sleep(LED_DELAY_INTERVAL);
 	IndicatorLedOnOrOff(LED_OFF);
-	usleep(500 * 1000);
+	sleep(LED_DELAY_INTERVAL);
 }
 
 

@@ -22,7 +22,6 @@
 #include "Net.h"
 #include "Uart.h"
 #include "../Config.h"
-#include "../DataStruct.h"
 #include "../RS485/RS485.h"
 
 

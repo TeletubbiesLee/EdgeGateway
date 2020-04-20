@@ -12,6 +12,8 @@
 #ifndef _RS485_H_
 #define _RS485_H_
 
+#define RS485_MODE 1
+
 typedef enum
 {
 	DISABLE_485 = 0,	//使能脚电平拉高
@@ -19,6 +21,8 @@ typedef enum
 }RS485_ENABLE_t;
 
 int RS485_Enable(const int fd, const RS485_ENABLE_t enable);
+int SetSerialInterfaceValue(int type);
+int GetSerialInterfaceValue(void);
 
 #endif
 

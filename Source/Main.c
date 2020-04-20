@@ -14,9 +14,10 @@
 #include "Led/Led.h"
 #include "TransparentTransmission/TransparentTransmission.h"
 #include "ProcessSignal/ProcessSignal.h"
+#include "Modbus/NoiseSensor/NoiseSensor.h"
 #include "DataStruct.h"
 
-
+#include "RS485/RS485.h"
 
 /**
  * 	@brief: main函数
@@ -25,10 +26,15 @@ int main(int argc, char *argv[])
 {
 	pid_t pid = 0;			//子进程的进程ID号
 
+	/* 透传功能需要的配置信息 */
 	int trsptTrsmsProcessNum = 0;			//透传功能进程数
-	int type[2] = {TCP_CLIENT_TO_UART, TCP_SERVER_TO_UART};
-	UartInfo uart[2] = {{"/dev/ttymxc1", 9600, RS232_TYPE}, {"/dev/ttymxc2", 9600, RS232_TYPE}};
-	NetworkInfo eth[2] = {{"192.168.10.10", 5555, "192.168.10.11", 3333}, {"192.168.10.10", 6666, "192.168.10.11", 4444}};
+	int trsptTrsmsType[2] = {TCP_CLIENT_TO_UART, TCP_SERVER_TO_UART};
+	UartInfo trsptTrsmsUart[2] = {{"/dev/ttymxc1", 9600, RS232_TYPE}, {"/dev/ttymxc2", 9600, RS232_TYPE}};
+	NetworkInfo trsptTrsmsEth[2] = {{"192.168.10.10", 5555, "192.168.10.11", 3333}, {"192.168.10.10", 6666, "192.168.10.11", 4444}};
+
+	/* 噪声传感器需要的配置信息 */
+	UartInfo noiseUart = {"/dev/ttymxc4", 9600, RS485_TYPE};
+	int noiseUartType = RS485_TYPE;
 
 
 	/* 解析配置文件，获取配置信息  */
@@ -43,11 +49,24 @@ int main(int argc, char *argv[])
 		{
 			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
-			TransparentTransmission(type[i], &uart[i], &eth[i]);		//透传功能
+			printf("TransparentTransmission (pid:%d) creat\n", getpid());
+			TransparentTransmission(trsptTrsmsType[i], &trsptTrsmsUart[i], &trsptTrsmsEth[i]);		//透传功能
 			printf("TransparentTransmission (pid:%d) exit\n", getpid());
 
 			return 0;
 		}
+	}
+
+	/* 创建噪声传感器通信进程 */
+	if((pid = fork()) == 0)
+	{
+		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+		printf("NoiseSensor (pid:%d) creat\n", getpid());
+		NoiseSensor(noiseUartType, &noiseUart);							//噪声传感器
+		printf("NoiseSensor (pid:%d) exit\n", getpid());
+
+		return 0;
 	}
 
 

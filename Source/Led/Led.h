@@ -17,6 +17,8 @@
 #define LED_ON		0			//LED亮
 #define LED_OFF		!LED_ON		//LED灭
 
+#define LED_DELAY_INTERVAL		1	//LED灯闪烁延时间隔，单位：s
+
 void IndicatorLedRunning(void);
 void IndicatorLedOnOrOff(bool onOrOff);
 
