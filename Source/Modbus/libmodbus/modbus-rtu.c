@@ -922,9 +922,6 @@ int modbus_rtu_set_serial_mode(modbus_t *ctx, int mode)
             rs485conf.flags |= SER_RS485_RTS_ON_SEND;
             rs485conf.flags |= SER_RS485_RTS_AFTER_SEND;
 
-            rs485conf.delay_rts_before_send = 0x0000000A;
-            rs485conf.delay_rts_after_send = 0x0000000A;
-
             if (ioctl(ctx->s, TIOCSRS485, &rs485conf) < 0) {
                 return -1;
             }

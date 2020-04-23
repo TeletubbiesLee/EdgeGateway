@@ -43,7 +43,13 @@ int UartInit(char *device, int bandrate, int type)
 	}
 
 	if(RS485_TYPE == type)			//485接收时，将使能引脚电平拉低
-		RS485_Enable(uartFd, ENABLE_485);
+	{
+		if(NO_ERROR != RS485_Enable(uartFd, ENABLE_485))
+		{
+			printf_debug("RS485_Enable() error!\n");
+			return FUNCTION_FAIL;
+		}
+	}
 
 	ret = SetPort(uartFd, bandrate, UART_DATA_BITS_NUM, UART_STOP_BITS_NUM, UART_PARITY_NUM);
 	if (FUNCTION_FAIL == ret)

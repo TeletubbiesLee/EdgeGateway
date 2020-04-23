@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 	pid_t pid = 0;			//子进程的进程ID号
 
 	/* 透传功能需要的配置信息 */
-	int trsptTrsmsProcessNum = 1;			//透传功能进程数
+	int trsptTrsmsProcessNum = 0;			//透传功能进程数
 	int trsptTrsmsType[2] = {TCP_SERVER_TO_UART, TCP_CLIENT_TO_UART};
 	UartInfo trsptTrsmsUart[2] = {{"/dev/ttymxc3", 9600, RS485_TYPE}, {"/dev/ttymxc4", 9600, RS485_TYPE}};
 	NetworkInfo trsptTrsmsEth[2] = {{"192.168.10.10", 6666, "iot.shangshan.info", 41001},
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 		printf("NoiseSensor (pid:%d) creat\n", getpid());
-		//NoiseSensor(noiseUartType, &noiseUart);							//噪声传感器
+		NoiseSensor(noiseUartType, &noiseUart);							//噪声传感器
 		printf("NoiseSensor (pid:%d) exit\n", getpid());
 
 		return 0;

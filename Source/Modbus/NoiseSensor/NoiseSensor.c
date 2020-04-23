@@ -42,12 +42,6 @@ int NoiseSensor(int type, UartInfo *uartInfo)
         return POINT_NULL;
     }
 
-    /* 设置Modbus为使用RS485 */
-    modbus_rtu_set_serial_mode(ctx, MODBUS_RTU_RS485);
-    modbus_rtu_set_rts(ctx, MODBUS_RTU_RTS_UP);
-    modbus_rtu_set_rts_delay(ctx, 0x0000000A);
-
-
     modbus_set_debug(ctx, TRUE);        //设置Dubug模式
     modbus_set_error_recovery(ctx, MODBUS_ERROR_RECOVERY_LINK | MODBUS_ERROR_RECOVERY_PROTOCOL);
 
@@ -61,6 +55,21 @@ int NoiseSensor(int type, UartInfo *uartInfo)
         return FUNCTION_FAIL;
     }
     printf("Connection Successful!\r\n");
+
+    /* 设置Modbus为使用RS485 */
+	if(-1 == modbus_rtu_set_serial_mode(ctx, MODBUS_RTU_RS485))
+	{
+		printf_debug("modbus_rtu_set_serial_mode() set RS485 error\n");
+		return POINT_NULL;
+	}
+	if(-1 == modbus_rtu_set_rts(ctx, MODBUS_RTU_RTS_UP))
+	{
+		printf_debug("modbus_rtu_set_rts() error\n");
+	}
+	if(-1 == modbus_rtu_set_rts_delay(ctx, 0x0000000A))
+	{
+		printf_debug("modbus_rtu_set_rts_delay() error\n");
+	}
 
     /* 为bit和寄存器分配内存空间 */
     nbPoints = NOISE_REGISTERS_NUMBER;

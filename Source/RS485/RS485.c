@@ -23,12 +23,12 @@
  * @brief 485使能函数
  * @param fd 485设备号
  * @param enable 是否使能
- * @return 成功:0 错误:其他
+ * @return 成功:0 错误:-1
  */
 int RS485_Enable(const int fd, const RS485_ENABLE_t enable)
 {
 	struct serial_rs485 rs485conf;
-	int res;
+	int res = 0;
 
 	/* Get configure from device */
 	res = ioctl(fd, TIOCGRS485, &rs485conf);
@@ -36,7 +36,7 @@ int RS485_Enable(const int fd, const RS485_ENABLE_t enable)
 	{
 		perror("Ioctl error on getting 485 configure:");
 		close(fd);
-		return res;
+		return FUNCTION_FAIL;
 	}
 
 	/* Set enable/disable to configure */
@@ -45,12 +45,12 @@ int RS485_Enable(const int fd, const RS485_ENABLE_t enable)
 		rs485conf.flags |= SER_RS485_ENABLED;
         rs485conf.flags |= SER_RS485_RTS_ON_SEND;
         rs485conf.flags |= SER_RS485_RTS_AFTER_SEND;
-		printf("Enable 485\n");
+		printf("Enable 485 mode\n");
 	}
 	else        		// Disable rs485 mode
 	{
 		rs485conf.flags &= ~(SER_RS485_ENABLED);
-		printf("Disable 485\n");
+		printf("Disable 485 mode\n");
 	}
 
     rs485conf.delay_rts_before_send = 0x0000000F;
@@ -62,9 +62,10 @@ int RS485_Enable(const int fd, const RS485_ENABLE_t enable)
 	{
 		perror("Ioctl error on setting 485 configure:");
 		close(fd);
+		return FUNCTION_FAIL;
 	}
 
-	return res;
+	return NO_ERROR;
 }
 
 
