@@ -16,6 +16,13 @@
 
 #define MAX_DATA_SIZE		1600		//数据最大数量
 
+#define DATA_PRINTF_NET_UART
+#ifdef DATA_PRINTF_NET_UART
+#define printf_data_net2uart(prefixName,data,lenth) do{PrintfData(prefixName,data,lenth);}while(0)
+#else
+#define printf_data_net2uart(prefixName,data,lenth) do{;}while(0)
+#endif
+
 int TCP_Client2Uart(UartInfo *uartInfo, NetworkInfo *networkInfo);
 int TCP_Server2Uart(UartInfo *uartInfo, NetworkInfo *networkInfo);
 int UDP2Uart(UartInfo *uartInfo, NetworkInfo *networkInfo);

@@ -14,10 +14,9 @@
 
 #include <stdio.h>
 
-#define DEBUG_PRINTF
-#ifdef DEBUG_PRINTF
+
 #define printf_debug(fmt,...) do{printf("%s: %s[line %d]: "fmt, __FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__);}while(0)
-#endif
+
 
 
 /* 程序错误码 */
@@ -31,5 +30,6 @@ typedef enum {
 	ERROR_ARGUMENTS,		//参数错误
 
 }ErrorCode;
+
 
 #endif

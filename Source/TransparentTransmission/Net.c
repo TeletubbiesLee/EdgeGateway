@@ -10,6 +10,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -55,6 +56,7 @@ int TCP_NetConnect(char *ipAddress, int serverPort)
 		sleep(1);
 	}
 	printf("connect success!\n");
+	write(socketFd, "SOJO", strlen("SOJO"));
 
     return socketFd;
 }
@@ -117,6 +119,7 @@ int TCP_NetAccept(int socketFd)
 	}
 
 	printf("Receive From： %s\n", inet_ntoa(remoteAddr.sin_addr));
+	write(clientFd, "SOJO", strlen("SOJO"));
 
     return clientFd;
 }

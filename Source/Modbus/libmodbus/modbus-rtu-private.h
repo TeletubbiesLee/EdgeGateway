@@ -19,6 +19,9 @@
 #include <termios.h>
 #endif
 
+#define HAVE_DECL_TIOCSRS485 1
+#define HAVE_DECL_TIOCM_RTS 1
+
 #define _MODBUS_RTU_HEADER_LENGTH      1
 #define _MODBUS_RTU_PRESET_REQ_LENGTH  6
 #define _MODBUS_RTU_PRESET_RSP_LENGTH  2

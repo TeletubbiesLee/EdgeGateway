@@ -33,6 +33,9 @@ static void UDPReceivePthread(void *param);
 static void UDPSendPthread(void *param);
 static void UartReceivePthread(void *param);
 static void UartSendPthread(void *param);
+static void PrintfData(char *prefixName, char *data, int lenth);
+
+
 
 
 /**
@@ -70,6 +73,11 @@ int TCP_Client2Uart(UartInfo *uartInfo, NetworkInfo *networkInfo)
 		goto TCP_CLIENT_CLOSE;
 	}
 	uartFd = UartInit(uartInfo->uartName, uartInfo->bandrate, uartInfo->uartType);
+	if(FUNCTION_FAIL == uartFd)
+	{
+		printf_debug("Uart Init error!\n");
+		goto TCP_CLIENT_CLOSE;
+	}
 
 	/* 网口与串口透传的线程 */
 	paramArray[0][0] = tcp2UartPipe[1];		//写管道
@@ -150,8 +158,23 @@ int TCP_Server2Uart(UartInfo *uartInfo, NetworkInfo *networkInfo)
 
 	/* 侦听客户端并且连接，建立socket，打开串口 */
 	socketFd = TCP_NetListen(networkInfo->localPort);
+	if(FUNCTION_FAIL == socketFd)
+	{
+		printf_debug("TCP Server Listen error!\n");
+		goto TCP_SERVER_CLOSE;
+	}
 	uartFd = UartInit(uartInfo->uartName, uartInfo->bandrate, uartInfo->uartType);
+	if(FUNCTION_FAIL == uartFd)
+	{
+		printf_debug("Uart Init error!\n");
+		goto TCP_SERVER_CLOSE;
+	}
 	clientFd = TCP_NetAccept(socketFd);
+	if(FUNCTION_FAIL == clientFd)
+	{
+		printf_debug("TCP Server Accept error!\n");
+		goto TCP_SERVER_CLOSE;
+	}
 
 	/* 网口与串口透传的线程 */
 	paramArray[0][0] = tcp2UartPipe[1];		//写管道
@@ -234,7 +257,17 @@ int UDP2Uart(UartInfo *uartInfo, NetworkInfo *networkInfo)
 
 	/* 连接UDP并建立socket，打开串口，设置远端配置的IP和端口号 */
 	socketFd = UDP_NetConnect(networkInfo->localPort);
+	if(FUNCTION_FAIL == socketFd)
+	{
+		printf_debug("UDP Connect error!\n");
+		goto UDP_CLOSE;
+	}
 	uartFd = UartInit(uartInfo->uartName, uartInfo->bandrate, uartInfo->uartType);
+	if(FUNCTION_FAIL == uartFd)
+	{
+		printf_debug("Uart Init error!\n");
+		goto UDP_CLOSE;
+	}
 	SetRemoteAddress(networkInfo->remoteAddress, networkInfo->remotePort, &remoteAddr);
 
 
@@ -308,6 +341,7 @@ static void TCPClientSendPthread(void *param)
     	dataBytes = read(pipeReadFd, dataBuffer, sizeof(dataBuffer));
         if(dataBytes > 0)
         {
+        	printf_data_net2uart("TCPClientSend: ", dataBuffer, dataBytes);
             if(send(*socketFd, dataBuffer, dataBytes, 0) == -1)
             {
             	printf_debug("send error！\r\n");
@@ -339,6 +373,7 @@ static void TCPClientReceivePthread(void *param)
     	dataBytes = recv(*socketFd, dataBuffer, MAX_DATA_SIZE, 0);
         if(dataBytes > 0)
         {
+        	printf_data_net2uart("TCPClientReceive: ", dataBuffer, dataBytes);
             if(write(pipeWriteFd, dataBuffer, dataBytes) == -1)
             {
             	printf_debug("write error！\r\n");
@@ -376,6 +411,7 @@ static void TCPServerSendPthread(void *param)
     	dataBytes = read(pipeReadFd, dataBuffer, sizeof(dataBuffer));
         if(dataBytes > 0)
         {
+        	printf_data_net2uart("TCPServerSend: ", dataBuffer, dataBytes);
             if(send(*clientFd, dataBuffer, dataBytes, 0) == -1)
             {
             	printf_debug("send error！\r\n");
@@ -406,6 +442,7 @@ static void TCPServerReceivePthread(void *param)
     	dataBytes = recv(*clientFd, dataBuffer, MAX_DATA_SIZE, 0);
         if(dataBytes > 0)
         {
+        	printf_data_net2uart("TCPServerReceive: ", dataBuffer, dataBytes);
             if(write(pipeWriteFd, dataBuffer, dataBytes) == -1)
             {
             	printf_debug("write error！\r\n");
@@ -447,6 +484,7 @@ static void UDPSendPthread(void *param)
     	dataBytes = read(pipeReadFd, dataBuffer, sizeof(dataBuffer));
     	if(dataBytes > 0)
     	{
+    		printf_data_net2uart("UDPSend: ", dataBuffer, dataBytes);
 			if(sendto(socketFd, dataBuffer, dataBytes, 0, (struct sockaddr *)remoteAddr, sinSize) == -1)
 			{
 				printf_debug("send error！\r\n");
@@ -479,6 +517,7 @@ static void UDPReceivePthread(void *param)
     	dataBytes = recvfrom(socketFd, dataBuffer, sizeof(dataBuffer)-1, 0, (struct sockaddr *)remoteAddr, &sinSize);
         if(dataBytes > 0)
         {
+        	printf_data_net2uart("UDPReceive: ", dataBuffer, dataBytes);
             /* 将接收到的数据写入管道 */
         	if(write(pipeWriteFd, dataBuffer, dataBytes) == -1)
         	{
@@ -511,6 +550,7 @@ static void UartSendPthread(void *param)
     	dataBytes = read(pipeReadFd, dataBuffer, sizeof(dataBuffer));
     	if(dataBytes > 0)
     	{
+    		printf_data_net2uart("UartSend: ", dataBuffer, dataBytes);
 			if(write(uartFd, dataBuffer, dataBytes) == -1)
 			{
 				printf_debug("write error！\r\n");
@@ -539,6 +579,7 @@ static void UartReceivePthread(void *param)
     	dataBytes = read(uartFd, dataBuffer, sizeof(dataBuffer));
 		if(dataBytes > 0)
 		{
+			printf_data_net2uart("UartReceive: ", dataBuffer, dataBytes);
 			/* 将接收到的数据写入管道 */
 			if(write(pipeWriteFd, dataBuffer, dataBytes) == -1)
 			{
@@ -547,6 +588,24 @@ static void UartReceivePthread(void *param)
 			}
 		}
 	}
+}
+
+
+/**
+ * @breif 打印数据
+ * @param prefixName 打印数据的前缀信息
+ * @param data 数据
+ * @param lenth 数据长度
+ * @return void
+ */
+static void PrintfData(char *prefixName, char *data, int lenth)
+{
+	printf("%s", prefixName);
+	for(int i = 0; i < lenth; i++)
+	{
+		printf("%02x ", data[i]);
+	}
+	printf("\n");
 }
 
 
