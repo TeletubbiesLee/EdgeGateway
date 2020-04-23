@@ -18,7 +18,6 @@
 #include "../libmodbus/modbus-config.h"
 #include "NoiseSensor.h"
 #include "../../Config.h"
-#include "../../RS485/RS485.h"
 
 
 
@@ -27,7 +26,7 @@
  * @param uartInfo 串口信息结构体指针
  * @return 成功:0 失败:其他
  */
-int NoiseSensor(int type, UartInfo *uartInfo)
+int NoiseSensor(UartInfo *uartInfo)
 {
     modbus_t *ctx = NULL;       //成功打开设备后返回的结构体指针
     uint16_t *tabRegisters = NULL;      //寄存器的空间
@@ -57,19 +56,15 @@ int NoiseSensor(int type, UartInfo *uartInfo)
     printf("Connection Successful!\r\n");
 
     /* 设置Modbus为使用RS485 */
-	if(-1 == modbus_rtu_set_serial_mode(ctx, MODBUS_RTU_RS485))
+    if(RS485_TYPE == uartInfo->uartType)
 	{
-		printf_debug("modbus_rtu_set_serial_mode() set RS485 error\n");
-		return POINT_NULL;
-	}
-	if(-1 == modbus_rtu_set_rts(ctx, MODBUS_RTU_RTS_UP))
-	{
-		printf_debug("modbus_rtu_set_rts() error\n");
-	}
-	if(-1 == modbus_rtu_set_rts_delay(ctx, 0x0000000A))
-	{
-		printf_debug("modbus_rtu_set_rts_delay() error\n");
-	}
+		if(-1 == modbus_rtu_set_serial_mode(ctx, MODBUS_RTU_RS485))
+		{
+			printf_debug("modbus_rtu_set_serial_mode() set RS485 error\n");
+			return FUNCTION_FAIL;
+		}
+		printf("%s()-modbus enable %s 485\n", __FUNCTION__, uartInfo->uartName);
+    }
 
     /* 为bit和寄存器分配内存空间 */
     nbPoints = NOISE_REGISTERS_NUMBER;

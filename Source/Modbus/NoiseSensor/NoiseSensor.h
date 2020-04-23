@@ -23,7 +23,7 @@
 #define NOISE_SERVER_ID						1			//从机地址
 
 
-int NoiseSensor(int type, UartInfo *uartInfo);
+int NoiseSensor(UartInfo *uartInfo);
 
 #endif
 

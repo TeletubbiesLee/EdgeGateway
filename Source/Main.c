@@ -34,7 +34,6 @@ int main(int argc, char *argv[])
 
 	/* 噪声传感器需要的配置信息 */
 	UartInfo noiseUart = {"/dev/ttymxc4", 9600, RS485_TYPE};
-	int noiseUartType = RS485_TYPE;
 
 
 	/* 解析配置文件，获取配置信息  */
@@ -63,7 +62,7 @@ int main(int argc, char *argv[])
 		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 		printf("NoiseSensor (pid:%d) creat\n", getpid());
-		NoiseSensor(noiseUartType, &noiseUart);							//噪声传感器
+		NoiseSensor(&noiseUart);							//噪声传感器
 		printf("NoiseSensor (pid:%d) exit\n", getpid());
 
 		return 0;

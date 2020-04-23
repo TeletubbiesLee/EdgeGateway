@@ -18,10 +18,16 @@
  * @param type 透传功能的类型：UDP_TO_UART TCP_CLIENT_TO_UART TCP_SERVER_TO_UART
  * @param uartInfo 串口信息结构体指针
  * @param networkInfo 网口信息结构体指针
- * @return 成功0或失败-1
+ * @return 成功0或失败
  */
 int TransparentTransmission(int type, UartInfo *uartInfo, NetworkInfo *networkInfo)
 {
+	if(uartInfo == NULL || networkInfo == NULL)
+	{
+		printf_debug("error: arguments is NULL!\n");
+		return POINT_NULL;
+	}
+
 	if(type == UDP_TO_UART)
 	{
 		UDP2Uart(uartInfo, networkInfo);
