@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 	int trsptTrsmsType[2] = {TCP_SERVER_TO_UART, TCP_CLIENT_TO_UART};
 	UartInfo trsptTrsmsUart[2] = {{"/dev/ttymxc3", 9600, RS485_TYPE}, {"/dev/ttymxc4", 9600, RS485_TYPE}};
 	NetworkInfo trsptTrsmsEth[2] = {{"192.168.10.10", 6666, "iot.shangshan.info", 41001},
-									{"192.168.10.10", 5555, "192.168.10.11", 3333}};
+									{"127.0.0.1", 5555, "192.168.10.11", 3333}};
 
 	/* 噪声传感器需要的配置信息 */
 	UartInfo noiseUart = {"/dev/ttymxc4", 9600, RS485_TYPE};
