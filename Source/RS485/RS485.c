@@ -43,8 +43,8 @@ int RS485_Enable(const int fd, const RS485_ENABLE_t enable)
 	if(ENABLE_485 == enable)			// Enable rs485 mode
 	{
 		rs485conf.flags |= SER_RS485_ENABLED;
-		rs485conf.flags |= SER_RS485_RTS_ON_SEND;
-		rs485conf.flags |= SER_RS485_RTS_AFTER_SEND;
+        rs485conf.flags |= SER_RS485_RTS_ON_SEND;
+        rs485conf.flags |= SER_RS485_RTS_AFTER_SEND;
 		printf("Enable 485\n");
 	}
 	else        		// Disable rs485 mode
@@ -53,8 +53,8 @@ int RS485_Enable(const int fd, const RS485_ENABLE_t enable)
 		printf("Disable 485\n");
 	}
 
-	rs485conf.delay_rts_before_send = 0x0000000F;
-	rs485conf.delay_rts_after_send = 0x0000000F;
+    rs485conf.delay_rts_before_send = 0x0000000F;
+    rs485conf.delay_rts_after_send = 0x0000000F;
 
 	/* Set configure to device */
 	res = ioctl(fd, TIOCSRS485, &rs485conf);

@@ -42,6 +42,7 @@ int NoiseSensor(int type, UartInfo *uartInfo)
         return POINT_NULL;
     }
 
+    /* 设置Modbus为使用RS485 */
     modbus_rtu_set_serial_mode(ctx, MODBUS_RTU_RS485);
     modbus_rtu_set_rts(ctx, MODBUS_RTU_RTS_UP);
     modbus_rtu_set_rts_delay(ctx, 0x0000000A);

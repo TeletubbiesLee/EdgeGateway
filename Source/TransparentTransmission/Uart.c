@@ -23,7 +23,6 @@
 #include "../DataStruct.h"
 
 
-static struct termios newtio, oldtio;
 
 /**
  * @breif 打开串口设备
@@ -90,6 +89,8 @@ int OpenDevice(char *dev)
  */
 int SetPort(int fd, int nSpeed, int nBits, char nEvent, int nStop)
 {
+	struct termios newtio, oldtio;
+
 	memset(&oldtio, 0, sizeof(oldtio));
 	/* save the old serial port configuration */
 	if(tcgetattr(fd, &oldtio) != 0) {

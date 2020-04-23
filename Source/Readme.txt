@@ -12,7 +12,7 @@
 Modbus通信相关：Modbus/
 	modbus第三方库：libmodbus/
 		1.接口函数：头文件包含modbus.h、modbus-config.h
-		2.外部引用：RS485.h、DataStruct.h（modbus-rtu.c中增加了RS485相关内容）
+		2.外部引用：
 	双杰测温中继：SOJO/
 		1.接口函数：头文件包含NoiseSensor.h，函数调用NoiseSensor()
 		2.外部引用：DataStruct.h、Config.h、RS485.h、modbus.h
