@@ -17,7 +17,6 @@
 #include "../Config.h"
 #include "../DataStruct.h"
 
-static int Rs232OrRs485 = RS232_TYPE;
 
 /**
  * @fn RS485_Enable
@@ -41,16 +40,21 @@ int RS485_Enable(const int fd, const RS485_ENABLE_t enable)
 	}
 
 	/* Set enable/disable to configure */
-	if(enable)			// Enable rs485 mode
+	if(ENABLE_485 == enable)			// Enable rs485 mode
 	{
 		rs485conf.flags |= SER_RS485_ENABLED;
+		rs485conf.flags |= SER_RS485_RTS_ON_SEND;
+		rs485conf.flags |= SER_RS485_RTS_AFTER_SEND;
+		printf("Enable 485\n");
 	}
 	else        		// Disable rs485 mode
 	{
 		rs485conf.flags &= ~(SER_RS485_ENABLED);
+		printf("Disable 485\n");
 	}
 
-	rs485conf.delay_rts_before_send = 0x00000004;
+	rs485conf.delay_rts_before_send = 0x0000000F;
+	rs485conf.delay_rts_after_send = 0x0000000F;
 
 	/* Set configure to device */
 	res = ioctl(fd, TIOCSRS485, &rs485conf);
@@ -63,36 +67,4 @@ int RS485_Enable(const int fd, const RS485_ENABLE_t enable)
 	return res;
 }
 
-
-/**
- * @fn SetSerialInterfaceValue
- * @brief 设置串口类型标志，用于程序中判断硬件接口是232还是485
- * @param type RS232_TYPE or RS485_TYPE
- * @return 成功:0 错误:其他
- */
-int SetSerialInterfaceValue(int type)
-{
-	if(RS232_TYPE == type || RS485_TYPE == type)
-	{
-		Rs232OrRs485 = type;
-		return NO_ERROR;
-	}
-	else
-	{
-		printf_debug("Argument value is error, type is RS232_TYPE or RS485_TYPE.\n");
-		return ERROR_ARGUMENTS;
-	}
-}
-
-
-/**
- * @fn GetSerialInterfaceValue
- * @brief 获取串口类型标志，用于程序中判断硬件接口是232还是485
- * @param void
- * @return RS232_TYPE or RS485_TYPE
- */
-int GetSerialInterfaceValue(void)
-{
-	return Rs232OrRs485;
-}
 

@@ -10,6 +10,7 @@
  */
 
 
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -18,17 +19,11 @@
 #include <termios.h>
 #include "Uart.h"
 #include "../Config.h"
+#include "../RS485/RS485.h"
+#include "../DataStruct.h"
 
 
-static int SpeedArray[] = {
-	B921600, B460800, B230400, B115200, B57600, B38400,
-    B19200, B9600, B4800, B2400, B1200, B300,
-};
-static int BandrateArray[] = {
-	921600, 460800, 230400, 115200, 57600, 38400,
-    19200, 9600, 4800, 2400, 1200, 300,
-};
-
+static struct termios newtio, oldtio;
 
 /**
  * @breif 打开串口设备
@@ -36,29 +31,29 @@ static int BandrateArray[] = {
  * @param bandrate 波特率
  * @return 设备文件描述符或-1
  */
-int UartInit(char *device, int bandrate)
+int UartInit(char *device, int bandrate, int type)
 {
 	int uartFd = -1;
 	int ret = 0;
 
 	uartFd = OpenDevice(device);
-	if (uartFd > 0)
-	{
-		SetSpeed(uartFd, bandrate);
-	}
-	else
+	if(uartFd < 0)
 	{
 		printf_debug("Error opening %s\n", device);
 		return FUNCTION_FAIL;
 	}
 
-	ret = SetParity(uartFd, UART_DATA_BITS_NUM, UART_STOP_BITS_NUM, UART_PARITY_NUM);
+	if(RS485_TYPE == type)			//485接收时，将使能引脚电平拉低
+		RS485_Enable(uartFd, ENABLE_485);
+
+	ret = SetPort(uartFd, bandrate, UART_DATA_BITS_NUM, UART_STOP_BITS_NUM, UART_PARITY_NUM);
 	if (FUNCTION_FAIL == ret)
 	{
 		printf_debug("Set Parity Error\n");
 		close(uartFd);
 		return FUNCTION_FAIL;
 	}
+	write(uartFd, "SOJO", strlen("SOJO"));
 
 	return uartFd;
 }
@@ -72,7 +67,7 @@ int UartInit(char *device, int bandrate)
 int OpenDevice(char *dev)
 {
 	int fd = open(dev, O_RDWR);         //阻塞模式打开 | O_NOCTTY | O_NDELAY | O_NONBLOCK
- 	if (-1 == fd)
+ 	if (fd < 0)
     {
  		printf_debug("Can't Open Serial Port: %s.\n", dev);
    		return FUNCTION_FAIL;
@@ -85,128 +80,176 @@ int OpenDevice(char *dev)
 
 
 /**
- * @breif 设置串口传输速度
+ * @breif 设置串口传输速度，数据位，校验位，停止位等
  * @param fd 串口设备的文件描述符
- * @param speed 波特率
- * @return void
+ * @param nSpeed 波特率
+ * @param nBits	数据位
+ * @param nEvent 校验位
+ * @param nStop 停止位
+ * @return 成功：0 失败：-1
  */
-void SetSpeed(int fd, int speed)
+int SetPort(int fd, int nSpeed, int nBits, char nEvent, int nStop)
 {
-	int i = 0;
-	int status = 0;
-	struct termios opt;
-
-	tcgetattr(fd, &opt);
-
-	for(i = 0; i < sizeof(SpeedArray) / sizeof(int); i++)
-    {
-		if(speed == BandrateArray[i])
-        {
-			tcflush(fd, TCIOFLUSH);
-			cfsetispeed(&opt, SpeedArray[i]);
-			cfsetospeed(&opt, SpeedArray[i]);
-			status = tcsetattr(fd, TCSANOW, &opt);
-			if(status != 0)
-			{
-				printf_debug("tcsetattr fd1\n");
-			}
-			return;
-		}
-		tcflush(fd, TCIOFLUSH);
-  	 }
-
-	if (i == 12)
-    {
-		printf_debug("\tSorry, please set the correct baud rate!\n");
-		PrintUartUsage();
-	}
-}
-
-
-/**
- * @brief 设置串口数据位，停止位和效验位
- * @param fd 打开的串口文件句柄*
- * @param dataBits 数据位，取值为：7 or 8
- * @param stopBits 停止位，取值为：1 or 2
- * @param parity 校验类型，取值为：N E O S
- * @return 成功:0 错误:-1
- */
-int SetParity(int fd, int dataBits, int stopBits, int parity)
-{
-	struct termios options;
-	if (tcgetattr(fd, &options) != 0)
-	{
-		printf_debug("SetupSerial 1\n");
+	memset(&oldtio, 0, sizeof(oldtio));
+	/* save the old serial port configuration */
+	if(tcgetattr(fd, &oldtio) != 0) {
+		printf_debug("SetPort tcgetattr");
 		return FUNCTION_FAIL;
 	}
-	options.c_cflag &= ~CSIZE;
-	switch (dataBits) /*设置数据位数*/
-	{
-		case 7:
-			options.c_cflag |= CS7;
-			break;
+
+	memset(&newtio, 0, sizeof(newtio));
+	/* ignore modem control lines and enable receiver */
+	newtio.c_cflag |= CLOCAL | CREAD;
+	newtio.c_cflag &= ~CSIZE;
+	/* set character size */
+	switch (nBits) {
 		case 8:
-			options.c_cflag |= CS8;
+			newtio.c_cflag |= CS8;
+			break;
+		case 7:
+			newtio.c_cflag |= CS7;
+			break;
+		case 6:
+			newtio.c_cflag |= CS6;
+			break;
+		case 5:
+			newtio.c_cflag |= CS5;
 			break;
 		default:
-			printf_debug("Unsupported data size\n");
-			return FUNCTION_FAIL;
-	}
-
-	switch (parity)
-	{
-		case 'n':
-		case 'N':
-			options.c_cflag &= ~PARENB;   /* Clear parity enable */
-			options.c_iflag &= ~INPCK;     /* Enable parity checking */
+			newtio.c_cflag |= CS8;
 			break;
+	}
+	/* set the parity */
+	switch (nEvent) {
 		case 'o':
 		case 'O':
-			options.c_cflag |= (PARODD | PARENB);  /* 设置为奇效验*/
-			options.c_iflag |= INPCK;             /* Disnable parity checking */
+			newtio.c_cflag |= PARENB;
+			newtio.c_cflag |= PARODD;
+			newtio.c_iflag |= (INPCK | ISTRIP);
 			break;
 		case 'e':
 		case 'E':
-			options.c_cflag |= PARENB;     /* Enable parity */
-			options.c_cflag &= ~PARODD;   /* 转换为偶效验*/
-			options.c_iflag |= INPCK;       /* Disnable parity checking */
+			newtio.c_cflag |= PARENB;
+			newtio.c_cflag &= ~PARODD;
+			newtio.c_iflag |= (INPCK | ISTRIP);
 			break;
-		case 'S':
-		case 's':  /*as no parity*/
-			options.c_cflag &= ~PARENB;
-			options.c_cflag &= ~CSTOPB;
+		case 'n':
+		case 'N':
+			newtio.c_cflag &= ~PARENB;
 			break;
 		default:
-			printf_debug("Unsupported parity\n");
-			return FUNCTION_FAIL;
+			newtio.c_cflag &= ~PARENB;
+			break;
 	}
- 	/* 设置停止位*/
-  	switch (stopBits)
-	{
+	/* set the stop bits */
+	switch (nStop) {
 		case 1:
-			options.c_cflag &= ~CSTOPB;
+			newtio.c_cflag &= ~CSTOPB;
 			break;
 		case 2:
-			options.c_cflag |= CSTOPB;
+			newtio.c_cflag |= CSTOPB;
 			break;
 		default:
-			printf_debug("Unsupported stop bits\n");
-			return FUNCTION_FAIL;
- 	}
-  	/* Set input parity option */
-  	if (parity != 'n')
-    	options.c_iflag |= INPCK;
-  	options.c_cc[VTIME] = 150; // 15 seconds
-    options.c_cc[VMIN] = 0;
-
-	options.c_lflag &= ~(ECHO | ICANON);
-
-  	tcflush(fd, TCIFLUSH);		/* Update the options and do it NOW */
-  	if (tcsetattr(fd, TCSANOW, &options) != 0)
+			newtio.c_cflag &= ~CSTOPB;
+			break;
+	}
+	/* set output and input baud rate */
+	switch (nSpeed) {
+		case 0:
+			cfsetospeed(&newtio, B0);
+			cfsetispeed(&newtio, B0);
+			break;
+		case 50:
+			cfsetospeed(&newtio, B50);
+			cfsetispeed(&newtio, B50);
+			break;
+		case 75:
+			cfsetospeed(&newtio, B75);
+			cfsetispeed(&newtio, B75);
+			break;
+		case 110:
+			cfsetospeed(&newtio, B110);
+			cfsetispeed(&newtio, B110);
+			break;
+		case 134:
+			cfsetospeed(&newtio, B134);
+			cfsetispeed(&newtio, B134);
+			break;
+		case 150:
+			cfsetospeed(&newtio, B150);
+			cfsetispeed(&newtio, B150);
+			break;
+		case 200:
+			cfsetospeed(&newtio, B200);
+			cfsetispeed(&newtio, B200);
+			break;
+		case 300:
+			cfsetospeed(&newtio, B300);
+			cfsetispeed(&newtio, B300);
+			break;
+		case 600:
+			cfsetospeed(&newtio, B600);
+			cfsetispeed(&newtio, B600);
+			break;
+		case 1200:
+			cfsetospeed(&newtio, B1200);
+			cfsetispeed(&newtio, B1200);
+			break;
+		case 1800:
+			cfsetospeed(&newtio, B1800);
+			cfsetispeed(&newtio, B1800);
+			break;
+		case 2400:
+			cfsetospeed(&newtio, B2400);
+			cfsetispeed(&newtio, B2400);
+			break;
+		case 4800:
+			cfsetospeed(&newtio, B4800);
+			cfsetispeed(&newtio, B4800);
+			break;
+		case 9600:
+			cfsetospeed(&newtio, B9600);
+			cfsetispeed(&newtio, B9600);
+			break;
+		case 19200:
+			cfsetospeed(&newtio, B19200);
+			cfsetispeed(&newtio, B19200);
+			break;
+		case 38400:
+			cfsetospeed(&newtio, B38400);
+			cfsetispeed(&newtio, B38400);
+			break;
+		case 57600:
+			cfsetospeed(&newtio, B57600);
+			cfsetispeed(&newtio, B57600);
+			break;
+		case 115200:
+			cfsetospeed(&newtio, B115200);
+			cfsetispeed(&newtio, B115200);
+			break;
+		case 230400:
+			cfsetospeed(&newtio, B230400);
+			cfsetispeed(&newtio, B230400);
+			break;
+		default:
+			cfsetospeed(&newtio, B115200);
+			cfsetispeed(&newtio, B115200);
+			break;
+	}
+	/* set timeout in deciseconds for non-canonical read */
+	newtio.c_cc[VTIME] = 0;
+	/* set minimum number of characters for non-canonical read */
+	newtio.c_cc[VMIN] = 0;
+	/* flushes data received but not read */
+	tcflush(fd, TCIFLUSH);
+	/* set the parameters associated with the terminal from
+		the termios structure and the change occurs immediately */
+	if((tcsetattr(fd, TCSANOW, &newtio))!=0)
 	{
-  		printf_debug("SetupSerial 3\n");
-  		return FUNCTION_FAIL;
- 	}
+		printf_debug("SetPort tcsetattr");
+		return FUNCTION_FAIL;
+	}
+
 	return NO_ERROR;
 }
 

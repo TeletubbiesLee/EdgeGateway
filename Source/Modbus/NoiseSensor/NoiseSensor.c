@@ -61,9 +61,6 @@ int NoiseSensor(int type, UartInfo *uartInfo)
     tabRegisters = (uint16_t *) malloc(nbPoints * sizeof(uint16_t));
     memset(tabRegisters, 0, nbPoints * sizeof(uint16_t));
 
-    /* 设置硬件接口为RS232还是RS485 */
-    SetSerialInterfaceValue(type);
-
     while (1)
     {
 		modbus_read_registers(ctx, NOISE_REGISTERS_ADDRESS, NOISE_REGISTERS_NUMBER, tabRegisters);

@@ -2,7 +2,7 @@
  * Copyright © 2001-2011 Stéphane Raimbault <stephane.raimbault@gmail.com>
  *
  * SPDX-License-Identifier: LGPL-2.1+
- * [update]:[2020.04.01][Lei.Lee] 添加RS485.h头文件，在272行_modbus_rtu_send()函数中增加延时和拉低485使能线的操作。
+ *
  */
 
 #include <stdio.h>
@@ -28,8 +28,6 @@
 #include <linux/serial.h>
 #endif
 
-#include "../../RS485/RS485.h"
-#include "../../DataStruct.h"
 
 /* Table of CRC values for high-order byte */
 static const uint8_t table_crc_hi[] = {
@@ -298,20 +296,7 @@ static ssize_t _modbus_rtu_send(modbus_t *ctx, const uint8_t *req, int req_lengt
         return size;
     } else {
 #endif
-    	/*****************此处由Lei针对RS485和RS232，对原作者程序进行了修改**********************/
-    	if(RS485_TYPE == GetSerialInterfaceValue())
-    	{
-			int num = write(ctx->s, req, req_length);
-			int usTime = 10 * 1000 * 1000 / ((modbus_rtu_t *)ctx->backend_data)->baud * num;
-			usleep(usTime);
-			RS485_Enable(ctx->s, ENABLE_485);
-			return num;
-    	}
-    	else if(RS232_TYPE == GetSerialInterfaceValue())
-    		return write(ctx->s, req, req_length);
-    	else
-    		return -1;
-    	/********************************************************************************/
+    	return write(ctx->s, req, req_length);
 #if HAVE_DECL_TIOCM_RTS
     }
 #endif

@@ -16,10 +16,9 @@
 #define UART_STOP_BITS_NUM		1		//串口传输停止位
 #define UART_PARITY_NUM			'N'		//串口传输校验位
 
-int UartInit(char *device, int bandrate);
+int UartInit(char *device, int bandrate, int type);
 int OpenDevice(char *dev);
-int SetParity(int fd, int dataBits, int stopBits, int parity);
-void SetSpeed(int fd, int speed);
+int SetPort(int fd, int nSpeed, int nBits, char nEvent, int nStop);
 void PrintUartUsage();
 
 #endif
