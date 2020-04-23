@@ -21,8 +21,6 @@ typedef enum
 }RS485_ENABLE_t;
 
 int RS485_Enable(const int fd, const RS485_ENABLE_t enable);
-int SetSerialInterfaceValue(int type);
-int GetSerialInterfaceValue(void);
 
 #endif
 

@@ -22,7 +22,6 @@
 #include "Net.h"
 #include "Uart.h"
 #include "../Config.h"
-#include "../RS485/RS485.h"
 
 
 
@@ -65,7 +64,12 @@ int TCP_Client2Uart(UartInfo *uartInfo, NetworkInfo *networkInfo)
 
 	/* 建立连接服务器端的socket，打开串口 */
 	socketFd = TCP_NetConnect(networkInfo->remoteAddress, networkInfo->remotePort);
-	uartFd = UartInit(uartInfo->uartName, uartInfo->bandrate);
+	if(FUNCTION_FAIL == socketFd)
+	{
+		printf_debug("TCP Client Connect error!\n");
+		goto TCP_CLIENT_CLOSE;
+	}
+	uartFd = UartInit(uartInfo->uartName, uartInfo->bandrate, uartInfo->uartType);
 
 	/* 网口与串口透传的线程 */
 	paramArray[0][0] = tcp2UartPipe[1];		//写管道
@@ -89,7 +93,6 @@ int TCP_Client2Uart(UartInfo *uartInfo, NetworkInfo *networkInfo)
 
 	paramArray[2][0] = uart2TcpPipe[1];		//写管道
 	paramArray[2][1] = uartFd;
-	paramArray[2][2] = uartInfo->uartType;
 	ret = pthread_create(&uartReceivePid, NULL, (void*)UartReceivePthread, paramArray[2]);
 	if(0 != ret)
 	{
@@ -99,7 +102,6 @@ int TCP_Client2Uart(UartInfo *uartInfo, NetworkInfo *networkInfo)
 
 	paramArray[3][0] = tcp2UartPipe[0];		//读管道
 	paramArray[3][1] = uartFd;
-	paramArray[3][2] = (int)uartInfo;
 	ret = pthread_create(&uartSendPid, NULL, (void*)UartSendPthread, paramArray[3]);
 	if(0 != ret)
 	{
@@ -148,7 +150,7 @@ int TCP_Server2Uart(UartInfo *uartInfo, NetworkInfo *networkInfo)
 
 	/* 侦听客户端并且连接，建立socket，打开串口 */
 	socketFd = TCP_NetListen(networkInfo->localPort);
-	uartFd = UartInit(uartInfo->uartName, uartInfo->bandrate);
+	uartFd = UartInit(uartInfo->uartName, uartInfo->bandrate, uartInfo->uartType);
 	clientFd = TCP_NetAccept(socketFd);
 
 	/* 网口与串口透传的线程 */
@@ -173,7 +175,6 @@ int TCP_Server2Uart(UartInfo *uartInfo, NetworkInfo *networkInfo)
 
 	paramArray[2][0] = uart2TcpPipe[1];		//写管道
 	paramArray[2][1] = uartFd;
-	paramArray[2][2] = uartInfo->uartType;
 	ret = pthread_create(&uartReceivePid, NULL, (void*)UartReceivePthread, paramArray[2]);
 	if(0 != ret)
 	{
@@ -183,7 +184,6 @@ int TCP_Server2Uart(UartInfo *uartInfo, NetworkInfo *networkInfo)
 
 	paramArray[3][0] = tcp2UartPipe[0];		//读管道
 	paramArray[3][1] = uartFd;
-	paramArray[3][2] = (int)uartInfo;
 	ret = pthread_create(&uartSendPid, NULL, (void*)UartSendPthread, paramArray[3]);
 	if(0 != ret)
 	{
@@ -234,7 +234,7 @@ int UDP2Uart(UartInfo *uartInfo, NetworkInfo *networkInfo)
 
 	/* 连接UDP并建立socket，打开串口，设置远端配置的IP和端口号 */
 	socketFd = UDP_NetConnect(networkInfo->localPort);
-	uartFd = UartInit(uartInfo->uartName, uartInfo->bandrate);
+	uartFd = UartInit(uartInfo->uartName, uartInfo->bandrate, uartInfo->uartType);
 	SetRemoteAddress(networkInfo->remoteAddress, networkInfo->remotePort, &remoteAddr);
 
 
@@ -261,7 +261,6 @@ int UDP2Uart(UartInfo *uartInfo, NetworkInfo *networkInfo)
 
 	paramArray[2][0] = uart2UdpPipe[1];		//写管道
 	paramArray[2][1] = uartFd;
-	paramArray[2][2] = uartInfo->uartType;
 	ret = pthread_create(&uartReceive, NULL, (void*)UartReceivePthread, paramArray[2]);
 	if(0 != ret)
 	{
@@ -271,7 +270,6 @@ int UDP2Uart(UartInfo *uartInfo, NetworkInfo *networkInfo)
 
 	paramArray[3][0] = udp2UartPipe[0];		//读管道
 	paramArray[3][1] = uartFd;
-	paramArray[3][2] = (int)uartInfo;
 	ret = pthread_create(&uartSendPid, NULL, (void*)UartSendPthread, paramArray[3]);
 	if(0 != ret)
 	{
@@ -495,7 +493,7 @@ static void UDPReceivePthread(void *param)
 
 /**
  * @breif 串口发送的线程程序
- * @param param 整型数组，第一个数存放读管道号，第二个数存放串口描述符，第三个数存放串口信息结构体指针
+ * @param param 整型数组，第一个数存放读管道号，第二个数存放串口描述符
  * @return void
  */
 static void UartSendPthread(void *param)
@@ -503,12 +501,9 @@ static void UartSendPthread(void *param)
     int uartFd = 0, pipeReadFd = 0;
     int dataBytes = 0;		//数据字节数
 	char dataBuffer[MAX_DATA_SIZE] = {0};		//数据缓存区
-	UartInfo *uartInfo = NULL;			//串口信息
-	int delayTime = 0;					//延时时间
 
     pipeReadFd = ((int*)param)[0];
     uartFd = ((int*)param)[1];
-    uartInfo = (UartInfo *)((int*)param)[2];
 
     while(1)
     {
@@ -520,12 +515,6 @@ static void UartSendPthread(void *param)
 			{
 				printf_debug("write error！\r\n");
 			}
-			if(RS485_TYPE == uartInfo->uartType)			//485发送时，write会自动将使能引脚电平拉高，发送完毕需要手动将电平拉低
-			{
-				delayTime = 1000 * 10 * dataBytes / uartInfo->bandrate;		//根据发送字节数和波特率计算需要延时的时间
-				usleep(delayTime * 1000);
-				RS485_Enable(uartFd, ENABLE_485);
-			}
     	}
     }
 }
@@ -533,7 +522,7 @@ static void UartSendPthread(void *param)
 
 /**
  * @breif 串口接收的线程程序
- * @param param 整型数组，第一个数存放写管道号，第二个数存放串口描述符，第三个数存放硬件接口类型232还是485
+ * @param param 整型数组，第一个数存放写管道号，第二个数存放串口描述符
  * @return void
  */
 static void UartReceivePthread(void *param)
@@ -541,17 +530,12 @@ static void UartReceivePthread(void *param)
     int uartFd = 0, pipeWriteFd = 0;
     char dataBuffer[MAX_DATA_SIZE] = {0};		//数据缓存区
 	int dataBytes = 0;			//数据字节数
-	int type = 0;			//硬件接口类型
 
     pipeWriteFd = ((int*)param)[0];
     uartFd = ((int*)param)[1];
-    type = ((int*)param)[2];
 
     while(1)
 	{
-    	if(RS485_TYPE == type)			//485接收时，将使能引脚电平拉低
-			RS485_Enable(uartFd, ENABLE_485);
-
     	dataBytes = read(uartFd, dataBuffer, sizeof(dataBuffer));
 		if(dataBytes > 0)
 		{
@@ -564,7 +548,6 @@ static void UartReceivePthread(void *param)
 		}
 	}
 }
-
 
 
 
