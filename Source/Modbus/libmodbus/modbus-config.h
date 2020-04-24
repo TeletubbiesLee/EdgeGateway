@@ -42,11 +42,6 @@
         };
 
 
-#define UART_PARITY         			'N'			//串口数据奇偶校验位
-#define UART_DATA_BIT       			8			//串口数据位
-#define UART_STOP_BIT       			1			//串口停止位
-
-
 /*
  * modbus类型枚举
  */

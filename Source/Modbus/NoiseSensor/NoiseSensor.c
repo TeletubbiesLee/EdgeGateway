@@ -13,11 +13,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <errno.h>
 #include "../libmodbus/modbus.h"
-#include "../libmodbus/modbus-config.h"
 #include "NoiseSensor.h"
 #include "../../Config.h"
+#include "../ModbusInit.h"
 
 
 
@@ -32,39 +31,10 @@ int NoiseSensor(UartInfo *uartInfo)
     uint16_t *tabRegisters = NULL;      //寄存器的空间
     int nbPoints;               //空间大小
 
+    ModbusInit(&ctx, uartInfo);		//Modbus初始化
 
-    /* 根据Modbus_RTU的类型建立连接 */
-    ctx = modbus_new_rtu(uartInfo->uartName, uartInfo->bandrate, UART_PARITY, UART_DATA_BIT, UART_STOP_BIT);
-    if (NULL == ctx)
-    {
-    	printf_debug("Unable to allocate libmodbus context\n");
-        return POINT_NULL;
-    }
-
-    modbus_set_debug(ctx, TRUE);        //设置Dubug模式
-    modbus_set_error_recovery(ctx, MODBUS_ERROR_RECOVERY_LINK | MODBUS_ERROR_RECOVERY_PROTOCOL);
-
-    /* 设置从机ID */
-    modbus_set_slave(ctx, NOISE_SERVER_ID);
-
-    /* 建立连接 */
-    if (-1 == modbus_connect(ctx)) {
-    	printf_debug("Connection failed: %s\n", modbus_strerror(errno));
-        modbus_free(ctx);
-        return FUNCTION_FAIL;
-    }
-    printf("Connection Successful!\r\n");
-
-    /* 设置Modbus为使用RS485 */
-    if(RS485_TYPE == uartInfo->uartType)
-	{
-		if(-1 == modbus_rtu_set_serial_mode(ctx, MODBUS_RTU_RS485))
-		{
-			printf_debug("modbus_rtu_set_serial_mode() set RS485 error\n");
-			return FUNCTION_FAIL;
-		}
-		printf("%s()-modbus enable %s 485\n", __FUNCTION__, uartInfo->uartName);
-    }
+	/* 设置从机ID */
+	modbus_set_slave(ctx, NOISE_SERVER_ID);
 
     /* 为bit和寄存器分配内存空间 */
     nbPoints = NOISE_REGISTERS_NUMBER;

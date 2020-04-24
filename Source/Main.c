@@ -35,6 +35,9 @@ int main(int argc, char *argv[])
 	/* 噪声传感器需要的配置信息 */
 	UartInfo noiseUart = {"/dev/ttymxc4", 9600, RS485_TYPE};
 
+	/* 六合一空气质量传感器需要的配置信息 */
+	//UartInfo airQualitySensor = {"/dev/ttymxc3", 9600, RS485_TYPE};
+
 
 	/* 解析配置文件，获取配置信息  */
 
