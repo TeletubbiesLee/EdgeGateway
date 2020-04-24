@@ -15,6 +15,7 @@
 #include "TransparentTransmission/TransparentTransmission.h"
 #include "ProcessSignal/ProcessSignal.h"
 #include "Modbus/NoiseSensor/NoiseSensor.h"
+#include "Modbus/AirQualitySensor/AirQualitySensor.h"
 #include "DataStruct.h"
 
 
@@ -36,7 +37,7 @@ int main(int argc, char *argv[])
 	UartInfo noiseUart = {"/dev/ttymxc4", 9600, RS485_TYPE};
 
 	/* 六合一空气质量传感器需要的配置信息 */
-	//UartInfo airQualitySensor = {"/dev/ttymxc3", 9600, RS485_TYPE};
+	UartInfo airQualitySensor = {"/dev/ttymxc3", 9600, RS485_TYPE};
 
 
 	/* 解析配置文件，获取配置信息  */
@@ -65,8 +66,21 @@ int main(int argc, char *argv[])
 		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 		printf("NoiseSensor (pid:%d) creat\n", getpid());
+		if(0)
 		NoiseSensor(&noiseUart);							//噪声传感器
 		printf("NoiseSensor (pid:%d) exit\n", getpid());
+
+		return 0;
+	}
+
+	/* 创建六合一空气质量传感器通信进程 */
+	if((pid = fork()) == 0)
+	{
+		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+		printf("AirQualitySensor (pid:%d) creat\n", getpid());
+		AirQualitySensor(&airQualitySensor);							//六合一空气质量传感器
+		printf("AirQualitySensor (pid:%d) exit\n", getpid());
 
 		return 0;
 	}

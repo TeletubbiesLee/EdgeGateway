@@ -600,6 +600,10 @@ static void UartReceivePthread(void *param)
  */
 static void PrintfData(char *prefixName, char *data, int lenth)
 {
+	if(prefixName == NULL || data == NULL)
+	{
+		return;
+	}
 	printf("%s", prefixName);
 	for(int i = 0; i < lenth; i++)
 	{

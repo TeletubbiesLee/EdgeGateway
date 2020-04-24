@@ -12,6 +12,13 @@
 #ifndef _AIR_QUALITY_SENSOR_H_
 #define _AIR_QUALITY_SENSOR_H_
 
+#include "../../DataStruct.h"
 
+#define AIR_QUALITY_REGISTERS_ADDRESS		0x00		//保持寄存器地址
+#define AIR_QUALITY_REGISTERS_NUMBER		7			//保持寄存器个数
+#define AIR_QUALITY_SERVER_ID				1			//从机地址
+#define AIR_QUALITY_MODBUS_INTERVAL			5			//噪声传感器Modbus通信时间间隔
+
+int AirQualitySensor(UartInfo *uartInfo);
 
 #endif

@@ -10,12 +10,14 @@
 	1.接口函数：头文件包含Led.h，函数调用IndicatorLedRunning()和IndicatorLedOnOrOff()
 	
 Modbus通信相关：Modbus/
+	六合一空气质量传感器：AirQualitySensor/
+		1.接口函数：头文件包含AirQualitySensor.h，函数调用AirQualitySensor()
+		2.外部引用：DataStruct.h、Config.h、modbus.h、ModbusInit.h
 	modbus第三方库：libmodbus/
 		1.接口函数：头文件包含modbus.h、modbus-config.h
 	噪声传感器：NoiseSensor/
 		1.接口函数：头文件包含NoiseSensor.h，函数调用NoiseSensor()
-		2.外部引用：DataStruct.h、Config.h、modbus.h
-		2.外部引用：
+		2.外部引用：DataStruct.h、Config.h、modbus.h、ModbusInit.h
 	双杰测温中继：SOJO/
 		1.接口函数：
 		2.外部引用：

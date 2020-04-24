@@ -31,7 +31,11 @@ int NoiseSensor(UartInfo *uartInfo)
     uint16_t *tabRegisters = NULL;      //寄存器的空间
     int nbPoints;               //空间大小
 
-    ModbusInit(&ctx, uartInfo);		//Modbus初始化
+    if(-1 == ModbusInit(&ctx, uartInfo))		//Modbus初始化
+	{
+		printf_debug("ModbusInit error\n");
+		return FUNCTION_FAIL;
+	}
 
 	/* 设置从机ID */
 	modbus_set_slave(ctx, NOISE_SERVER_ID);

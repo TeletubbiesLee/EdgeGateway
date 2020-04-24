@@ -20,7 +20,7 @@
 #ifdef DATA_PRINTF_NET_UART
 #define printf_data_net2uart(prefixName,data,lenth) do{PrintfData(prefixName,data,lenth);}while(0)
 #else
-#define printf_data_net2uart(prefixName,data,lenth) do{;}while(0)
+#define printf_data_net2uart(prefixName,data,lenth) do{PrintfData(NULL,NULL,0);}while(0)
 #endif
 
 int TCP_Client2Uart(UartInfo *uartInfo, NetworkInfo *networkInfo);
