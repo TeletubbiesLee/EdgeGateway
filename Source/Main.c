@@ -16,6 +16,7 @@
 #include "TransparentTransmission/TransparentTransmission.h"
 #include "Modbus/NoiseSensor/NoiseSensor.h"
 #include "Modbus/AirQualitySensor/AirQualitySensor.h"
+#include "Modbus/SOJO/TemperatureRelay.h"
 #include "MQTT/MqttPublish.h"
 #include "DataStruct.h"
 
@@ -35,12 +36,14 @@ int main(int argc, char *argv[])
 									{"127.0.0.1", 5555, "192.168.10.11", 3333}};
 
 	/* 噪声传感器需要的配置信息 */
-	UartInfo noiseUart = {"/dev/ttymxc4", 9600, RS485_TYPE};
+	UartInfo noiseUart = {"/dev/ttymxc3", 9600, RS485_TYPE};
 
 	/* 六合一空气质量传感器需要的配置信息 */
-	UartInfo airQualitySensor = {"/dev/ttymxc3", 9600, RS485_TYPE};
+	UartInfo airQualitySensor = {"/dev/ttymxc4", 9600, RS485_TYPE};
 
-	/* MQTT需要的配置信息 */
+	/* 双杰测温中继需要的配置信息 */
+	UartInfo sojoRelaySensor = {"/dev/ttymxc5", 115200, RS232_TYPE};
+
 
 
 	/* 解析配置文件，获取配置信息  */
@@ -89,13 +92,25 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
+	/* 创建双杰测温中继通信进程 */
+	if((pid = fork()) == 0)
+	{
+		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+		printf("TemperatureRelay (pid:%d) creat\n", getpid());
+		TemperatureRelay(&sojoRelaySensor);							//六合一空气质量传感器
+		printf("TemperatureRelay (pid:%d) exit\n", getpid());
+
+		return 0;
+	}
+
 	/* 创建MQTT通信进程 */
 	if((pid = fork()) == 0)
 	{
 		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 		printf("MqttPublish (pid:%d) creat\n", getpid());
-		MqttPublish();							//MQTT发布信息
+		//MqttPublish();							//MQTT发布信息
 		printf("MqttPublish (pid:%d) exit\n", getpid());
 
 		return 0;

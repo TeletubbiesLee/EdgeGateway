@@ -319,7 +319,8 @@ int Thread_post_sem(sem_type sem)
 		rc = (int)dispatch_semaphore_signal(sem);
 	#else
 		int val;
-		int rc1 = sem_getvalue(sem, &val);
+		//int rc1 = sem_getvalue(sem, &val);
+		sem_getvalue(sem, &val);
 		if (val == 0 && sem_post(sem) == -1)
 			rc = errno;
 	#endif

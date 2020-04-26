@@ -37,31 +37,35 @@ int MqttPublish(void)
     MQTTClient_create(&client, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL);
     conn_opts.keepAliveInterval = 20;
     conn_opts.cleansession = 1;
-    conn_opts.username = "A1_TEST_TOKEN";
 
-    if ((rc = MQTTClient_connect(client, &conn_opts)) != MQTTCLIENT_SUCCESS)
+    while(1)
     {
-        printf("Failed to connect, return code %d\n", rc);
-        exit(EXIT_FAILURE);
-    }
-    printf("Connect Successful!\n");
+		conn_opts.username = "A1_TEST_TOKEN";
 
-    int i = 2;
-	while(i--)
-	{
-		pubmsg.payload = payload[i];
-		pubmsg.payloadlen = (int)strlen(payload[i]);
+		if ((rc = MQTTClient_connect(client, &conn_opts)) != MQTTCLIENT_SUCCESS)
+		{
+			printf("Failed to connect, return code %d\n", rc);
+			exit(EXIT_FAILURE);
+		}
+		printf("Connect Successful!\n");
+
+		/* TODO:从数据库中读取出数据 */
+
+		pubmsg.payload = payload[0];
+		pubmsg.payloadlen = (int)strlen(payload[0]);
 		pubmsg.qos = QOS;
 		pubmsg.retained = 0;
 		MQTTClient_publishMessage(client, TOPIC, &pubmsg, &token);
 		printf("Waiting for up to %d seconds for publication of %s\n"
 				"on topic %s for client with ClientID: %s\n",
-				(int)(TIMEOUT/1000), payload[i], TOPIC, CLIENTID);
+				(int)(TIMEOUT/1000), payload[0], TOPIC, CLIENTID);
 		rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
 		printf("Message with delivery token %d delivered\n", token);
-	}
 
-    MQTTClient_disconnect(client, 10000);
+	    MQTTClient_disconnect(client, 10000);
+	    printf("Disconnect Successful!\n");
+    }
+
     MQTTClient_destroy(&client);
     return rc;
 }
