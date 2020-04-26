@@ -19,7 +19,9 @@
 
 
 
-/* 程序错误码 */
+/*
+ * 程序错误码
+ */
 typedef enum {
 	FUNCTION_FAIL = -1,		//函数执行错误
 	NO_ERROR = 0,			//没有错误

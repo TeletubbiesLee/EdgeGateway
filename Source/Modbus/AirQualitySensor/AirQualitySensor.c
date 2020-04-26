@@ -39,9 +39,6 @@ int AirQualitySensor(UartInfo *uartInfo)
 		return FUNCTION_FAIL;
 	}
 
-	/* 设置从机ID */
-	modbus_set_slave(ctx, AIR_QUALITY_SERVER_ID);
-
 	/* 为bit和寄存器分配内存空间 */
 	nbPoints = AIR_QUALITY_REGISTERS_NUMBER;
 	tabRegisters = (uint16_t *) malloc(nbPoints * sizeof(uint16_t));
@@ -49,6 +46,8 @@ int AirQualitySensor(UartInfo *uartInfo)
 
 	while (1)
 	{
+		/* 设置从机ID */
+		modbus_set_slave(ctx, AIR_QUALITY_SERVER_ID);
 		modbus_read_registers(ctx, AIR_QUALITY_REGISTERS_ADDRESS, AIR_QUALITY_REGISTERS_NUMBER, tabRegisters);
 
 		/* TODO：对数据进行解析和保存 */

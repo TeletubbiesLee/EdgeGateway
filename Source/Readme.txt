@@ -22,6 +22,11 @@ Modbus通信相关：Modbus/
 		1.接口函数：
 		2.外部引用：
 
+MQTT通信相关：MQTT/
+	paho mqtt-c第三方库：paho_mqtt_c/
+		1.接口函数：头文件包含MqttPublish.h，函数调用MqttPublish()
+		2.外部引用：Config.h
+
 信号处理相关：ProcessSignal/
 	1.接口函数：头文件包含ProcessSignal.h，函数调用SetProcessCloseSignal()
 

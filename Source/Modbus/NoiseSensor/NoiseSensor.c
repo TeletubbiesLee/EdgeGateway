@@ -37,9 +37,6 @@ int NoiseSensor(UartInfo *uartInfo)
 		return FUNCTION_FAIL;
 	}
 
-	/* 设置从机ID */
-	modbus_set_slave(ctx, NOISE_SERVER_ID);
-
     /* 为bit和寄存器分配内存空间 */
     nbPoints = NOISE_REGISTERS_NUMBER;
     tabRegisters = (uint16_t *) malloc(nbPoints * sizeof(uint16_t));
@@ -47,10 +44,12 @@ int NoiseSensor(UartInfo *uartInfo)
 
     while (1)
     {
+    	/* 设置从机ID */
+    	modbus_set_slave(ctx, NOISE_SERVER_ID);
 		modbus_read_registers(ctx, NOISE_REGISTERS_ADDRESS, NOISE_REGISTERS_NUMBER, tabRegisters);
-		printf("value = %d\n", tabRegisters[0]);
 
 		/* TODO：对数据进行解析和保存 */
+		printf("value = %d\n", tabRegisters[0]);
 
 		sleep(NOISE_MODBUS_INTERVAL);
     }

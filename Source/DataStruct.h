@@ -13,17 +13,6 @@
 #define _DATA_STRUCT_H_
 
 
-/*
- * 透传功能类型枚举
- */
-typedef enum TagUartToNetworkType
-{
-	NO_UART_NET_TYPE	= 0,
-	UDP_TO_UART	= 1,
-	TCP_SERVER_TO_UART,
-	TCP_CLIENT_TO_UART
-}UartToNetworkType;
-
 
 /*
  * 串口的电气接口类型枚举
