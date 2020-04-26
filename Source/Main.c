@@ -98,6 +98,7 @@ int main(int argc, char *argv[])
 		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 		printf("TemperatureRelay (pid:%d) creat\n", getpid());
+		if(0)
 		TemperatureRelay(&sojoRelaySensor);							//六合一空气质量传感器
 		printf("TemperatureRelay (pid:%d) exit\n", getpid());
 

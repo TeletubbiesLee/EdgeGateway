@@ -98,8 +98,8 @@ static void SOJO_TemperatureDataProcess(uint16_t registerData[], int arrayNumber
 			tempValue = registerData[i];
 		}
 		temperature[i] = tempValue / 10.0;
-		printf("temperature[%d] = %.2f\n", i, temperature[i]);
 	}
+	printf("temperature[5] = %.2f\n", temperature[5]);
 }
 
 
