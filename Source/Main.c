@@ -16,7 +16,7 @@
 #include "TransparentTransmission/TransparentTransmission.h"
 #include "Modbus/NoiseSensor/NoiseSensor.h"
 #include "Modbus/AirQualitySensor/AirQualitySensor.h"
-#include "Modbus/SOJO/TemperatureRelay.h"
+#include "Modbus/SojoRelay/TemperatureRelay.h"
 #include "MQTT/MqttPublish.h"
 #include "DataStruct.h"
 
