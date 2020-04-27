@@ -16,7 +16,7 @@
 #include "./sqlite/sqlite3.h"
 
 //SQL语句长度
-#define  SQL_SIZE  250
+#define  SQL_SIZE  256
 
 
 int openSqlite(char *fileName);
