@@ -113,8 +113,7 @@ int main(int argc, char *argv[])
 		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 		printf("MqttPublish (pid:%d) creat\n", getpid());
-		if(0)
-		MqttPublish();							//MQTT发布信息
+		MqttPublish("A1_TEST_TOKEN");							//MQTT发布信息
 		printf("MqttPublish (pid:%d) exit\n", getpid());
 
 		return 0;
