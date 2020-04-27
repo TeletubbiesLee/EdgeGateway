@@ -14,6 +14,7 @@
 
 #include <stdbool.h>
 #include "./sqlite/sqlite3.h"
+#include "DataProcess.h"
 
 //SQL语句长度
 #define  SQL_SIZE  256
