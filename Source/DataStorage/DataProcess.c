@@ -10,6 +10,9 @@
  */
 
 
+#include <stdlib.h>
+#include <string.h>
+#include "SqliteInterface.h"
 #include "../Config.h"
 #include "DataProcess.h"
 
