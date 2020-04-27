@@ -9,7 +9,8 @@
  * @version ver 1.0
  */
 
-
+#include <stdio.h>
+#include <unistd.h>
 #include "sojo_interface.h"
 #include "sojo_point_table_enum.h"
 #include "SojoDtu.h"
@@ -35,9 +36,9 @@ int SojoDtu_IEC101(void)
 		{
 			sleep(30);
 			num = ReadDataYc(i, IEC101, YCDATA_DC1);
-			printf("IEC101: device %d : YCDATA_DC1 = %d\n", i, YCDATA_DC1);
+			printf("IEC101: device %d : YCDATA_DC1 = %f\n", i, num);
 			num = ReadDataYc(i, IEC101, YCDATA_DC2);
-			printf("IEC101: device %d : YCDATA_DC2 = %d\n", i, YCDATA_DC2);
+			printf("IEC101: device %d : YCDATA_DC2 = %f\n", i, num);
 		}
 		sleep(IEC101_INTERVAL);
 	}
@@ -65,9 +66,9 @@ int SojoDtu_IEC104(void)
 		{
 			sleep(30);
 			num = ReadDataYc(i, IEC104, YCDATA_DC1);
-			printf("IEC104: device %d : YCDATA_DC1 = %d\n", i, YCDATA_DC1);
+			printf("IEC104: device %d : YCDATA_DC1 = %f\n", i, num);
 			num = ReadDataYc(i, IEC104, YCDATA_DC2);
-			printf("IEC104: device %d : YCDATA_DC2 = %d\n", i, YCDATA_DC2);
+			printf("IEC104: device %d : YCDATA_DC2 = %f\n", i, num);
 		}
 		sleep(IEC104_INTERVAL);
 	}

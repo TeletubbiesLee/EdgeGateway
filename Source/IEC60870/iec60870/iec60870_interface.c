@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <malloc.h>
 #include <time.h>
+#include <sys/time.h>
 #include "./port/iec_interface.h"
 #include "./common/common.h"
 #include "mysem/mysem.h"

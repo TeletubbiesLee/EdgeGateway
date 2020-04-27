@@ -8,7 +8,8 @@
  * @author Lei.L
  * @version ver 1.0
  */
-
+#include <stdlib.h>
+#include <math.h>
 #include <stdio.h>
 #include <unistd.h>
 #include "Led/Led.h"
@@ -31,21 +32,27 @@ int main(int argc, char *argv[])
 	/* 透传功能需要的配置信息 */
 	int trsptTrsmsProcessNum = 0;			//透传功能进程数
 	int trsptTrsmsType[2] = {TCP_SERVER_TO_UART, TCP_CLIENT_TO_UART};
-	UartInfo trsptTrsmsUart[2] = {{"/dev/ttymxc3", 9600, RS485_TYPE}, {"/dev/ttymxc4", 9600, RS485_TYPE}};
+	UartInfo trsptTrsmsUart[2] = {{"/dev/ttymxc3", 9600, RS485_TYPE}, {"/dev/ttymxc1", 9600, RS232_TYPE}};
 	NetworkInfo trsptTrsmsEth[2] = {{"192.168.10.10", 6666, "iot.shangshan.info", 41001},
 									{"127.0.0.1", 5555, "192.168.10.11", 3333}};
 
 	/* 噪声传感器需要的配置信息 */
-	UartInfo noiseUart = {"/dev/ttymxc3", 9600, RS485_TYPE};
-	int noiseDeviceId[1] = {1};
+	int noiseProcessNum = 0;			//透传功能进程数
+	UartInfo noiseUart[2] = {{"/dev/ttymxc3", 9600, RS485_TYPE}, {"/dev/ttymxc4", 9600, RS485_TYPE}};
+	int noiseDeviceNum[2] = {1, 3};
+	int noiseDeviceId[2][10] = {{1}, {8, 12, 5}};
 
 	/* 六合一空气质量传感器需要的配置信息 */
-	UartInfo airQualitySensor = {"/dev/ttymxc4", 9600, RS485_TYPE};
-	int airQualityDeviceId[1] = {1};
+	int airQualityProcessNum = 0;			//透传功能进程数
+	UartInfo airQualitySensor[2] = {{"/dev/ttymxc4", 9600, RS485_TYPE}, {"/dev/ttymxc3", 9600, RS485_TYPE}};
+	int airQualityDeviceNum[3] = {1, 2, 3};
+	int airQualityDeviceId[3][10] = {{1}, {1, 2}, {8, 12, 5}};
 
 	/* 双杰测温中继需要的配置信息 */
-	UartInfo sojoRelaySensor = {"/dev/ttymxc5", 115200, RS232_TYPE};
-	int sojoRelayDeviceId[1] = {1};
+	int sojoRelayProcessNum = 0;			//透传功能进程数
+	UartInfo sojoRelaySensor[2] = {{"/dev/ttymxc5", 115200, RS232_TYPE}, {"/dev/ttymxc2", 115200, RS232_TYPE}};
+	int sojoRelayDeviceNum[4] = {1, 3, 2, 5};
+	int sojoRelayDeviceId[4][10] = {{1}, {8, 12, 5}, {1, 2}, {79, 45, 5, 9, 12}};
 
 	/* MQTT发布数据需要的配置信息 */
 	int mqttProcessNum = 0;			//透传功能进程数
@@ -73,42 +80,48 @@ int main(int argc, char *argv[])
 	}
 
 	/* 创建噪声传感器通信进程 */
-	if((pid = fork()) == 0)
+	for(int i = 0; i < noiseProcessNum; i++)
 	{
-		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+		if((pid = fork()) == 0)
+		{
+			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
-		printf("NoiseSensor (pid:%d) creat\n", getpid());
-		if(0)
-		NoiseSensor(&noiseUart, noiseDeviceId, 1);							//噪声传感器
-		printf("NoiseSensor (pid:%d) exit\n", getpid());
+			printf("NoiseSensor (pid:%d) creat\n", getpid());
+			NoiseSensor(&noiseUart[i], noiseDeviceId[i], noiseDeviceNum[i]);							//噪声传感器
+			printf("NoiseSensor (pid:%d) exit\n", getpid());
 
-		return 0;
+			return 0;
+		}
 	}
 
 	/* 创建六合一空气质量传感器通信进程 */
-	if((pid = fork()) == 0)
+	for(int i = 0; i < airQualityProcessNum; i++)
 	{
-		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+		if((pid = fork()) == 0)
+		{
+			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
-		printf("AirQualitySensor (pid:%d) creat\n", getpid());
-		if(0)
-		AirQualitySensor(&airQualitySensor, airQualityDeviceId, 1);							//六合一空气质量传感器
-		printf("AirQualitySensor (pid:%d) exit\n", getpid());
+			printf("AirQualitySensor (pid:%d) creat\n", getpid());
+			AirQualitySensor(&airQualitySensor[i], airQualityDeviceId[i], airQualityDeviceNum[i]);							//六合一空气质量传感器
+			printf("AirQualitySensor (pid:%d) exit\n", getpid());
 
-		return 0;
+			return 0;
+		}
 	}
 
 	/* 创建双杰测温中继通信进程 */
-	if((pid = fork()) == 0)
+	for(int i = 0; i < sojoRelayProcessNum; i++)
 	{
-		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+		if((pid = fork()) == 0)
+		{
+			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
-		printf("TemperatureRelay (pid:%d) creat\n", getpid());
-		if(0)
-		TemperatureRelay(&sojoRelaySensor, sojoRelayDeviceId, 1);							//六合一空气质量传感器
-		printf("TemperatureRelay (pid:%d) exit\n", getpid());
+			printf("TemperatureRelay (pid:%d) creat\n", getpid());
+			TemperatureRelay(&sojoRelaySensor[i], sojoRelayDeviceId[i], sojoRelayDeviceNum[i]);							//六合一空气质量传感器
+			printf("TemperatureRelay (pid:%d) exit\n", getpid());
 
-		return 0;
+			return 0;
+		}
 	}
 
 	/* 创建MQTT通信进程 */
