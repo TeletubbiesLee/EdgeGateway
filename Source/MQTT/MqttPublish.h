@@ -13,6 +13,7 @@
 #define _MQTT_PUBLISH_H_
 
 
+#define MQTT_PUBLISH_INTERVAL	5			//MQTT发布消息时间间隔
 #define ADDRESS     "iot.shangshan.info"			//MQTT代理服务器地址
 #define CLIENTID    "0"								//客户端ID
 #define TOPIC       "v1/devices/me/telemetry"		//信息主题
@@ -20,7 +21,7 @@
 #define TIMEOUT     10000L							//超时时间
 
 
-int MqttPublish(char *accessUser);
+int MqttPublish(char *accessUser);;
 
 #endif
 

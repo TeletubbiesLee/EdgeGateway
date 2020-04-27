@@ -12,6 +12,12 @@
 #ifndef _SOJO_DTU_H_
 #define _SOJO_DTU_H_
 
+#define IEC101_INTERVAL		10
+#define IEC104_INTERVAL		10
+
+int SojoDtu_IEC101(void);
+int SojoDtu_IEC104(void);
+
 
 #endif
 

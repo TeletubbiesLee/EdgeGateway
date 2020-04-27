@@ -39,6 +39,7 @@ int SojoDtu_IEC101(void)
 			num = ReadDataYc(i, IEC101, YCDATA_DC2);
 			printf("IEC101: device %d : YCDATA_DC2 = %d\n", i, YCDATA_DC2);
 		}
+		sleep(IEC101_INTERVAL);
 	}
 	return NO_ERROR;
 
@@ -68,6 +69,7 @@ int SojoDtu_IEC104(void)
 			num = ReadDataYc(i, IEC104, YCDATA_DC2);
 			printf("IEC104: device %d : YCDATA_DC2 = %d\n", i, YCDATA_DC2);
 		}
+		sleep(IEC104_INTERVAL);
 	}
 	return NO_ERROR;
 

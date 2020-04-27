@@ -47,6 +47,10 @@ int main(int argc, char *argv[])
 	UartInfo sojoRelaySensor = {"/dev/ttymxc5", 115200, RS232_TYPE};
 	int sojoRelayDeviceId[1] = {1};
 
+	/* MQTT发布数据需要的配置信息 */
+	int mqttProcessNum = 0;			//透传功能进程数
+	char userName[2][20] = {"A1_TEST_TOKEN", "ACCESS_TEST"};
+
 
 	/* 解析配置文件，获取配置信息  */
 
@@ -108,15 +112,18 @@ int main(int argc, char *argv[])
 	}
 
 	/* 创建MQTT通信进程 */
-	if((pid = fork()) == 0)
+	for(int i = 0; i < mqttProcessNum; i++)
 	{
-		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+		if((pid = fork()) == 0)
+		{
+			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
-		printf("MqttPublish (pid:%d) creat\n", getpid());
-		MqttPublish("A1_TEST_TOKEN");							//MQTT发布信息
-		printf("MqttPublish (pid:%d) exit\n", getpid());
+			printf("MqttPublish (pid:%d) creat\n", getpid());
+			MqttPublish(userName[i]);							//MQTT发布信息
+			printf("MqttPublish (pid:%d) exit\n", getpid());
 
-		return 0;
+			return 0;
+		}
 	}
 
 	/* 创建其他功能的进程 */

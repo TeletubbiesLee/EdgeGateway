@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "paho_mqtt_c/MQTTClient.h"
 #include "MqttPublish.h"
 #include "../Config.h"
@@ -22,9 +23,12 @@ static void MqttPublishMessage(MQTTClient *client, char *payload, int payloadLen
 static int MqttInit(MQTTClient *client, char *accessUser);
 
 
+
+
+
 /**
  * @breif MQTT发布消息到ThingsBoard函数
- * @param void
+ * @param accessUser 管理凭证
  * @return void
  */
 int MqttPublish(char *accessUser)
@@ -35,13 +39,14 @@ int MqttPublish(char *accessUser)
 
     MqttInit(&client, accessUser);
 
-    //while(1)
+    while(1)
     {
 		/* TODO:从数据库中读取出数据 */
 
 		MqttPublishMessage(&client, payload[0], strlen(payload[0]));
 		MqttPublishMessage(&client, payload[1], strlen(payload[1]));
 
+		sleep(MQTT_PUBLISH_INTERVAL);
     }
 
     MQTTClient_disconnect(client, 10000);
