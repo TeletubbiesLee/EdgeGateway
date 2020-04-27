@@ -14,10 +14,10 @@
 
 #include <stdbool.h>
 
-#define DATA_NAME_STRING_LENTH	40
+#define DATA_NAME_STRING_LENTH	20
 #define TIME_STRING_LENTH		20
 
-
+#define DATA_LIB_NAME		"deviceDase.db"
 /*
  * 数据类型
  */
@@ -45,6 +45,12 @@ typedef struct TagDataInformation
 
 }DataInformation;
 
+void test(void);
+int CreateDataFile(char *filename);
+int InsertData(char *filename, DataInformation *dataInfo);
+int DeleteData(char *filename, DataInformation *dataInfo);
+int UpdateData(char *filename, DataInformation *dataInfo);
+int SelectData(char *filename, DataInformation *dataInfo);
 
 #endif
 

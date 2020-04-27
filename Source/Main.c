@@ -18,7 +18,7 @@
 #include "Modbus/AirQualitySensor/AirQualitySensor.h"
 #include "MQTT/MqttPublish.h"
 #include "DataStruct.h"
-
+#include "./DataStorage/DataProcess.h"
 
 /**
  * 	@brief: main函数
@@ -27,93 +27,18 @@ int main(int argc, char *argv[])
 {
 	pid_t pid = 0;			//子进程的进程ID号
 
-	/* 透传功能需要的配置信息 */
-	int trsptTrsmsProcessNum = 0;			//透传功能进程数
-	int trsptTrsmsType[2] = {TCP_SERVER_TO_UART, TCP_CLIENT_TO_UART};
-	UartInfo trsptTrsmsUart[2] = {{"/dev/ttymxc3", 9600, RS485_TYPE}, {"/dev/ttymxc4", 9600, RS485_TYPE}};
-	NetworkInfo trsptTrsmsEth[2] = {{"192.168.10.10", 6666, "iot.shangshan.info", 41001},
-									{"127.0.0.1", 5555, "192.168.10.11", 3333}};
 
-	/* 噪声传感器需要的配置信息 */
-	UartInfo noiseUart = {"/dev/ttymxc4", 9600, RS485_TYPE};
+	printf("sqlite (pid:%d) creat\n", getpid());
+	test();
+	printf("sqlite (pid:%d) exit\n", getpid());
 
-	/* 六合一空气质量传感器需要的配置信息 */
-	UartInfo airQualitySensor = {"/dev/ttymxc3", 9600, RS485_TYPE};
-
-	/* MQTT需要的配置信息 */
-
-
-	/* 解析配置文件，获取配置信息  */
-
-	/*********END***********/
-
-
-	/* 创建透传功能进程 */
-	for(int i = 0; i < trsptTrsmsProcessNum; i++)
-	{
-		if((pid = fork()) == 0)
-		{
-			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
-
-			printf("TransparentTransmission (pid:%d) creat\n", getpid());
-			TransparentTransmission(trsptTrsmsType[i], &trsptTrsmsUart[i], &trsptTrsmsEth[i]);		//透传功能
-			printf("TransparentTransmission (pid:%d) exit\n", getpid());
-
-			return 0;
-		}
-	}
-
-	/* 创建噪声传感器通信进程 */
-	if((pid = fork()) == 0)
-	{
-		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
-
-		printf("NoiseSensor (pid:%d) creat\n", getpid());
-		if(0)
-		NoiseSensor(&noiseUart);							//噪声传感器
-		printf("NoiseSensor (pid:%d) exit\n", getpid());
-
-		return 0;
-	}
-
-	/* 创建六合一空气质量传感器通信进程 */
-	if((pid = fork()) == 0)
-	{
-		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
-
-		printf("AirQualitySensor (pid:%d) creat\n", getpid());
-		if(0)
-		AirQualitySensor(&airQualitySensor);							//六合一空气质量传感器
-		printf("AirQualitySensor (pid:%d) exit\n", getpid());
-
-		return 0;
-	}
-
-	/* 创建MQTT通信进程 */
-	if((pid = fork()) == 0)
-	{
-		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
-
-		printf("MqttPublish (pid:%d) creat\n", getpid());
-		MqttPublish();							//MQTT发布信息
-		printf("MqttPublish (pid:%d) exit\n", getpid());
-
-		return 0;
-	}
 
 	/* 创建其他功能的进程 */
 
 	/****************/
 
 
-	/* 父进程创建完子进程后，执行的任务 */
-	while(1)
-	{
-		IndicatorLedRunning();		//程序运行指示灯
-	}
-
 	IndicatorLedOnOrOff(LED_OFF);	//程序退出，灯关闭
-	printf("EdgeGateway (pid:%d) exit\n", getpid());
 
 	return 0;
 }
