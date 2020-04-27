@@ -25,9 +25,11 @@ static void AirQualityDataParse(uint16_t *tabRegisters);
 /**
  * @breif 六合一空气质量传感器modbus通信函数
  * @param uartInfo 串口信息结构体指针
+ * @param deviceId 设备ID数组
+ * @param deviceNum 设备数量
  * @return 成功:0 失败:其他
  */
-int AirQualitySensor(UartInfo *uartInfo)
+int AirQualitySensor(UartInfo *uartInfo, int deviceId[], int deviceNum)
 {
 	modbus_t *ctx = NULL;       //成功打开设备后返回的结构体指针
 	uint16_t *tabRegisters = NULL;      //寄存器的空间
@@ -46,13 +48,15 @@ int AirQualitySensor(UartInfo *uartInfo)
 
 	while (1)
 	{
-		/* 设置从机ID */
-		modbus_set_slave(ctx, AIR_QUALITY_SERVER_ID);
-		modbus_read_registers(ctx, AIR_QUALITY_REGISTERS_ADDRESS, AIR_QUALITY_REGISTERS_NUMBER, tabRegisters);
+		for(int i = 0; i < deviceNum; i++)
+		{
+			/* 设置从机ID */
+			modbus_set_slave(ctx, deviceId[i]);
+			modbus_read_registers(ctx, AIR_QUALITY_REGISTERS_ADDRESS, AIR_QUALITY_REGISTERS_NUMBER, tabRegisters);
 
-		/* TODO：对数据进行解析和保存 */
-		AirQualityDataParse(tabRegisters);
-
+			/* TODO：对数据进行解析和保存 */
+			AirQualityDataParse(tabRegisters);
+		}
 		sleep(AIR_QUALITY_MODBUS_INTERVAL);
 	}
 

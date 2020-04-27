@@ -37,13 +37,15 @@ int main(int argc, char *argv[])
 
 	/* 噪声传感器需要的配置信息 */
 	UartInfo noiseUart = {"/dev/ttymxc3", 9600, RS485_TYPE};
+	int noiseDeviceId[1] = {1};
 
 	/* 六合一空气质量传感器需要的配置信息 */
 	UartInfo airQualitySensor = {"/dev/ttymxc4", 9600, RS485_TYPE};
+	int airQualityDeviceId[1] = {1};
 
 	/* 双杰测温中继需要的配置信息 */
 	UartInfo sojoRelaySensor = {"/dev/ttymxc5", 115200, RS232_TYPE};
-
+	int sojoRelayDeviceId[1] = {1};
 
 
 	/* 解析配置文件，获取配置信息  */
@@ -73,7 +75,7 @@ int main(int argc, char *argv[])
 
 		printf("NoiseSensor (pid:%d) creat\n", getpid());
 		if(0)
-		NoiseSensor(&noiseUart);							//噪声传感器
+		NoiseSensor(&noiseUart, noiseDeviceId, 1);							//噪声传感器
 		printf("NoiseSensor (pid:%d) exit\n", getpid());
 
 		return 0;
@@ -86,7 +88,7 @@ int main(int argc, char *argv[])
 
 		printf("AirQualitySensor (pid:%d) creat\n", getpid());
 		if(0)
-		AirQualitySensor(&airQualitySensor);							//六合一空气质量传感器
+		AirQualitySensor(&airQualitySensor, airQualityDeviceId, 1);							//六合一空气质量传感器
 		printf("AirQualitySensor (pid:%d) exit\n", getpid());
 
 		return 0;
@@ -99,7 +101,7 @@ int main(int argc, char *argv[])
 
 		printf("TemperatureRelay (pid:%d) creat\n", getpid());
 		if(0)
-		TemperatureRelay(&sojoRelaySensor);							//六合一空气质量传感器
+		TemperatureRelay(&sojoRelaySensor, sojoRelayDeviceId, 1);							//六合一空气质量传感器
 		printf("TemperatureRelay (pid:%d) exit\n", getpid());
 
 		return 0;
@@ -111,7 +113,8 @@ int main(int argc, char *argv[])
 		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 		printf("MqttPublish (pid:%d) creat\n", getpid());
-		//MqttPublish();							//MQTT发布信息
+		if(0)
+		MqttPublish();							//MQTT发布信息
 		printf("MqttPublish (pid:%d) exit\n", getpid());
 
 		return 0;

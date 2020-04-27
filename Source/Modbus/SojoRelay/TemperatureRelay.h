@@ -16,10 +16,9 @@
 
 #define TEMP_RELAY_REGISTERS_ADDRESS		0x0008		//保持寄存器地址
 #define TEMP_RELAY_REGISTERS_NUMBER			256			//保持寄存器个数
-#define TEMP_RELAY_SERVER_ID				1			//从机地址
 #define TEMP_RELAY_MODBUS_INTERVAL			10			//噪声传感器Modbus通信时间间隔
 
-int TemperatureRelay(UartInfo *uartInfo);
+int TemperatureRelay(UartInfo *uartInfo, int deviceId[], int deviceNum);
 
 #endif
 

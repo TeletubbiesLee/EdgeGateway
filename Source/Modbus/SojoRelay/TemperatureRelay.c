@@ -25,9 +25,11 @@ static void SOJO_TemperatureDataProcess(uint16_t registerData[], int arrayNumber
 /**
  * @breif 噪声传感器modbus通信函数
  * @param uartInfo 串口信息结构体指针
+ * @param deviceId 设备ID数组
+ * @param deviceNum 设备数量
  * @return 成功:0 失败:其他
  */
-int TemperatureRelay(UartInfo *uartInfo)
+int TemperatureRelay(UartInfo *uartInfo, int deviceId[], int deviceNum)
 {
     modbus_t *ctx = NULL;       //成功打开设备后返回的结构体指针
     uint16_t *tabRegisters = NULL;      //寄存器的空间
@@ -48,17 +50,19 @@ int TemperatureRelay(UartInfo *uartInfo)
 
     while (1)
     {
-    	/* 设置从机ID */
-    	modbus_set_slave(ctx, TEMP_RELAY_SERVER_ID);
-    	for(int i = 0; i < TEMP_RELAY_REGISTERS_NUMBER; i += tempValue)
+    	for(int i = 0; i < deviceNum; i++)
     	{
-    		tempValue = (TEMP_RELAY_REGISTERS_NUMBER - i) > 125 ? 125 : TEMP_RELAY_REGISTERS_NUMBER - i;
-    		modbus_read_registers(ctx, TEMP_RELAY_REGISTERS_ADDRESS + i, tempValue, &tabRegisters[i]);
+			/* 设置从机ID */
+			modbus_set_slave(ctx, deviceId[i]);
+			for(int j = 0; j < TEMP_RELAY_REGISTERS_NUMBER; j += tempValue)
+			{
+				tempValue = (TEMP_RELAY_REGISTERS_NUMBER - j) > 125 ? 125 : TEMP_RELAY_REGISTERS_NUMBER - j;
+				modbus_read_registers(ctx, TEMP_RELAY_REGISTERS_ADDRESS + j, tempValue, &tabRegisters[j]);
+			}
+
+			/* TODO：对数据进行解析和保存 */
+			SOJO_TemperatureDataProcess(tabRegisters, TEMP_RELAY_REGISTERS_NUMBER, temperature);
     	}
-
-		/* TODO：对数据进行解析和保存 */
-    	SOJO_TemperatureDataProcess(tabRegisters, TEMP_RELAY_REGISTERS_NUMBER, temperature);
-
 		sleep(TEMP_RELAY_MODBUS_INTERVAL);
     }
 
@@ -99,7 +103,7 @@ static void SOJO_TemperatureDataProcess(uint16_t registerData[], int arrayNumber
 		}
 		temperature[i] = tempValue / 10.0;
 	}
-	printf("temperature[5] = %.2f\n", temperature[5]);
+	printf("temperature[%d] = %.2f\n", i, temperature[i]);
 }
 
 

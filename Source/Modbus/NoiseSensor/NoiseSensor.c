@@ -23,9 +23,11 @@
 /**
  * @breif 噪声传感器modbus通信函数
  * @param uartInfo 串口信息结构体指针
+ * @param deviceId 设备ID数组
+ * @param deviceNum 设备数量
  * @return 成功:0 失败:其他
  */
-int NoiseSensor(UartInfo *uartInfo)
+int NoiseSensor(UartInfo *uartInfo, int deviceId[], int deviceNum)
 {
     modbus_t *ctx = NULL;       //成功打开设备后返回的结构体指针
     uint16_t *tabRegisters = NULL;      //寄存器的空间
@@ -44,12 +46,15 @@ int NoiseSensor(UartInfo *uartInfo)
 
     while (1)
     {
-    	/* 设置从机ID */
-    	modbus_set_slave(ctx, NOISE_SERVER_ID);
-		modbus_read_registers(ctx, NOISE_REGISTERS_ADDRESS, NOISE_REGISTERS_NUMBER, tabRegisters);
+    	for(int i = 0; i < deviceNum; i++)
+    	{
+			/* 设置从机ID */
+			modbus_set_slave(ctx, deviceId[i]);
+			modbus_read_registers(ctx, NOISE_REGISTERS_ADDRESS, NOISE_REGISTERS_NUMBER, tabRegisters);
 
-		/* TODO：对数据进行解析和保存 */
-		printf("value = %d\n", tabRegisters[0]);
+			/* TODO：对数据进行解析和保存 */
+			printf("value = %d\n", tabRegisters[0]);
+    	}
 
 		sleep(NOISE_MODBUS_INTERVAL);
     }
