@@ -50,6 +50,7 @@ int CreateDataFile(char *filename);
 int SaveData(char *filename, DataInformation *dataInfo);
 int DeleteData(char *filename, DataInformation *dataInfo);
 int ReadData(char *filename, DataInformation *dataInfo);
+int PollData(char *filename, DataInformation *dataInfo);
 int GetTimeStr(char *timeStr);
 
 #endif

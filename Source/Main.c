@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
 	/* 双杰测温中继需要的配置信息 */
 	int sojoRelayProcessNum = 0;			//透传功能进程数
-	char sojoRelayUsername[2][20] = {"A1_TEST_TOKEN", "ACCESS_TEST"};
+	char sojoRelayUsername[2][20] = {"ACCESS_TEST", "A1_TEST_TOKEN"};
 	UartInfo sojoRelaySensor[2] = {{"/dev/ttymxc5", 115200, RS232_TYPE}, {"/dev/ttymxc2", 115200, RS232_TYPE}};
 	int sojoRelayDeviceNum[4] = {1, 3, 2, 5};
 	int sojoRelayDeviceId[4][10] = {{1}, {8, 12, 5}, {1, 2}, {79, 45, 5, 9, 12}};

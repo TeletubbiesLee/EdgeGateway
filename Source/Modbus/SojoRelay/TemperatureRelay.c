@@ -20,7 +20,7 @@
 #include "../../DataStorage/DataProcess.h"
 
 
-static void SOJO_TemperatureDataProcess(uint16_t registerData[], int arrayNumber, float temperature[]);
+static void SOJO_TemperatureDataProcess(uint16_t registerData[], int arrayNumber, int deviceId, char *filename);
 
 
 /**
@@ -66,7 +66,7 @@ int TemperatureRelay(UartInfo *uartInfo, int deviceId[], int deviceNum, char *fi
 				modbus_read_registers(ctx, TEMP_RELAY_REGISTERS_ADDRESS + j, tempValue, &tabRegisters[j]);
 			}
 
-			/* TODO：对数据进行解析和保存 */
+			/* 对数据进行解析和保存 */
 			SOJO_TemperatureDataProcess(tabRegisters, TEMP_RELAY_REGISTERS_NUMBER, deviceId[i], filename);
     	}
 		sleep(TEMP_RELAY_MODBUS_INTERVAL);

@@ -74,6 +74,21 @@ int ReadData(char *filename, DataInformation *dataInfo)
 
 
 /**
+ * @breif 轮询读取数据
+ * @param filename 数据文件的名字
+ * @param dataInfo 保存数据的结构体指针
+ * @return 成功：0 失败：其他
+ */
+int PollData(char *filename, DataInformation *dataInfo)
+{
+	/* TODO:数据库轮询读取数据 */
+
+
+	return NO_ERROR;
+}
+
+
+/**
  * @brief 获取当前时间字符串
  * @param timeStr 保存时间字符串
  * @return 成功:0 错误:-1

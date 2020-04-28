@@ -17,12 +17,12 @@
 #include "paho_mqtt_c/MQTTClient.h"
 #include "MqttPublish.h"
 #include "../Config.h"
+#include "../DataStorage/DataProcess.h"
 
 
 static void MqttPublishMessage(MQTTClient *client, char *payload, int payloadLenth);
 static int MqttInit(MQTTClient *client, char *accessUser);
-
-
+static int ReadDataPoll(char *filename, char *payload);
 
 
 
@@ -34,17 +34,16 @@ static int MqttInit(MQTTClient *client, char *accessUser);
 int MqttPublish(char *accessUser)
 {
     MQTTClient client;
-    char payload[2][128] = {"{\"temperature\":121, \"humidity\":55.3, \"active\": true}",
-    						"{\"temperature1\":12, \"humidity1\":5.3, \"active1\": false}"};
+    char payload[128] = {0};
 
     MqttInit(&client, accessUser);
 
     while(1)
     {
-		/* TODO:从数据库中读取出数据 */
+		/* 读取出数据 */
+    	ReadDataPoll(accessUser, payload);
 
-		MqttPublishMessage(&client, payload[0], strlen(payload[0]));
-		MqttPublishMessage(&client, payload[1], strlen(payload[1]));
+		MqttPublishMessage(&client, payload, strlen(payload));
 
 		sleep(MQTT_PUBLISH_INTERVAL);
     }
@@ -108,6 +107,46 @@ static void MqttPublishMessage(MQTTClient *client, char *payload, int payloadLen
 	MQTTClient_waitForCompletion(*client, token, TIMEOUT);
 	printf("Message with delivery token %d delivered\n", token);
 
+}
+
+
+/**
+ * @breif 轮询读取数据
+ * @param filename 数据文件名
+ * @param payload 负载消息
+ * @param payloadLenth 消息长度
+ * @return 成功：0 失败 -1
+ */
+static int ReadDataPoll(char *filename, char *payload)
+{
+	int ret = NO_ERROR;
+	DataInformation dataInfo;
+
+	if(0 == PollData(filename, &dataInfo))
+	{
+		switch (dataInfo.dataType)
+		{
+		case BIT_TYPE:
+			sprintf(payload, "{\"%s_%d\":%s}", dataInfo.dataName, dataInfo.deviceId, (dataInfo.bitData?"true":"flase"));
+			break;
+		case INT_TYPE:
+			sprintf(payload, "{\"%s_%d\":%d}", dataInfo.dataName, dataInfo.deviceId, dataInfo.intData);
+			break;
+		case FLOAT_TYPE:
+			sprintf(payload, "{\"%s_%d\":%.3f}", dataInfo.dataName, dataInfo.deviceId, dataInfo.floatData);
+			break;
+		default:
+			printf_debug("dataInfo.dataType value error\n");
+			ret = FUNCTION_FAIL;
+			break;
+		}
+	}
+	else
+	{
+		printf_debug("PollData error\n");
+		ret = FUNCTION_FAIL;
+	}
+	return ret;
 }
 
 
