@@ -95,6 +95,7 @@ static void AirQualityDataParse(uint16_t *tabRegisters, int deviceId, char *file
 
 	CO2 = tabRegisters[0];
 	printf("CO2 = %d ppm\n", CO2);
+	/* 保存数据 */
 	strcpy(dataInfo.dataName, "CO2");
 	dataInfo.dataType = INT_TYPE;
 	dataInfo.intData = CO2;
@@ -103,6 +104,7 @@ static void AirQualityDataParse(uint16_t *tabRegisters, int deviceId, char *file
 
 	TVOC = tabRegisters[1] / 10.0;
 	printf("TVOC = %.2f ug/m3\n", TVOC);
+	/* 保存数据 */
 	strcpy(dataInfo.dataName, "TVOC");
 	dataInfo.dataType = FLOAT_TYPE;
 	dataInfo.floatData = TVOC;
@@ -111,6 +113,7 @@ static void AirQualityDataParse(uint16_t *tabRegisters, int deviceId, char *file
 
 	CH2O = tabRegisters[2] / 10.0;
 	printf("CH2O = %.2f ug/m3\n", CH2O);
+	/* 保存数据 */
 	strcpy(dataInfo.dataName, "CH2O");
 	dataInfo.dataType = FLOAT_TYPE;
 	dataInfo.floatData = CH2O;
@@ -119,6 +122,7 @@ static void AirQualityDataParse(uint16_t *tabRegisters, int deviceId, char *file
 
 	PM2_5 = tabRegisters[3];
 	printf("PM2_5 = %d ppm\n", PM2_5);
+	/* 保存数据 */
 	strcpy(dataInfo.dataName, "PM2_5");
 	dataInfo.dataType = INT_TYPE;
 	dataInfo.intData = PM2_5;
@@ -128,6 +132,7 @@ static void AirQualityDataParse(uint16_t *tabRegisters, int deviceId, char *file
 	sRH = tabRegisters[4];
 	humidity = -6 + 125 * sRH / (64 * 1024);
 	printf("humidity = %d %%RH\n", humidity);
+	/* 保存数据 */
 	strcpy(dataInfo.dataName, "humidity");
 	dataInfo.dataType = INT_TYPE;
 	dataInfo.intData = humidity;
@@ -137,6 +142,7 @@ static void AirQualityDataParse(uint16_t *tabRegisters, int deviceId, char *file
 	Stem = tabRegisters[5];
 	temperature = -46.85 + 175.72 * Stem / (64 * 1024);
 	printf("temperature = %.2f ℃\n", temperature);
+	/* 保存数据 */
 	strcpy(dataInfo.dataName, "temperature");
 	dataInfo.dataType = FLOAT_TYPE;
 	dataInfo.floatData = temperature;
@@ -145,6 +151,7 @@ static void AirQualityDataParse(uint16_t *tabRegisters, int deviceId, char *file
 
 	PM10 = tabRegisters[6];
 	printf("PM10 = %d ppm\n", PM10);
+	/* 保存数据 */
 	strcpy(dataInfo.dataName, "PM10");
 	dataInfo.dataType = INT_TYPE;
 	dataInfo.intData = PM10;

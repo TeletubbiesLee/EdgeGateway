@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 									{"127.0.0.1", 5555, "192.168.10.11", 3333}};
 
 	/* 噪声传感器需要的配置信息 */
-	int noiseProcessNum = 1;			//透传功能进程数
+	int noiseProcessNum = 0;			//透传功能进程数
 	char noiseUsername[2][20] = {"ACCESS_TEST", "A1_TEST_TOKEN"};
 	UartInfo noiseUart[2] = {{"/dev/ttymxc3", 9600, RS485_TYPE}, {"/dev/ttymxc4", 9600, RS485_TYPE}};
 	int noiseDeviceNum[2] = {1, 3};

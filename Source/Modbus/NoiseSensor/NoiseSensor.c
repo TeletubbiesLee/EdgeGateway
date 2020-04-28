@@ -93,6 +93,8 @@ static void NoiseDataParse(uint16_t *tabRegisters, int deviceId, char *filename)
 
 	noiseValue = tabRegisters[0];
 	printf("noiseValue = %d\n", noiseValue);
+
+	/* 保存数据 */
 	strcpy(dataInfo.dataName, "noiseValue");
 	dataInfo.dataType = INT_TYPE;
 	dataInfo.intData = noiseValue;

@@ -36,7 +36,6 @@ int TemperatureRelay(UartInfo *uartInfo, int deviceId[], int deviceNum, char *fi
     modbus_t *ctx = NULL;       //成功打开设备后返回的结构体指针
     uint16_t *tabRegisters = NULL;      //寄存器的空间
     int nbPoints;               //空间大小
-    float temperature[TEMP_RELAY_REGISTERS_NUMBER] = {0};		//存放温度数据
     int tempValue = 0;			//临时值
 
     if(-1 == ModbusInit(&ctx, uartInfo))		//Modbus初始化
@@ -68,7 +67,7 @@ int TemperatureRelay(UartInfo *uartInfo, int deviceId[], int deviceNum, char *fi
 			}
 
 			/* TODO：对数据进行解析和保存 */
-			SOJO_TemperatureDataProcess(tabRegisters, TEMP_RELAY_REGISTERS_NUMBER, temperature);
+			SOJO_TemperatureDataProcess(tabRegisters, TEMP_RELAY_REGISTERS_NUMBER, deviceId[i], filename);
     	}
 		sleep(TEMP_RELAY_MODBUS_INTERVAL);
     }
@@ -89,13 +88,20 @@ int TemperatureRelay(UartInfo *uartInfo, int deviceId[], int deviceNum, char *fi
  * @brief 双杰温度数据处理
  * @param registerData 用于存放数据
  * @param arrayNumber 数据个数
+ * @param deviceId 设备ID
+ * @param filename 保存的文件名
  * @return void
  * @updata: [2020-01-07][Gang][creat]
  */
-static void SOJO_TemperatureDataProcess(uint16_t registerData[], int arrayNumber, float temperature[])
+static void SOJO_TemperatureDataProcess(uint16_t registerData[], int arrayNumber, int deviceId, char *filename)
 {
 	int i = 0;
 	int tempValue = 0;				//存放临时值
+	float temperature = 0.0;
+	char tempString[20] = {0};
+	DataInformation dataInfo;
+	dataInfo.deviceId = deviceId;
+	strcpy(dataInfo.mqttUserName, filename);
 
 	for(i = 0; i < arrayNumber; i++)
 	{
@@ -108,9 +114,18 @@ static void SOJO_TemperatureDataProcess(uint16_t registerData[], int arrayNumber
 		{
 			tempValue = registerData[i];
 		}
-		temperature[i] = tempValue / 10.0;
+		temperature = tempValue / 10.0;
+		printf("temperature[%d] = %.2f\n", i, temperature);
+
+		/* 保存数据 */
+		sprintf(tempString, "temperature%d", i);
+		strcpy(dataInfo.dataName, tempString);
+		dataInfo.dataType = FLOAT_TYPE;
+		dataInfo.floatData = temperature;
+		GetTimeStr(dataInfo.updateTime);
+		SaveData(filename, &dataInfo);
 	}
-	printf("temperature[%d] = %.2f\n", i, temperature[i]);
+
 }
 
 
