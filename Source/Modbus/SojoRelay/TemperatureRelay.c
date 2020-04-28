@@ -17,6 +17,7 @@
 #include "../libmodbus/modbus.h"
 #include "../../Config.h"
 #include "../ModbusInit.h"
+#include "../../DataStorage/DataProcess.h"
 
 
 static void SOJO_TemperatureDataProcess(uint16_t registerData[], int arrayNumber, float temperature[]);
@@ -27,9 +28,10 @@ static void SOJO_TemperatureDataProcess(uint16_t registerData[], int arrayNumber
  * @param uartInfo 串口信息结构体指针
  * @param deviceId 设备ID数组
  * @param deviceNum 设备数量
+ * @param filename 数据文件名
  * @return 成功:0 失败:其他
  */
-int TemperatureRelay(UartInfo *uartInfo, int deviceId[], int deviceNum)
+int TemperatureRelay(UartInfo *uartInfo, int deviceId[], int deviceNum, char *filename)
 {
     modbus_t *ctx = NULL;       //成功打开设备后返回的结构体指针
     uint16_t *tabRegisters = NULL;      //寄存器的空间

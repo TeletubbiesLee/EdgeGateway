@@ -20,7 +20,7 @@
 #define NOISE_MODBUS_INTERVAL			5			//噪声传感器Modbus通信时间间隔
 
 
-int NoiseSensor(UartInfo *uartInfo, int deviceId[], int deviceNum);
+int NoiseSensor(UartInfo *uartInfo, int deviceId[], int deviceNum, char *filename);
 
 #endif
 

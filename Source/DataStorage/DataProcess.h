@@ -45,12 +45,12 @@ typedef struct TagDataInformation
 
 }DataInformation;
 
-void test(void);
+void DataBaseTest(void);
 int CreateDataFile(char *filename);
-int InsertData(char *filename, DataInformation *dataInfo);
+int SaveData(char *filename, DataInformation *dataInfo);
 int DeleteData(char *filename, DataInformation *dataInfo);
-int UpdateData(char *filename, DataInformation *dataInfo);
-int SelectData(char *filename, DataInformation *dataInfo);
+int ReadData(char *filename, DataInformation *dataInfo);
+int GetTimeStr(char *timeStr);
 
 #endif
 

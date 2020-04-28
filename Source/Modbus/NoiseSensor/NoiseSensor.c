@@ -17,6 +17,7 @@
 #include "NoiseSensor.h"
 #include "../../Config.h"
 #include "../ModbusInit.h"
+#include "../../DataStorage/DataProcess.h"
 
 
 
@@ -25,9 +26,10 @@
  * @param uartInfo 串口信息结构体指针
  * @param deviceId 设备ID数组
  * @param deviceNum 设备数量
+ * @param filename 数据文件名
  * @return 成功:0 失败:其他
  */
-int NoiseSensor(UartInfo *uartInfo, int deviceId[], int deviceNum)
+int NoiseSensor(UartInfo *uartInfo, int deviceId[], int deviceNum, char *filename)
 {
     modbus_t *ctx = NULL;       //成功打开设备后返回的结构体指针
     uint16_t *tabRegisters = NULL;      //寄存器的空间
