@@ -143,6 +143,17 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	/* 创建嵌入式网页进程 */
+	if((pid = fork()) == 0)
+	{
+		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+		printf("Web (pid:%d) creat\n", getpid());
+		/* TODO:在此处添加嵌入式网页的对完接口函数 */
+		printf("Web (pid:%d) exit\n", getpid());
+
+		return 0;
+	}
 
 	/* 创建其他功能的进程 */
 

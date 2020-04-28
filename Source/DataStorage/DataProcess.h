@@ -14,8 +14,8 @@
 
 #include <stdbool.h>
 
-#define DATA_NAME_STRING_LENTH	20
-#define TIME_STRING_LENTH		20
+#define DATA_NAME_STRING_LENTH	32
+#define TIME_STRING_LENTH		32
 
 #define DATA_LIB_NAME		"deviceDase.db"
 /*

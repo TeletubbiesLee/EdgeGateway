@@ -42,8 +42,9 @@
  * \brief Synchronous API implementation
  *
  */
-
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE /* for pthread_mutexattr_settype */
+#endif
 #include <stdlib.h>
 #include <string.h>
 #if !defined(WIN32) && !defined(WIN64)
