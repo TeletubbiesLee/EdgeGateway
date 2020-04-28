@@ -20,7 +20,6 @@
 #include "Modbus/SojoRelay/TemperatureRelay.h"
 #include "MQTT/MqttPublish.h"
 #include "DataStruct.h"
-#include "DataStorage/DataProcess.h"
 
 
 /**

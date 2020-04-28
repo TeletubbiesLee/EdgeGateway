@@ -8,7 +8,7 @@
 程序文件夹介绍：
 数据存储：DataStorage/
 	1.接口函数：头文件包含DataProcess.h
-	2.外部引用：
+	2.外部引用：Config.h
 
 101协议和104协议通信相关：IEC60870/
 	101协议和104协议的库：iec60870/
@@ -39,7 +39,7 @@ MQTT通信相关：MQTT/
 		1.接口函数：头文件包含MQTTClient.h
 	MQTT发布消息文件：
 		1.接口函数：头文件包含MqttPublish.h，函数调用MqttPublish()
-		2.外部引用：Config.h
+		2.外部引用：Config.h、DataProcess.h
 
 信号处理相关：ProcessSignal/
 	1.接口函数：头文件包含ProcessSignal.h，函数调用SetProcessCloseSignal()
@@ -51,6 +51,10 @@ MQTT通信相关：MQTT/
 透传功能：TransparentTransmission/
 	1.接口函数：头文件包含TransparentTransmission.h，函数调用TransparentTransmission()
 	2.外部引用：Config.h、DataStruct.h、RS485.h
+	
+嵌入式网页相关：Web/
+	1.接口函数：
+	2.外部引用：
 
 
 
