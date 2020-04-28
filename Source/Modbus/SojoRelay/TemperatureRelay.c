@@ -50,6 +50,11 @@ int TemperatureRelay(UartInfo *uartInfo, int deviceId[], int deviceNum, char *fi
     tabRegisters = (uint16_t *) malloc(nbPoints * sizeof(uint16_t));
     memset(tabRegisters, 0, nbPoints * sizeof(uint16_t));
 
+    if(0 != CreateDataFile(filename))
+	{
+		printf_debug("CreateDataFile(\"%s\") error\n", filename);
+	}
+
     while (1)
     {
     	for(int i = 0; i < deviceNum; i++)

@@ -50,7 +50,7 @@ int AirQualitySensor(UartInfo *uartInfo, int deviceId[], int deviceNum, char *fi
 
 	if(0 != CreateDataFile(filename))
 	{
-		printf_debug("CreateDataFile(%s) error\n", filename);
+		printf_debug("CreateDataFile(\"%s\") error\n", filename);
 	}
 
 	while (1)
@@ -81,6 +81,8 @@ int AirQualitySensor(UartInfo *uartInfo, int deviceId[], int deviceNum, char *fi
 /**
  * @breif 六合一空气质量传感器数据解析和保存
  * @param tabRegisters 数据集
+ * @param deviceId 设备ID
+ * @param filename 保存的文件名
  * @return 成功:0 失败:其他
  */
 static void AirQualityDataParse(uint16_t *tabRegisters, int deviceId, char *filename)

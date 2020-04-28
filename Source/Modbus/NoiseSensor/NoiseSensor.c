@@ -19,7 +19,7 @@
 #include "../ModbusInit.h"
 #include "../../DataStorage/DataProcess.h"
 
-
+static void NoiseDataParse(uint16_t *tabRegisters, int deviceId, char *filename);
 
 /**
  * @breif 噪声传感器modbus通信函数
@@ -46,6 +46,11 @@ int NoiseSensor(UartInfo *uartInfo, int deviceId[], int deviceNum, char *filenam
     tabRegisters = (uint16_t *) malloc(nbPoints * sizeof(uint16_t));
     memset(tabRegisters, 0, nbPoints * sizeof(uint16_t));
 
+	if(0 != CreateDataFile(filename))
+	{
+		printf_debug("CreateDataFile(\"%s\") error\n", filename);
+	}
+
     while (1)
     {
     	for(int i = 0; i < deviceNum; i++)
@@ -54,8 +59,8 @@ int NoiseSensor(UartInfo *uartInfo, int deviceId[], int deviceNum, char *filenam
 			modbus_set_slave(ctx, deviceId[i]);
 			modbus_read_registers(ctx, NOISE_REGISTERS_ADDRESS, NOISE_REGISTERS_NUMBER, tabRegisters);
 
-			/* TODO：对数据进行解析和保存 */
-			printf("value = %d\n", tabRegisters[0]);
+			/* 对数据进行解析和保存 */
+			NoiseDataParse(tabRegisters, deviceId[i], filename);
     	}
 
 		sleep(NOISE_MODBUS_INTERVAL);
@@ -69,6 +74,30 @@ int NoiseSensor(UartInfo *uartInfo, int deviceId[], int deviceNum, char *filenam
     modbus_free(ctx);
 
 	return NO_ERROR;
+}
+
+
+/**
+ * @breif 噪声传感器数据解析和保存
+ * @param tabRegisters 数据集
+ * @param deviceId 设备ID
+ * @param filename 保存的文件名
+ * @return 成功:0 失败:其他
+ */
+static void NoiseDataParse(uint16_t *tabRegisters, int deviceId, char *filename)
+{
+	int noiseValue = 0;
+	DataInformation dataInfo;
+	dataInfo.deviceId = deviceId;
+	strcpy(dataInfo.mqttUserName, filename);
+
+	noiseValue = tabRegisters[0];
+	printf("noiseValue = %d\n", noiseValue);
+	strcpy(dataInfo.dataName, "noiseValue");
+	dataInfo.dataType = INT_TYPE;
+	dataInfo.intData = noiseValue;
+	GetTimeStr(dataInfo.updateTime);
+	SaveData(filename, &dataInfo);
 }
 
 
