@@ -115,7 +115,7 @@ int S2J_test(void)
 
 /**
  * @fn ConfigPrintf
- * @brief 配置信息打印
+ * @brief 配置信息打印，主要用于调试使用
  * @param edgeGatewayConfig 配置信息结构体
  * @return void
  */
@@ -301,6 +301,7 @@ JSON_RES:
 
 /*
  * 系统信息，由json转struct
+ * SystemInfomation结构体
  */
 #define J2S_SystemInfo(struct_obj,json_obj) do{		\
 	s2j_struct_get_basic_element(struct_obj, json_obj, string, deviceName);			\
@@ -313,6 +314,7 @@ JSON_RES:
 
 /*
  * 串口转网口配置信息，由json转struct
+ * UartToNetConfig结构体
  */
 #define J2S_UartToNet(struct_obj,json_obj) do{		\
 	s2j_struct_get_basic_element(struct_obj, json_obj, int, ProtocolType);	\
@@ -328,6 +330,7 @@ JSON_RES:
 
 /*
  * Modbus配置信息，由json转struct
+ * ModbusConfig结构体
  */
 #define J2S_Modbus(struct_obj,json_obj) do{		\
 	s2j_struct_get_basic_element(struct_obj, json_obj, string, uartName);		\
@@ -341,6 +344,7 @@ JSON_RES:
 
 /*
  * 101配置信息，由json转struct
+ * IEC101Config结构体
  */
 #define J2S_IEC101(struct_obj,json_obj) do{		\
 	s2j_struct_get_basic_element(struct_obj, json_obj, string, uartName);		\
@@ -354,6 +358,7 @@ JSON_RES:
 
 /*
  * 104配置信息，由json转struct
+ * IEC104Config结构体
  */
 #define J2S_IEC104(struct_obj,json_obj) do{		\
 	s2j_struct_get_basic_element(struct_obj, json_obj, string, localIP);	\
@@ -369,6 +374,7 @@ JSON_RES:
 
 /*
  * MQTT配置信息，由json转struct
+ * MqttConfig结构体
  */
 #define J2S_Mqtt(struct_obj,json_obj) do{		\
 	s2j_struct_get_basic_element(struct_obj, json_obj, int, mqttNumber);	\
@@ -467,6 +473,7 @@ static void *json_to_struct(cJSON* json_obj)
 
 /*
  * 系统信息，由struct转json
+ * SystemInfomation结构体
  */
 #define S2J_SystemInfo(json_obj,struct_obj) do{		\
 	s2j_json_set_basic_element(json_obj, struct_obj, string, deviceName);		\
@@ -479,6 +486,7 @@ static void *json_to_struct(cJSON* json_obj)
 
 /*
  * 串口转网口配置信息，由struct转json
+ * UartToNetConfig结构体
  */
 #define S2J_UartToNet(json_obj,struct_obj) do{		\
 	s2j_json_set_basic_element(json_obj, struct_obj, int, ProtocolType);	\
@@ -494,6 +502,7 @@ static void *json_to_struct(cJSON* json_obj)
 
 /*
  * Modbus配置信息，由struct转json
+ * ModbusConfig结构体
  */
 #define S2J_Modbus(json_obj,struct_obj) do{		\
 	s2j_json_set_basic_element(json_obj, struct_obj, string, uartName);		\
@@ -507,6 +516,7 @@ static void *json_to_struct(cJSON* json_obj)
 
 /*
  * 101配置信息，由struct转json
+ * IEC101Config结构体
  */
 #define S2J_IEC101(json_obj,struct_obj) do{		\
 	s2j_json_set_basic_element(json_obj, struct_obj, string, uartName);		\
@@ -520,6 +530,7 @@ static void *json_to_struct(cJSON* json_obj)
 
 /*
  * 104配置信息，由struct转json
+ * IEC104Config结构体
  */
 #define S2J_IEC104(json_obj,struct_obj) do{		\
 	s2j_json_set_basic_element(json_obj, struct_obj, string, localIP);		\
@@ -535,6 +546,7 @@ static void *json_to_struct(cJSON* json_obj)
 
 /*
  * MQTT配置信息，由struct转json
+ * MqttConfig结构体
  */
 #define S2J_Mqtt(json_obj,struct_obj) do{		\
 	s2j_json_set_basic_element(json_obj, struct_obj, int, mqttNumber);	\
