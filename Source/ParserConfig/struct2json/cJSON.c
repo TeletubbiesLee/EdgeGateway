@@ -106,8 +106,28 @@ static const char *parse_number(cJSON *item,const char *num)
 		while (*num>='0' && *num<='9') subscale=(subscale*10)+(*num++ - '0');	/* Number? */
 	}
 
-	n=sign*n*pow(10.0,(scale+subscale*signsubscale));	/* number = +/- number.fraction * 10^+/- exponent */
-	
+	/* 注：pow函数总是出现莫名其妙计算错误的情况，所以将作者原程序注释，换另一种方法实现，怀疑是不同的库函数，实现的程度不一样，导致对参数要求严格 */
+	//n=sign*n*pow(10.0,(scale+subscale*signsubscale));	/* number = +/- number.fraction * 10^+/- exponent */
+	n = sign * n;
+	int i = 0, temp = 0;
+	if((scale + subscale * signsubscale) >= 0)
+	{
+		temp = scale+subscale * signsubscale;
+		for(i = 0; i < temp; i++)
+		{
+			n *= 10.0;
+		}
+	}
+	else if((scale + subscale * signsubscale) < 0)
+	{
+		temp = -(scale+subscale * signsubscale);
+		for(i = 0; i < temp; i++)
+		{
+			n /= 10.0;
+		}
+	}
+	/*************************************************************************************************************/
+
 	item->valuedouble=n;
 	item->valueint=(int)n;
 	item->type=cJSON_Number;

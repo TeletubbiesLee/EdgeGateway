@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 
 
 	/* 解析配置文件，获取配置信息  */
-	S2J();
+	S2J_test();
 	/*********END***********/
 
 
