@@ -7,6 +7,8 @@
   * @date:      2020-04-08
   * @update:    [2020-04-08][txl][newly increased]
   */
+
+#include <stdio.h>
 #include "../iec60870/iec60870_interface.h"
 #include "sojo_interface.h"
 

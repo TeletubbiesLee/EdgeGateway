@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include "DataProcess.h"
 #include "SqliteInterface.h"
 #include "./sqlite/sqlite3.h"
@@ -271,7 +272,6 @@ int selectRecord(char *tableName, DataInformation *dataInfo)
 	char *dataName = dataInfo->dataName;
 	int deviceId = dataInfo->deviceId;
 	int dataType;
-	float dataValue;
 
 	sprintf(sql, "SELECT * FROM %s WHERE dataName='%s' AND deviceId=%d;", tableName, dataName, deviceId);
 	if(SQLITE_OK != sqlite3_get_table(db,sql,&azResult,&nrow,&ncolumn,&zErrMsg))
@@ -283,7 +283,7 @@ int selectRecord(char *tableName, DataInformation *dataInfo)
 	{
 		printf("azResult[%d] = %s\n",i,azResult[i]);
 	}
-	int bitData;
+	int bitData = 0;
 	dataInfo->dataType = atoi(azResult[10]);
 	dataType = dataInfo->dataType;
 	if (dataType == BIT_TYPE)
