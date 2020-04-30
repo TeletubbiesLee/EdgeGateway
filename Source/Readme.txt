@@ -41,6 +41,12 @@ MQTT通信相关：MQTT/
 		1.接口函数：头文件包含MqttPublish.h，函数调用MqttPublish()
 		2.外部引用：Config.h、DataProcess.h
 
+配置信息相关：ParserConfig/
+	结构体转json第三方库：struct2json/
+	结构体转json针对自定义结构体的接口文件：
+		1.接口函数：头文件包含Interface_S2J.h
+		2.外部引用：Config.h、DataProcess.h、TransparentTransmission.h
+
 信号处理相关：ProcessSignal/
 	1.接口函数：头文件包含ProcessSignal.h，函数调用SetProcessCloseSignal()
 

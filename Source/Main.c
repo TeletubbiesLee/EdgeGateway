@@ -19,9 +19,10 @@
 #include "Modbus/AirQualitySensor/AirQualitySensor.h"
 #include "Modbus/SojoRelay/TemperatureRelay.h"
 #include "MQTT/MqttPublish.h"
+#include "ParserConfig/Interface_S2J.h"
 #include "DataStruct.h"
 
-#include "ParserConfig/Interface_S2J.h"
+
 
 /**
  * 	@brief: main函数
@@ -64,8 +65,9 @@ int main(int argc, char *argv[])
 
 
 	/* 解析配置文件，获取配置信息  */
-	S2J_test();
-	/*********END***********/
+	GetJsonFile(JSON_CONFIG_FILENAME, &g_EdgeGatewayConfig);
+	ConfigPrintf(g_EdgeGatewayConfig);
+	/* TODO:将获取的配置信息进行赋值 */
 
 
 	/* 创建透传功能进程 */
@@ -143,13 +145,37 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	/* 创建101进程 */
+	if((pid = fork()) == 0)
+	{
+		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+		printf("IEC101 (pid:%d) creat\n", getpid());
+		/* TODO:在此处添加101的对外接口函数 */
+		printf("IEC101 (pid:%d) exit\n", getpid());
+
+		return 0;
+	}
+
+	/* 创建104进程 */
+	if((pid = fork()) == 0)
+	{
+		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+		printf("IEC104 (pid:%d) creat\n", getpid());
+		/* TODO:在此处添加104协议的对外接口函数 */
+		printf("IEC104 (pid:%d) exit\n", getpid());
+
+		return 0;
+	}
+
 	/* 创建嵌入式网页进程 */
 	if((pid = fork()) == 0)
 	{
 		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 		printf("Web (pid:%d) creat\n", getpid());
-		/* TODO:在此处添加嵌入式网页的对完接口函数 */
+		/* TODO:在此处添加嵌入式网页的对外接口函数 */
 		printf("Web (pid:%d) exit\n", getpid());
 
 		return 0;
