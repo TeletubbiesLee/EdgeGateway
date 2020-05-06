@@ -46,5 +46,17 @@ typedef struct TagNetworkInfo
 	int remotePort;
 }NetworkInfo;
 
+
+/*
+ * Modbus传感器类型
+ */
+typedef enum TagSersorType
+{
+	NOISE_SERSOR = 1,
+	AIR_QUALITY_SERSOR,
+	SOJO_RELAY,
+}SersorType;
+
+
 #endif
 

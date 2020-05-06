@@ -22,9 +22,12 @@
 #include "MQTT/MqttPublish.h"
 #include "ParserConfig/Interface_S2J.h"
 #include "DataStruct.h"
+#include "Config.h"
 
 
 static void TrsptTrsmsParamConfig(EdgeGatewayConfig *configInfo, int *processNum, int type[], UartInfo *uart[], NetworkInfo *eth[]);
+static void ModbusParamConfig(EdgeGatewayConfig *configInfo, int *processNum, char *username[], UartInfo *uart[], int deviceNum[], int *deviceId[], int sersorType);
+static void MqttParamConfig(EdgeGatewayConfig *configInfo, int *processNum, char *username[]);
 
 
 /**
@@ -36,45 +39,72 @@ int main(int argc, char *argv[])
 
 	/* 透传功能需要的配置信息 */
 	int trsptTrsmsProcessNum = 0;			//透传功能进程数
-	int trsptTrsmsType[5] = {0};
-	UartInfo *trsptTrsmsUart[5] = {0};
-	NetworkInfo *trsptTrsmsEth[5] = {0};
-	for(int i = 0; i < 5; i++)
+	int trsptTrsmsType[PROTOCOL_MAX_PROCESS] = {0};
+	UartInfo *trsptTrsmsUart[PROTOCOL_MAX_PROCESS] = {0};
+	NetworkInfo *trsptTrsmsEth[PROTOCOL_MAX_PROCESS] = {0};
+	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
 	{
 		trsptTrsmsUart[i] = malloc(sizeof(UartInfo));
 		trsptTrsmsEth[i] = malloc(sizeof(NetworkInfo));
 	}
 
 	/* 噪声传感器需要的配置信息 */
-	int noiseProcessNum = 0;			//透传功能进程数
-	char noiseUsername[2][20] = {"ACCESS_TEST", "A1_TEST_TOKEN"};
-	UartInfo noiseUart[2] = {{"/dev/ttymxc3", 9600, RS485_TYPE}, {"/dev/ttymxc4", 9600, RS485_TYPE}};
-	int noiseDeviceNum[2] = {1, 3};
-	int noiseDeviceId[2][10] = {{1}, {8, 12, 5}};
+	int noiseProcessNum = 0;
+	char *noiseUsername[PROTOCOL_MAX_PROCESS] = {0};
+	UartInfo *noiseUart[PROTOCOL_MAX_PROCESS] = {0};
+	int noiseDeviceNum[PROTOCOL_MAX_PROCESS] = {0};
+	int *noiseDeviceId[PROTOCOL_MAX_PROCESS] = {0};
+	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
+	{
+		noiseUsername[i] = malloc(sizeof(char) * 30);
+		noiseUart[i] = malloc(sizeof(UartInfo));
+		noiseDeviceId[i] = malloc(sizeof(int) * SLAVE_MAX_NUMBER);
+	}
 
 	/* 六合一空气质量传感器需要的配置信息 */
-	int airQualityProcessNum = 0;			//透传功能进程数
-	char airQualityUsername[2][20] = {"A1_TEST_TOKEN", "ACCESS_TEST"};
-	UartInfo airQualitySensor[2] = {{"/dev/ttymxc3", 9600, RS485_TYPE}, {"/dev/ttymxc4", 9600, RS485_TYPE}};
-	int airQualityDeviceNum[3] = {1, 2, 3};
-	int airQualityDeviceId[3][10] = {{1}, {1, 2}, {8, 12, 5}};
+	int airQualityProcessNum = 0;
+	char *airQualityUsername[PROTOCOL_MAX_PROCESS] = {0};
+	UartInfo *airQualitySensor[PROTOCOL_MAX_PROCESS] = {0};
+	int airQualityDeviceNum[PROTOCOL_MAX_PROCESS] = {0};
+	int *airQualityDeviceId[PROTOCOL_MAX_PROCESS] = {0};
+	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
+	{
+		airQualityUsername[i] = malloc(sizeof(char) * 30);
+		airQualitySensor[i] = malloc(sizeof(UartInfo));
+		airQualityDeviceId[i] = malloc(sizeof(int) * SLAVE_MAX_NUMBER);
+	}
 
 	/* 双杰测温中继需要的配置信息 */
-	int sojoRelayProcessNum = 0;			//透传功能进程数
-	char sojoRelayUsername[2][20] = {"ACCESS_TEST", "A1_TEST_TOKEN"};
-	UartInfo sojoRelaySensor[2] = {{"/dev/ttymxc5", 115200, RS232_TYPE}, {"/dev/ttymxc2", 115200, RS232_TYPE}};
-	int sojoRelayDeviceNum[4] = {1, 3, 2, 5};
-	int sojoRelayDeviceId[4][10] = {{1}, {8, 12, 5}, {1, 2}, {79, 45, 5, 9, 12}};
+	int sojoRelayProcessNum = 0;
+	char *sojoRelayUsername[PROTOCOL_MAX_PROCESS] = {0};
+	UartInfo *sojoRelaySensor[PROTOCOL_MAX_PROCESS] = {0};
+	int sojoRelayDeviceNum[PROTOCOL_MAX_PROCESS] = {0};
+	int *sojoRelayDeviceId[PROTOCOL_MAX_PROCESS] = {0};
+	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
+	{
+		sojoRelayUsername[i] = malloc(sizeof(char) * 30);
+		sojoRelaySensor[i] = malloc(sizeof(UartInfo));
+		sojoRelayDeviceId[i] = malloc(sizeof(int) * SLAVE_MAX_NUMBER);
+	}
 
 	/* MQTT发布数据需要的配置信息 */
-	int mqttProcessNum = 0;			//透传功能进程数
-	char userName[2][20] = {"A1_TEST_TOKEN", "ACCESS_TEST"};
+	int mqttProcessNum = 0;
+	char *userName[PROTOCOL_MAX_PROCESS] = {0};
+	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
+	{
+		userName[i] = malloc(sizeof(char) * 30);
+	}
 
 
 	/* 解析配置文件，获取配置信息  */
 	GetJsonFile(JSON_CONFIG_FILENAME, &g_EdgeGatewayConfig);
-	/* TODO:将获取的配置信息进行赋值 */
+
+	/* 将获取的配置信息进行赋值 */
 	TrsptTrsmsParamConfig(g_EdgeGatewayConfig, &trsptTrsmsProcessNum, trsptTrsmsType, trsptTrsmsUart, trsptTrsmsEth);
+	ModbusParamConfig(g_EdgeGatewayConfig, &noiseProcessNum, noiseUsername, noiseUart, noiseDeviceNum, noiseDeviceId, NOISE_SERSOR);
+	ModbusParamConfig(g_EdgeGatewayConfig, &airQualityProcessNum, airQualityUsername, airQualitySensor, airQualityDeviceNum, airQualityDeviceId, AIR_QUALITY_SERSOR);
+	ModbusParamConfig(g_EdgeGatewayConfig, &sojoRelayProcessNum, sojoRelayUsername, sojoRelaySensor, sojoRelayDeviceNum, sojoRelayDeviceId, SOJO_RELAY);
+	MqttParamConfig(g_EdgeGatewayConfig, &mqttProcessNum, userName);
 
 
 	/* 创建透传功能进程 */
@@ -100,7 +130,7 @@ int main(int argc, char *argv[])
 			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 			printf("NoiseSensor (pid:%d) creat\n", getpid());
-			NoiseSensor(&noiseUart[i], noiseDeviceId[i], noiseDeviceNum[i], noiseUsername[i]);
+			NoiseSensor(noiseUart[i], noiseDeviceId[i], noiseDeviceNum[i], noiseUsername[i]);
 			printf("NoiseSensor (pid:%d) exit\n", getpid());
 
 			return 0;
@@ -115,7 +145,7 @@ int main(int argc, char *argv[])
 			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 			printf("AirQualitySensor (pid:%d) creat\n", getpid());
-			AirQualitySensor(&airQualitySensor[i], airQualityDeviceId[i], airQualityDeviceNum[i], airQualityUsername[i]);
+			AirQualitySensor(airQualitySensor[i], airQualityDeviceId[i], airQualityDeviceNum[i], airQualityUsername[i]);
 			printf("AirQualitySensor (pid:%d) exit\n", getpid());
 
 			return 0;
@@ -130,7 +160,7 @@ int main(int argc, char *argv[])
 			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 			printf("TemperatureRelay (pid:%d) creat\n", getpid());
-			TemperatureRelay(&sojoRelaySensor[i], sojoRelayDeviceId[i], sojoRelayDeviceNum[i], sojoRelayUsername[i]);
+			TemperatureRelay(sojoRelaySensor[i], sojoRelayDeviceId[i], sojoRelayDeviceNum[i], sojoRelayUsername[i]);
 			printf("TemperatureRelay (pid:%d) exit\n", getpid());
 
 			return 0;
@@ -202,6 +232,24 @@ int main(int argc, char *argv[])
 	IndicatorLedOnOrOff(LED_OFF);	//程序退出，灯关闭
 	printf("EdgeGateway (pid:%d) exit\n", getpid());
 
+	/* 释放内存空间 */
+	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
+	{
+		free(trsptTrsmsUart[i]);
+		free(trsptTrsmsEth[i]);
+		free(noiseUsername[i]);
+		free(noiseUart[i]);
+		free(noiseDeviceId[i]);
+		free(airQualityUsername[i]);
+		free(airQualitySensor[i]);
+		free(airQualityDeviceId[i]);
+		free(sojoRelayUsername[i]);
+		free(sojoRelaySensor[i]);
+		free(sojoRelayDeviceId[i]);
+		free(userName[i]);
+	}
+
+
 	return 0;
 }
 
@@ -213,7 +261,7 @@ int main(int argc, char *argv[])
  * @param type 协议类型数组
  * @param uart 串口信息结构体数组
  * @param eth 网口信息结构体数组
- * @return 成功：0 失败：其他
+ * @return void
  */
 static void TrsptTrsmsParamConfig(EdgeGatewayConfig *configInfo, int *processNum, int type[], UartInfo *uart[], NetworkInfo *eth[])
 {
@@ -253,6 +301,118 @@ static void TrsptTrsmsParamConfig(EdgeGatewayConfig *configInfo, int *processNum
 }
 
 
+/**
+ * @brief 透传功能参数配置
+ * @param configInfo 从配置文件获取到的配置信息
+ * @param processNum 进程数
+ * @param username 保存数据的数据表名
+ * @param uart 串口信息结构体数组
+ * @param deviceNum 设备数
+ * @param deviceId 设备号
+ * @param sersorType 传感器类型
+ * @return void
+ */
+static void ModbusParamConfig(EdgeGatewayConfig *configInfo, int *processNum, char *username[], UartInfo *uart[], int deviceNum[], int *deviceId[], int sersorType)
+{
+	ModbusConfig **modbusInfo = NULL;
+	ModbusConfig *noiseInfo = NULL, *airQulityInfo = NULL, *sojoRelay = NULL;
+
+	switch(sersorType)
+	{
+	case NOISE_SERSOR:
+		modbusInfo = &noiseInfo;
+		break;
+	case AIR_QUALITY_SERSOR:
+		modbusInfo = &airQulityInfo;
+		break;
+	case SOJO_RELAY:
+		modbusInfo = &sojoRelay;
+		break;
+	}
+
+	*processNum = configInfo->noiseNumber;
+
+	for(int i = 0; i < *processNum; i++)
+	{
+		switch(i)
+		{
+		case 0:
+			noiseInfo = &configInfo->noiseSersor1;
+			airQulityInfo = &configInfo->airSersor1;
+			sojoRelay = &configInfo->tempSersor1;
+			break;
+		case 1:
+			noiseInfo = &configInfo->noiseSersor2;
+			airQulityInfo = &configInfo->airSersor2;
+			sojoRelay = &configInfo->tempSersor2;
+			break;
+		case 2:
+			noiseInfo = &configInfo->noiseSersor3;
+			airQulityInfo = &configInfo->airSersor3;
+			sojoRelay = &configInfo->tempSersor3;
+			break;
+		case 3:
+			noiseInfo = &configInfo->noiseSersor4;
+			airQulityInfo = &configInfo->airSersor4;
+			sojoRelay = &configInfo->tempSersor4;
+			break;
+		case 4:
+			noiseInfo = &configInfo->noiseSersor5;
+			airQulityInfo = &configInfo->airSersor5;
+			sojoRelay = &configInfo->tempSersor5;
+			break;
+		}
+
+		strcpy(username[i], (*modbusInfo)->dataFilename);
+		uart[i]->bandrate = (*modbusInfo)->bandrate;
+		uart[i]->uartType = (*modbusInfo)->uartType;
+		strcpy(uart[i]->uartName, (*modbusInfo)->uartName);
+		deviceNum[i] = (*modbusInfo)->slaveNumber;
+		for(int j = 0; j < deviceNum[i]; j++)
+		{
+			deviceId[i][j] = (*modbusInfo)->slaveID[j];
+		}
+	}
+}
+
+
+/**
+ * @brief 透传功能参数配置
+ * @param configInfo 从配置文件获取到的配置信息
+ * @param processNum 进程数
+ * @param username 保存数据的数据表名
+ * @return void
+ */
+static void MqttParamConfig(EdgeGatewayConfig *configInfo, int *processNum, char *username[])
+{
+	MqttConfig *mqttInfo = NULL;
+	char *tempString = NULL;
+
+	mqttInfo = &configInfo->mqttAccess;
+	*processNum = mqttInfo->mqttNumber;
+	for(int i = 0; i < *processNum; i++)
+	{
+		switch(i)
+		{
+		case 0:
+			tempString = mqttInfo->username1;
+			break;
+		case 1:
+			tempString = mqttInfo->username2;
+			break;
+		case 2:
+			tempString = mqttInfo->username3;
+			break;
+		case 3:
+			tempString = mqttInfo->username4;
+			break;
+		case 4:
+			tempString = mqttInfo->username5;
+			break;
+		}
+		strcpy(username[i], tempString);
+	}
+}
 
 
 
