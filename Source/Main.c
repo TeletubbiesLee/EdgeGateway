@@ -12,6 +12,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
 #include "Led/Led.h"
 #include "ProcessSignal/ProcessSignal.h"
 #include "TransparentTransmission/TransparentTransmission.h"
@@ -23,6 +24,8 @@
 #include "DataStruct.h"
 
 
+static void TrsptTrsmsParamConfig(EdgeGatewayConfig *configInfo, int *processNum, int type[], UartInfo *uart[], NetworkInfo *eth[]);
+
 
 /**
  * 	@brief: main函数
@@ -33,10 +36,14 @@ int main(int argc, char *argv[])
 
 	/* 透传功能需要的配置信息 */
 	int trsptTrsmsProcessNum = 0;			//透传功能进程数
-	int trsptTrsmsType[2] = {TCP_SERVER_TO_UART, TCP_CLIENT_TO_UART};
-	UartInfo trsptTrsmsUart[2] = {{"/dev/ttymxc3", 9600, RS485_TYPE}, {"/dev/ttymxc1", 9600, RS232_TYPE}};
-	NetworkInfo trsptTrsmsEth[2] = {{"192.168.10.10", 6666, "iot.shangshan.info", 41001},
-									{"127.0.0.1", 5555, "192.168.10.11", 3333}};
+	int trsptTrsmsType[5] = {0};
+	UartInfo *trsptTrsmsUart[5] = {0};
+	NetworkInfo *trsptTrsmsEth[5] = {0};
+	for(int i = 0; i < 5; i++)
+	{
+		trsptTrsmsUart[i] = malloc(sizeof(UartInfo));
+		trsptTrsmsEth[i] = malloc(sizeof(NetworkInfo));
+	}
 
 	/* 噪声传感器需要的配置信息 */
 	int noiseProcessNum = 0;			//透传功能进程数
@@ -66,8 +73,8 @@ int main(int argc, char *argv[])
 
 	/* 解析配置文件，获取配置信息  */
 	GetJsonFile(JSON_CONFIG_FILENAME, &g_EdgeGatewayConfig);
-	ConfigPrintf(g_EdgeGatewayConfig);
 	/* TODO:将获取的配置信息进行赋值 */
+	TrsptTrsmsParamConfig(g_EdgeGatewayConfig, &trsptTrsmsProcessNum, trsptTrsmsType, trsptTrsmsUart, trsptTrsmsEth);
 
 
 	/* 创建透传功能进程 */
@@ -78,7 +85,7 @@ int main(int argc, char *argv[])
 			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 			printf("TransparentTransmission (pid:%d) creat\n", getpid());
-			TransparentTransmission(trsptTrsmsType[i], &trsptTrsmsUart[i], &trsptTrsmsEth[i]);		//透传功能
+			TransparentTransmission(trsptTrsmsType[i], trsptTrsmsUart[i], trsptTrsmsEth[i]);		//透传功能
 			printf("TransparentTransmission (pid:%d) exit\n", getpid());
 
 			return 0;
@@ -196,6 +203,53 @@ int main(int argc, char *argv[])
 	printf("EdgeGateway (pid:%d) exit\n", getpid());
 
 	return 0;
+}
+
+
+/**
+ * @brief 透传功能参数配置
+ * @param configInfo 从配置文件获取到的配置信息
+ * @param processNum 进程数
+ * @param type 协议类型数组
+ * @param uart 串口信息结构体数组
+ * @param eth 网口信息结构体数组
+ * @return 成功：0 失败：其他
+ */
+static void TrsptTrsmsParamConfig(EdgeGatewayConfig *configInfo, int *processNum, int type[], UartInfo *uart[], NetworkInfo *eth[])
+{
+	UartToNetConfig *uart2Net = NULL;
+
+	*processNum = configInfo->uartToNetNumber;
+
+	for(int i = 0; i < *processNum; i++)
+	{
+		switch(i)
+		{
+			case 0:
+				uart2Net = &configInfo->uartToNet1;
+				break;
+			case 1:
+				uart2Net = &configInfo->uartToNet2;
+				break;
+			case 2:
+				uart2Net = &configInfo->uartToNet3;
+				break;
+			case 3:
+				uart2Net = &configInfo->uartToNet4;
+				break;
+			case 4:
+				uart2Net = &configInfo->uartToNet5;
+				break;
+		}
+		type[i] = uart2Net->ProtocolType;
+		strcpy(uart[i]->uartName, uart2Net->uartName);
+		uart[i]->bandrate = uart2Net->bandrate;
+		uart[i]->uartType = uart2Net->uartType;
+		strcpy(eth[i]->localAddress, uart2Net->localIP);
+		eth[i]->localPort = uart2Net->localPort;
+		strcpy(eth[i]->remoteAddress, uart2Net->remoteIP);
+		eth[i]->remotePort = uart2Net->remotePort;
+	}
 }
 
 

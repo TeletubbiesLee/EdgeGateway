@@ -89,8 +89,8 @@ EdgeGatewayConfig g_DefaultConfig = {
 
 static void *json_to_struct(cJSON* json_obj);
 static cJSON *struct_to_json(void* struct_obj);
-static cJSON* vPort_Get_cJSON(const char *value);
-static char* vPort_Print_cJSON(cJSON *item);
+static cJSON* Get_cJSON(const char *value);
+static char* Print_cJSON(cJSON *item);
 
 
 
@@ -207,7 +207,7 @@ int CreateJsonFile(char *filename, EdgeGatewayConfig *edgeGatewayStruct)
 
 	cJSON* structJson = struct_to_json(edgeGatewayStruct);
 
-	string = vPort_Print_cJSON(structJson);
+	string = Print_cJSON(structJson);
 
 	writeNum = write(fd, string, strlen(string));    //依照标准格式进行写入
 	if(writeNum != strlen(string))
@@ -273,7 +273,7 @@ int GetJsonFile(char *filename, EdgeGatewayConfig **edgeGatewayStruct)
         goto JSON_RES;
     }
 
-    readJson = vPort_Get_cJSON(string);
+    readJson = Get_cJSON(string);
     if(NULL == readJson)
     {
     	printf_debug("vPort_Get_cJSON error\n");
@@ -649,9 +649,8 @@ static cJSON *struct_to_json(void* struct_obj)
  * @brief 获取json，重新封装cJSON_Parse函数
  * @param value 指向要转换为json结构的字符串
  * @return 返回指向获取到的json指针
- *
  */
-static cJSON* vPort_Get_cJSON(const char *value)
+static cJSON* Get_cJSON(const char *value)
 {
     return cJSON_Parse(value);
 }
@@ -663,7 +662,7 @@ static cJSON* vPort_Get_cJSON(const char *value)
  * @param item 指向要打印的json结构体的指针
  * @return 返回指向打印的json结构体生成的字符串指针
  */
-static char* vPort_Print_cJSON(cJSON *item)
+static char* Print_cJSON(cJSON *item)
 {
     return cJSON_Print(item);
 }

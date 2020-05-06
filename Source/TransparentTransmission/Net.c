@@ -36,13 +36,13 @@ int TCP_NetConnect(char *ipAddress, int serverPort)
 
     if((host = gethostbyname(ipAddress)) == NULL)
 	{
-    	printf_debug("gethostbyname error！");
+    	printf_debug("gethostbyname %s error!\n", ipAddress);
 		return FUNCTION_FAIL;
 	}
 
     if((socketFd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
-    	printf_debug("socket create error!");
+    	printf_debug("socket create error!\n");
 		return FUNCTION_FAIL;
 	}
 
@@ -74,7 +74,7 @@ int TCP_NetListen(int serverPort)
 
     if ((socketFd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
-    	printf_debug("socket fail!");
+    	printf_debug("socket fail!\n");
         return FUNCTION_FAIL;
 	}
 
@@ -114,7 +114,7 @@ int TCP_NetAccept(int socketFd)
 
 	while((clientFd = accept(socketFd, (struct sockaddr *)&remoteAddr, &sinSize)) == -1)
 	{
-		printf_debug("accept error\n");
+		printf_debug("accept error!\n");
 		sleep(1);
 	}
 
@@ -151,7 +151,7 @@ int UDP_NetConnect(int serverPort)
 
     if((socketFd = socket(AF_INET, SOCK_DGRAM, 0)) == -1)
 	{
-    	printf_debug("socket fail!");
+    	printf_debug("socket fail!\n");
         return FUNCTION_FAIL;
 	}
 
@@ -163,7 +163,7 @@ int UDP_NetConnect(int serverPort)
 
 	if(bind(socketFd, (struct sockaddr *)&localAddr, sizeof(struct sockaddr)) == -1)
 	{
-		printf_debug("bind error!");
+		printf_debug("bind error!\n");
 		return FUNCTION_FAIL;
 	}
 
