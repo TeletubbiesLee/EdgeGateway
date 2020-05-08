@@ -28,8 +28,9 @@ int ModbusInit(modbus_t **ctx, UartInfo *uartInfo)
 		printf_debug("Unable to allocate libmodbus context\n");
 		return POINT_NULL;
 	}
-
+#if MODBUS_TX_RX_DEBUG
 	modbus_set_debug(*ctx, TRUE);        //设置Dubug模式
+#endif
 	modbus_set_error_recovery(*ctx, MODBUS_ERROR_RECOVERY_LINK | MODBUS_ERROR_RECOVERY_PROTOCOL);
 
 	/* 建立连接 */

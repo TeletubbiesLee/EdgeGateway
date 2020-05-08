@@ -24,28 +24,32 @@
 Modbus通信相关：Modbus/
 	六合一空气质量传感器：AirQualitySensor/
 		1.接口函数：头文件包含AirQualitySensor.h，函数调用AirQualitySensor()
-		2.外部引用：DataStruct.h、Config.h、DataProcess.h
+		2.外部引用：DataStruct.h、Config.h、DataProcess.h、Semaphore.h
 	modbus第三方库：libmodbus/
 		1.接口函数：头文件包含modbus.h、modbus-config.h
 	噪声传感器：NoiseSensor/
 		1.接口函数：头文件包含NoiseSensor.h，函数调用NoiseSensor()
-		2.外部引用：DataStruct.h、Config.h、DataProcess.h
+		2.外部引用：DataStruct.h、Config.h、DataProcess.h、Semaphore.h
 	双杰测温中继：SOJO/
 		1.接口函数：头文件包含TemperatureRelay.h，函数调用TemperatureRelay()
-		2.外部引用：DataStruct.h、Config.h、DataProcess.h
+		2.外部引用：DataStruct.h、Config.h、DataProcess.h、Semaphore.h
 
 MQTT通信相关：MQTT/
 	paho mqtt-c第三方库：paho_mqtt_c/
 		1.接口函数：头文件包含MQTTClient.h
 	MQTT发布消息文件：
 		1.接口函数：头文件包含MqttPublish.h，函数调用MqttPublish()
-		2.外部引用：Config.h、DataProcess.h
+		2.外部引用：Config.h、DataProcess.h、Semaphore.h
 
 配置信息相关：ParserConfig/
 	结构体转json第三方库：struct2json/
 	结构体转json针对自定义结构体的接口文件：
 		1.接口函数：头文件包含Interface_S2J.h
 		2.外部引用：Config.h、DataProcess.h、TransparentTransmission.h
+		
+进程间通信相关：ProcessCommunication/
+	信号量相关：Semaphore
+		1.接口函数：头文件包含Semaphore.h
 
 信号处理相关：ProcessSignal/
 	1.接口函数：头文件包含ProcessSignal.h，函数调用SetProcessCloseSignal()

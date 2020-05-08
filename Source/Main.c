@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/sem.h>
 #include "Led/Led.h"
 #include "ProcessSignal/ProcessSignal.h"
 #include "TransparentTransmission/TransparentTransmission.h"
@@ -21,6 +22,7 @@
 #include "Modbus/SojoRelay/TemperatureRelay.h"
 #include "MQTT/MqttPublish.h"
 #include "ParserConfig/Interface_S2J.h"
+#include "ProcessCommunication/Semaphore.h"
 #include "DataStruct.h"
 #include "Config.h"
 
@@ -36,6 +38,7 @@ static void MqttParamConfig(EdgeGatewayConfig *configInfo, int *processNum, char
 int main(int argc, char *argv[])
 {
 	pid_t pid = 0;			//子进程的进程ID号
+	int semId = 0;
 
 	/* 透传功能需要的配置信息 */
 	int trsptTrsmsProcessNum = 0;			//透传功能进程数
@@ -106,6 +109,9 @@ int main(int argc, char *argv[])
 	ModbusParamConfig(g_EdgeGatewayConfig, &sojoRelayProcessNum, sojoRelayUsername, sojoRelaySensor, sojoRelayDeviceNum, sojoRelayDeviceId, SOJO_RELAY);
 	MqttParamConfig(g_EdgeGatewayConfig, &mqttProcessNum, userName);
 
+	/* 初始化信号量 */
+	semId = semget((key_t)SEMAPHORE_KEY, 1, 0666 | IPC_CREAT);
+	SetSemValue(semId);
 
 	/* 创建透传功能进程 */
 	for(int i = 0; i < trsptTrsmsProcessNum; i++)
@@ -248,6 +254,7 @@ int main(int argc, char *argv[])
 		free(sojoRelayDeviceId[i]);
 		free(userName[i]);
 	}
+	DelSemValue(semId);
 
 
 	return 0;

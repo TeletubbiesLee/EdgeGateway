@@ -13,11 +13,13 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <sys/sem.h>
 #include "../libmodbus/modbus.h"
 #include "../../Config.h"
 #include "../ModbusInit.h"
 #include "AirQualitySensor.h"
 #include "../../DataStorage/DataProcess.h"
+#include "../../ProcessCommunication/Semaphore.h"
 
 
 static void AirQualityDataParse(uint16_t *tabRegisters, int deviceId, char *filename);
@@ -36,6 +38,7 @@ int AirQualitySensor(UartInfo *uartInfo, int deviceId[], int deviceNum, char *fi
 	modbus_t *ctx = NULL;       //成功打开设备后返回的结构体指针
 	uint16_t *tabRegisters = NULL;      //寄存器的空间
 	int nbPoints;               //空间大小
+	int semId = 0;
 
 	if(-1 == ModbusInit(&ctx, uartInfo))		//Modbus初始化
 	{
@@ -48,9 +51,18 @@ int AirQualitySensor(UartInfo *uartInfo, int deviceId[], int deviceNum, char *fi
 	tabRegisters = (uint16_t *) malloc(nbPoints * sizeof(uint16_t));
 	memset(tabRegisters, 0, nbPoints * sizeof(uint16_t));
 
-	if(0 != CreateDataFile(filename))
+    semId = semget((key_t)SEMAPHORE_KEY, 1, 0666 | IPC_CREAT);
+
+    if(Semaphore_P(semId) == NO_ERROR)
 	{
-		printf_debug("CreateDataFile(\"%s\") error\n", filename);
+		printf("AirQualitySensor: Semaphore_P success\n");
+		if(0 != CreateDataFile(filename))
+		{
+			printf_debug("CreateDataFile(\"%s\") error\n", filename);
+		}
+		printf("CreateDataFile(\"%s\") success\n", filename);
+		if(Semaphore_V(semId) == NO_ERROR)
+			printf("AirQualitySensor: Semaphore_V success\n");
 	}
 
 	while (1)
@@ -62,7 +74,13 @@ int AirQualitySensor(UartInfo *uartInfo, int deviceId[], int deviceNum, char *fi
 			modbus_read_registers(ctx, AIR_QUALITY_REGISTERS_ADDRESS, AIR_QUALITY_REGISTERS_NUMBER, tabRegisters);
 
 			/* 对数据进行解析和保存 */
-			AirQualityDataParse(tabRegisters, deviceId[i], filename);
+			if(Semaphore_P(semId) == NO_ERROR)
+			{
+				printf("AirQualitySensor: Semaphore_P success\n");
+				AirQualityDataParse(tabRegisters, deviceId[i], filename);
+				if(Semaphore_V(semId) == NO_ERROR)
+					printf("AirQualitySensor: Semaphore_V success\n");
+			}
 		}
 		sleep(AIR_QUALITY_MODBUS_INTERVAL);
 	}

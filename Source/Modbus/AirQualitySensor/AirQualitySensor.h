@@ -14,6 +14,7 @@
 
 #include "../../DataStruct.h"
 
+
 #define AIR_QUALITY_REGISTERS_ADDRESS		0x00		//保持寄存器地址
 #define AIR_QUALITY_REGISTERS_NUMBER		7			//保持寄存器个数
 #define AIR_QUALITY_MODBUS_INTERVAL			5			//噪声传感器Modbus通信时间间隔

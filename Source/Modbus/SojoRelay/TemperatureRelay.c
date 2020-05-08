@@ -13,11 +13,13 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <sys/sem.h>
 #include "TemperatureRelay.h"
 #include "../libmodbus/modbus.h"
 #include "../../Config.h"
 #include "../ModbusInit.h"
 #include "../../DataStorage/DataProcess.h"
+#include "../../ProcessCommunication/Semaphore.h"
 
 
 static void SOJO_TemperatureDataProcess(uint16_t registerData[], int arrayNumber, int deviceId, char *filename);
@@ -37,6 +39,7 @@ int TemperatureRelay(UartInfo *uartInfo, int deviceId[], int deviceNum, char *fi
     uint16_t *tabRegisters = NULL;      //寄存器的空间
     int nbPoints;               //空间大小
     int tempValue = 0;			//临时值
+	int semId = 0;
 
     if(-1 == ModbusInit(&ctx, uartInfo))		//Modbus初始化
 	{
@@ -49,9 +52,18 @@ int TemperatureRelay(UartInfo *uartInfo, int deviceId[], int deviceNum, char *fi
     tabRegisters = (uint16_t *) malloc(nbPoints * sizeof(uint16_t));
     memset(tabRegisters, 0, nbPoints * sizeof(uint16_t));
 
-    if(0 != CreateDataFile(filename))
+    semId = semget((key_t)SEMAPHORE_KEY, 1, 0666 | IPC_CREAT);
+
+    if(Semaphore_P(semId) == NO_ERROR)
 	{
-		printf_debug("CreateDataFile(\"%s\") error\n", filename);
+		printf("TemperatureRelay: Semaphore_P success\n");
+		if(0 != CreateDataFile(filename))
+		{
+			printf_debug("CreateDataFile(\"%s\") error\n", filename);
+		}
+		printf("CreateDataFile(\"%s\") success\n", filename);
+		if(Semaphore_V(semId) == NO_ERROR)
+			printf("TemperatureRelay: Semaphore_V success\n");
 	}
 
     while (1)
@@ -67,7 +79,13 @@ int TemperatureRelay(UartInfo *uartInfo, int deviceId[], int deviceNum, char *fi
 			}
 
 			/* 对数据进行解析和保存 */
-			SOJO_TemperatureDataProcess(tabRegisters, TEMP_RELAY_REGISTERS_NUMBER, deviceId[i], filename);
+			if(Semaphore_P(semId) == NO_ERROR)
+			{
+				printf("TemperatureRelay: Semaphore_P success\n");
+				SOJO_TemperatureDataProcess(tabRegisters, TEMP_RELAY_REGISTERS_NUMBER, deviceId[i], filename);
+				if(Semaphore_V(semId) == NO_ERROR)
+					printf("TemperatureRelay: Semaphore_V success\n");
+			}
     	}
 		sleep(TEMP_RELAY_MODBUS_INTERVAL);
     }

@@ -14,10 +14,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/sem.h>
 #include "paho_mqtt_c/MQTTClient.h"
 #include "MqttPublish.h"
 #include "../Config.h"
 #include "../DataStorage/DataProcess.h"
+#include "../ProcessCommunication/Semaphore.h"
 
 
 static void MqttPublishMessage(MQTTClient *client, char *payload, int payloadLenth);
@@ -35,13 +37,22 @@ int MqttPublish(char *accessUser)
 {
     MQTTClient client;
     char payload[128] = {0};
+	int semId = 0;
 
     MqttInit(&client, accessUser);
+
+    semId = semget((key_t)SEMAPHORE_KEY, 1, 0666 | IPC_CREAT);
 
     while(1)
     {
 		/* 读取出数据 */
-    	ReadDataPoll(accessUser, payload);
+		if(Semaphore_P(semId) == NO_ERROR)
+		{
+			printf("MQTT: Semaphore_P success\n");
+	    	ReadDataPoll(accessUser, payload);
+			if(Semaphore_V(semId) == NO_ERROR)
+				printf("MQTT: Semaphore_V success\n");
+		}
 
 		MqttPublishMessage(&client, payload, strlen(payload));
 
