@@ -38,6 +38,7 @@ int MqttPublish(char *accessUser)
     MQTTClient client;
     char payload[128] = {0};
 	int semId = 0;
+	int ret = 0;
 
     MqttInit(&client, accessUser);
 
@@ -49,12 +50,13 @@ int MqttPublish(char *accessUser)
 		if(Semaphore_P(semId) == NO_ERROR)
 		{
 			printf("MQTT: Semaphore_P success\n");
-	    	ReadDataPoll(accessUser, payload);
+	    	ret = ReadDataPoll(accessUser, payload);
 			if(Semaphore_V(semId) == NO_ERROR)
 				printf("MQTT: Semaphore_V success\n");
 		}
 
-		MqttPublishMessage(&client, payload, strlen(payload));
+		if(0 == ret)
+			MqttPublishMessage(&client, payload, strlen(payload));
 
 		sleep(MQTT_PUBLISH_INTERVAL);
     }
