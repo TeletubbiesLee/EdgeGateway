@@ -90,7 +90,7 @@ int PollData(char *filename, DataInformation *dataInfo)
 		printf("table NULL or error!\n");
 		return POINT_NULL;
 	}
-		/* TODO:读取到数据赋值 */
+	/* TODO:读取到数据赋值 */
 
 	//数据内存释放
 	freePollDataInformation(allData);

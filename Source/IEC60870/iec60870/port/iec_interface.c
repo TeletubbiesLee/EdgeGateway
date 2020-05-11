@@ -26,7 +26,7 @@
 #include "..\master101\101master.h"
 //#include "modbus_master.h"
 #include "..\tcp_socket\tcp_interface.h"
-#include "..\..\RS485\RS485.h"
+#include "../../../RS485/RS485.h"
 /* PRIVATE VARIABLES ---------------------------------------------------------*/
 static uint8_t 	portNo = 0;
 static int 		baudRate = 9600;
@@ -166,7 +166,7 @@ int iec_init(IecParam sParam)
 			}
 
 			res = RS485_Enable(portFd, ENABLE_485);
-			if (res != NO_ERROR)
+			if (res != 0)
 			{
 				printf("RS485_Enable error!\n");
 			}
@@ -207,7 +207,7 @@ int iec_init(IecParam sParam)
 			}
 
 			res = RS485_Enable(portFd, ENABLE_485);
-			if (res != NO_ERROR)
+			if (res != 0)
 			{
 				printf("RS485_Enable error!\n");
 			}

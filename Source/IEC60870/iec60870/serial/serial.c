@@ -20,7 +20,6 @@
 #include "serial.h"
 //#include "elog.h"
 #include "../port/iec_interface.h"
-#include "485.h"
 //#include "monitor.h"
 /* PRIVATE VARIABLES ---------------------------------------------------------*/
 static const char *uart_dev[] =
