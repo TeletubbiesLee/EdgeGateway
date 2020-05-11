@@ -48,7 +48,7 @@ int SojoDtu_IEC101(void)
 
 
 /**
- * @breif 双杰DTU的101通信
+ * @breif 双杰DTU的104通信
  * @param void
  * @return 成功：0 失败：-1
  */

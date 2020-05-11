@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include "../iec60870/iec60870_interface.h"
+#include "../iec60870/iec60870_configure.h"
 #include "sojo_interface.h"
 
 /**
@@ -21,13 +22,14 @@
   */
 void iec_startup(IECType iecType, uint8_t num)
 {
+	ParameterConfiguration *para;
 	if(iecType == IEC101)
 	{
-		iec101_init(num);
+		iec101_init(para);
 	}
 	else if(iecType == IEC104)
 	{
-		iec104_init(num);
+		iec104_init(para);
 	}
 	else
 	{

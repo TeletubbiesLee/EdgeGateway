@@ -1,0 +1,46 @@
+/**
+  *             Copyright (C) SOJO Electric CO., Ltd. 2018-2019. All right reserved.
+  * @file:      iec60870_configure.h
+  * @brief:		通用对外配置头文件
+  * @version:   V1.0.0
+  * @author:    txl
+  * @date:      2020-05-11
+  * @update:    [2020-05-11][txl][newly increased]
+  */
+
+#ifndef	_IEC60870_CONDIFURE_H_
+#define _IEC60870_CONDIFURE_H_
+
+#include "stdint.h"
+
+
+
+
+typedef struct TagParameterConfiguration{
+	uint8_t  num;			//从机个数
+
+	uint8_t  portNo; 		/*串口号 0—2*/
+	uint8_t  baudRate;		/*波特率 0: 2400 4800 9600 38400 115200*/
+	uint8_t  parity;	    /*奇偶校验 0无 1奇 2偶*/
+
+	char     *ip;           /*IP地址(点分十进制)*/
+	uint8_t  balanMode;		/*平衡or非平衡 1平衡*/
+	uint16_t sourceAddr; 	/*链路地址*/
+	uint8_t  linkAddrSize;	/*链路地址长度 1 2*/
+	uint16_t ASDUCotSize;	/*传送原因长度*/
+	uint16_t ASDUAddr;		/*ASDU地址*/
+	uint8_t  ASDUAddrSize;	/*ASDU地址长度 1 2*/
+	uint8_t  InfoAddrSize;	/*信息体地址长度 2 3*/
+
+	uint16_t *sModuleId;                       /* 模块ID */
+	uint8_t  sMstate;							/* 通讯状态 */
+	uint16_t *sMsourceAddr; 	                    /* 链路地址 */
+	uint8_t  sMportNo; 		                    /* 串口号 */
+	uint8_t  sMnetEn; 		                    /* 网口使用 */
+	char     *sMip;								//从机IP
+}ParameterConfiguration;
+
+
+
+
+#endif
