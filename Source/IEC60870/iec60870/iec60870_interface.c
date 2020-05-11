@@ -43,7 +43,7 @@ static const char *ipAddr[] =
 	"192.168.1.222",
 };
 
-void iec101_init(ParameterConfiguration *para)
+void iec101_init(Configure101 *para)
 {
 	time_t ti;
 	struct tm * pTM;
@@ -69,7 +69,7 @@ void iec101_init(ParameterConfiguration *para)
 	sParam101.baudRate = para->baudRate;				/*波特率 0: 2400 4800 9600 38400 115200*/
 	sParam101.parity = para->parity;	    			/*奇偶校验 0无 1奇 2偶*/
 
-	sParam101.ip = para->ip;   							/*IP地址(点分十进制)*/		//本机IP
+	sParam101.ip = "192.168.1.1";   					/*IP地址(点分十进制)*/		//本机IP
 	sParam101.LocalNetPort = 1;							/*本机网口 1 2*/
 	sParam101.ModuleSN = 0;	    						/*模块ID号*/
 	sParam101.encrypt = 0;								/*是否加密 0不加密 1加密*/
@@ -85,7 +85,6 @@ void iec101_init(ParameterConfiguration *para)
 	g_tagOverallCfg.def.switch_OFF = 1;
 
 	sParam101.allInfoDisk = &g_tagOverallCfg; //全局配置结构
-	uint8_t state = 1;
 	mParam101 = (struct sMasterParam *)malloc(para->num * sizeof(struct sMasterParam));
 	if (mParam101 == NULL)
 	{
@@ -99,7 +98,7 @@ void iec101_init(ParameterConfiguration *para)
 		{
 			((struct sMasterParam *)(mParam101 + i))->module_id = para->sModuleId[i];          /* 模块ID */
 			((struct sMasterParam *)(mParam101 + i))->sourceAddr = para->sMsourceAddr[i]; 	   /* 链路地址 */
-			((struct sMasterParam *)(mParam101 + i))->communication_state.pValue = &state;	   /* 通讯状态 */
+			((struct sMasterParam *)(mParam101 + i))->communication_state.pValue = &para->sMstate;	   /* 通讯状态 */
 			((struct sMasterParam *)(mParam101 + i))->YX_len = 150;                            /* 遥信长度 */
 			((struct sMasterParam *)(mParam101 + i))->YC_len = 100;                            /* 遥测长度 */
 			((struct sMasterParam *)(mParam101 + i))->p_YC_data = (tagAnalogQuantityIn_t)malloc(100 * sizeof(struct tagAnalogQuantityIn));
@@ -117,8 +116,8 @@ void iec101_init(ParameterConfiguration *para)
 
 			((struct sMasterParam *)(mParam101 + i))->YK_len = 11;                            	/* 遥控长度 */
 			((struct sMasterParam *)(mParam101 + i))->portNo = para->sMportNo; 		            /* 串口号0关闭1开启 */
-			((struct sMasterParam *)(mParam101 + i))->netEn = para->sMnetEn; 		            /* 网口使用0关闭1开启 */
-			((struct sMasterParam *)(mParam101 + i))->ip = para->sMip[i];           				/*IP地址(点分十进制)*/   //设备IP
+			((struct sMasterParam *)(mParam101 + i))->netEn = 0; 		            			/* 网口使用0关闭1开启 */
+			((struct sMasterParam *)(mParam101 + i))->ip = "192.168.1.1";           			/*IP地址(点分十进制)*/   //设备IP
 			((struct sMasterParam *)(mParam101 + i))->yk_type = 1;		                    	/* 遥控单双点 */
 
 			MasterModleParam(((struct sMasterParam *)(mParam101 + i)));							//从站链路地址为1
@@ -133,7 +132,7 @@ void iec101_init(ParameterConfiguration *para)
 	}
 }
 
-void iec104_init(ParameterConfiguration *para)
+void iec104_init(Configure104 *para)
 {
 	time_t ti;
 	struct tm * pTM;
@@ -155,9 +154,9 @@ void iec104_init(ParameterConfiguration *para)
 	mysem_init();			//初始化信号量
 	sParam104.stype = 4; 		/*协议类型 0代表s101 1代表s104*/
 
-	sParam104.portNo = para->portNo; 		/*串口号 0—2*/
-	sParam104.baudRate = para->baudRate;		/*波特率 0: 2400 4800 9600 38400 115200*/
-	sParam104.parity = para->parity;	    /*奇偶校验 0无 1奇 2偶*/
+	sParam104.portNo = 0; 		/*串口号 0—2*/
+	sParam104.baudRate = 0;		/*波特率 0: 2400 4800 9600 38400 115200*/
+	sParam104.parity = 0;	    /*奇偶校验 0无 1奇 2偶*/
 
 	sParam104.ip = para->ip;   /*IP地址(点分十进制)*/		//本机IP
 	sParam104.LocalNetPort = 1;	/*本机网口 1 2*/
@@ -175,7 +174,6 @@ void iec104_init(ParameterConfiguration *para)
 	g_tagOverallCfg.def.switch_OFF = 1;
 
 	sParam104.allInfoDisk = &g_tagOverallCfg; //全局配置结构
-	uint8_t state = 1;
 	mParam104 = (struct sMasterParam *)malloc(para->num * sizeof(struct sMasterParam));
 	if (mParam104 == NULL)
 	{
@@ -189,8 +187,8 @@ void iec104_init(ParameterConfiguration *para)
 		while(i < para->num)
 		{
 			((struct sMasterParam *)(mParam104 + i))->module_id = para->sModuleId[i];                         /* 模块ID */
-			((struct sMasterParam *)(mParam104 + i))->sourceAddr = para->sMsourceAddr; 	                    /* 链路地址 */
-			((struct sMasterParam *)(mParam104 + i))->communication_state.pValue = para->sMstate;
+			((struct sMasterParam *)(mParam104 + i))->sourceAddr = para->sMsourceAddr[i]; 	                    /* 链路地址 */
+			((struct sMasterParam *)(mParam104 + i))->communication_state.pValue = &para->sMstate;
 			((struct sMasterParam *)(mParam104 + i))->YX_len = 150;                            /* 遥信长度 */
 			((struct sMasterParam *)(mParam104 + i))->YC_len = 100;                            /* 遥测长度 */
 			((struct sMasterParam *)(mParam104 + i))->p_YC_data = (tagAnalogQuantityIn_t)malloc(100 * sizeof(struct tagAnalogQuantityIn));
@@ -203,7 +201,7 @@ void iec104_init(ParameterConfiguration *para)
 				j++;
 			}
 			((struct sMasterParam *)(mParam104 + i))->YK_len = 11;                            /* 遥控长度 */
-			((struct sMasterParam *)(mParam104 + i))->portNo = para->sMportNo; 		                    /* 串口号0关闭1开启 */
+			((struct sMasterParam *)(mParam104 + i))->portNo = 0; 		                    /* 串口号0关闭1开启 */
 			((struct sMasterParam *)(mParam104 + i))->netEn = para->sMnetEn; 		                    /* 网口使用0关闭1开启 */
 			((struct sMasterParam *)(mParam104 + i))->ip = para->sMip[i];           		/*IP地址(点分十进制)*/   //设备IP
 			((struct sMasterParam *)(mParam104 + i))->yk_type = 1;		                    /* 遥控单双点 */
