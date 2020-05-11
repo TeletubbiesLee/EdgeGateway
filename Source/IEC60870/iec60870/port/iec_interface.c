@@ -26,6 +26,7 @@
 #include "..\master101\101master.h"
 //#include "modbus_master.h"
 #include "..\tcp_socket\tcp_interface.h"
+#include "..\..\RS485\RS485.h"
 /* PRIVATE VARIABLES ---------------------------------------------------------*/
 static uint8_t 	portNo = 0;
 static int 		baudRate = 9600;
@@ -134,6 +135,7 @@ int iec_init(IecParam sParam)
 	uint8_t server_no = 0;
 	static uint8_t onceInit = TRUE;
 	SerialPort serialPort;
+	int res = 0;
 
 	if(onceInit)
 	{
@@ -145,15 +147,13 @@ int iec_init(IecParam sParam)
 	switch(sParam->stype) /*协议类型*/
 	{
 		case SLAVE101:
-//			log_i("iec101 init");
 
 			/*串口参数*/
 			if(SerialPortParamCheck(sParam) == FALSE)
             {
-//                log_e("portNo error:%d",portNo);
+
                 break;
             }
-//            log_i("portNo:%d baudRate:%d parity:%c",portNo, baudRate, parity);
             
 			/*串口创建 初始化*/
 			serialPort = SerialPort_create(portNo, baudRate, 8, parity, 1);
@@ -162,9 +162,14 @@ int iec_init(IecParam sParam)
 			portFd = SerialPort_open(serialPort,portNo);
 			if(portFd < 0)
 			{
-//				log_e("SerialPort_open error:%d",portFd);
+
 			}
-//			log_w("portFd:%d,baudRate:%d,parity:%c",portFd,baudRate,parity);
+
+			res = RS485_Enable(portFd, ENABLE_485);
+			if (res != NO_ERROR)
+			{
+				printf("RS485_Enable error!\n");
+			}
 
 			/*初始化*/
 			CS101_Slave_create(s101_pdrv,portFd,sParam);
@@ -173,30 +178,24 @@ int iec_init(IecParam sParam)
 			break;
 
 		case SLAVE104:
-//			log_i("iec104 init");
 			if(sParam->ip == NULL)
 			{
-//				log_e("ip = null");
 				status = -1;
 				break;
 			}
 			server_no = tcp_start(SERVER,sParam->ip);/*网口号*/
-//			log_w("server_no:%d",server_no);
 			CS104_Slave_create(s104_pdrv,server_no,sParam);
 			s104_pdrv++;
 			status = sParam->stype;
 			break;
 
 		case MASTER101:
-//			log_i("MASTER101 init");
 
 			/*串口参数*/
 			if(SerialPortParamCheck(sParam) == FALSE)
             {
-//                log_e("portNo error:%d",portNo);
                 break;
             }
-//            log_i("portNo:%d",portNo);
 			/*串口创建 初始化*/
 			serialPort = SerialPort_create(portNo, baudRate, 8, parity, 1);
 
@@ -204,42 +203,29 @@ int iec_init(IecParam sParam)
 			portFd = SerialPort_open(serialPort,portNo);
 			if(portFd < 0)
 			{
-//				log_e("SerialPort_open error:%d",portFd);
+
 			}
-//			log_w("portFd:%d,baudRate:%d,parity:%c",portFd,baudRate,parity);
+
+			res = RS485_Enable(portFd, ENABLE_485);
+			if (res != NO_ERROR)
+			{
+				printf("RS485_Enable error!\n");
+			}
 
 			/*初始化*/
 			if (cs101_master_comconfig_init(portFd, sParam) == -1)
             {
-//                log_e("config_101master_init error");
+
             }
 			status = sParam->stype;
 			break;
 
 		case MASTER104:
-//			log_i("MASTER104 init");
+
 			backupDataOfsParam(sParam);
 			status = sParam->stype;
 			break;
-//
-//        case MASTERMODBUS:
-//			log_i("MASTERMODBUS init");
-//
-//			/*串口参数*/
-//            if(SerialPortParamCheck(sParam) == FALSE)
-//            {
-//                log_e("portNo error:%d",portNo);
-//                break;
-//            }
-//            log_i("portNo:%d baudRate:%d parity:%c",portNo,baudRate,parity);
-//
-//			if (modbus_master_comconfig_init(sParam) == -1)
-//            {
-//                log_e("modbus_master_comconfig_init error");
-//            }
-//			status = sParam->stype;
-//			break;
-		
+
 		default:
 			break;
 	}
@@ -258,38 +244,30 @@ int iec_init(IecParam sParam)
     uint8_t  client_no;
 
     portNo = sParam->portNo;
-//    log_w("MasterModleParam");
     if(portNo)
     {
         if (cs101_master_appconfig_init(sParam) == 0)
         {
             return true;
         }
-//        if (modbus_master_appconfig_init(sParam) == 0)
-//        {
-//            return true;
-//        }
     }
     if(sParam->netEn)
     {
         if(m104Param.stype != MASTER104)
         {
-//            log_e("not find iec_init");
+
             return FALSE;
         }
 		if(sParam->ip == NULL)
 		{
-//			log_e("ip = null");
+
 			return FALSE;
 		}
-//        log_e("IP:%s",sParam->ip);
         client_no = tcp_start(CLIENT,sParam->ip);/*网口号*/
-//        log_w("client_no:%d m104_pdrv:%d",client_no,m104_pdrv);
 
 		CS104_Master_create(m104_pdrv,client_no,&m104Param);
         if (CS104_Master_AppConfigInit(m104_pdrv,client_no,sParam) == FALSE)
         {
-//            log_e("CS104_Master_AppConfigInit error");
 			return FALSE;
         }
 		m104_pdrv++;
@@ -406,10 +384,8 @@ int iec_start(uint8_t stype)
 	switch(stype)
 	{
 		case SLAVE101:
-//			log_i("iec101 start");
 			if(s101_pdrv <= 0)
 			{
-//				log_e("s101_pdrv:%d,pthread101 cannot create",s101_pdrv);
 				break;
 			}
 			/* 101子站线程*/
@@ -424,10 +400,8 @@ int iec_start(uint8_t stype)
 			break;
 
 		case SLAVE104:
-//			log_i("iec104 start");
 			if(s104_pdrv <= 0)
 			{
-//				log_e("s104_pdrv:%d,pthread104 cannot create",s104_pdrv);
 				break;
 			}
 			/* 104子站线程*/
@@ -439,32 +413,22 @@ int iec_start(uint8_t stype)
 			}
 			pthread_detach(tid);
 			break;
-//
+
 		case MASTER101:
 			ret = cs101_master_start();
             if (ret == -1)
             {
-//                log_e("master101 start error = %d", ret);
+
             }
 			break;
-//
+
 		case MASTER104:
-//			log_i("master104 start");
 			/* 104主站线程*/
 			ret = CS104_Master_Pthread(m104_pdrv);
 			if(ret == FALSE)
 			{
-//				log_e("create cs104 master err");
 			}
 			break;
-//
-//        case MASTERMODBUS:
-//			ret = modbus_master_start();
-//            if (ret == -1)
-//            {
-//                log_e("modbus_master_start = %d", ret);
-//            }
-//			break;
 	}
 	return TRUE;
 }

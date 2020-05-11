@@ -381,15 +381,6 @@ again:
 		else
 			return -1;
 	}
-	if (buffer[startPos] == 0x10)
-	{
-		usleep(7000);
-	}
-	else
-	{
-		usleep(25000);
-	}
-	rs485_enable(fd, ENABLE_485);
     return result;
 }
 

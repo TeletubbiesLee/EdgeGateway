@@ -82,9 +82,18 @@ int ReadData(char *filename, DataInformation *dataInfo)
  */
 int PollData(char *filename, DataInformation *dataInfo)
 {
-	/* TODO:数据库轮询读取数据 */
+	PollDataInformation *allData = NULL;
+	int rowNum = 0;
+	pollAllRecord(filename, allData, &rowNum);
+	if (allData == NULL || rowNum == 0)
+	{
+		printf("table NULL or error!\n");
+		return POINT_NULL;
+	}
+		/* TODO:读取到数据赋值 */
 
-
+	//数据内存释放
+	freePollDataInformation(allData);
 	return NO_ERROR;
 }
 
