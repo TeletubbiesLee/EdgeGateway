@@ -22,12 +22,11 @@
 
 typedef struct TagPollDataInformation
 {
+	char id[4];
 	char dataName[DATA_NAME_STRING_LENTH];
 	char deviceId[8];
 	char dataType[4];
-	char bitData[4];
-	char intData[20];
-	char floatData[20];
+	char dataValue[20];
 	char updateTime[TIME_STRING_LENTH];
 	char mqttUserName[DATA_NAME_STRING_LENTH];
 
@@ -39,7 +38,7 @@ int insertRecord(char *tableName, DataInformation *dataInfo);
 int deleteRecord(char *tableName, DataInformation *dataInfo);
 int updateRecord(char *tableName, DataInformation *dataInfo);
 int selectRecord(char *tableName, DataInformation *dataInfo);
-int pollAllRecord(char *tableName, PollDataInformation *allData, int *rowNum);
+int pollAllRecord(char *tableName, PollDataInformation **allData, int *rowNum);
 void freePollDataInformation(PollDataInformation *allData);
 #endif
 

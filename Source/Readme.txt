@@ -8,7 +8,11 @@
 程序文件夹介绍：
 数据存储：DataStorage/
 	1.接口函数：头文件包含DataProcess.h
-	2.外部引用：Config.h
+	2.外部引用：Config.h、db_linklist.h
+	
+双链表操作相关：db_linklist/
+	1.接口函数：头文件包含db_linklist.h
+	2.外部引用：
 
 101协议和104协议通信相关：IEC60870/
 	101协议和104协议的库：iec60870/

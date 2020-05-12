@@ -55,15 +55,16 @@ int AirQualitySensor(UartInfo *uartInfo, int deviceId[], int deviceNum, char *fi
 
     if(Semaphore_P(semId) == NO_ERROR)
 	{
-		printf("AirQualitySensor: Semaphore_P success\n");
 		if(0 != CreateDataFile(filename))
 		{
 			printf_debug("CreateDataFile(\"%s\") error\n", filename);
 		}
 		printf("CreateDataFile(\"%s\") success\n", filename);
-		if(Semaphore_V(semId) == NO_ERROR)
-			printf("AirQualitySensor: Semaphore_V success\n");
+		if(Semaphore_V(semId) != NO_ERROR)
+			printf_debug("AirQualitySensor: Semaphore_V error\n");
 	}
+    else
+    	printf_debug("AirQualitySensor: Semaphore_P error\n");
 
 	while (1)
 	{

@@ -22,7 +22,7 @@
   */
 void iec_startup(IECType iecType, uint8_t num)
 {
-	ParameterConfiguration *para;
+	ParameterConfiguration *para = NULL;
 	if(iecType == IEC101)
 	{
 		iec101_init(para);

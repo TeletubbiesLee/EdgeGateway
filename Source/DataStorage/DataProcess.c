@@ -80,17 +80,28 @@ int ReadData(char *filename, DataInformation *dataInfo)
  * @param dataInfo 保存数据的结构体指针
  * @return 成功：0 失败：其他
  */
-int PollData(char *filename, DataInformation *dataInfo)
+int PollData(char *filename, db_list_t **dataInfo)
 {
 	PollDataInformation *allData = NULL;
 	int rowNum = 0;
-	pollAllRecord(filename, allData, &rowNum);
+	char *str = NULL;
+
+	pollAllRecord(filename, &allData, &rowNum);
 	if (allData == NULL || rowNum == 0)
 	{
-		printf("table NULL or error!\n");
+		printf_debug("allData = %d, rowNum = %d!\n", (int)allData, rowNum);
 		return POINT_NULL;
 	}
-	/* TODO:读取到数据赋值 */
+
+	*dataInfo = db_list_create();
+	for(int i = 1; i < rowNum; i++)
+	{
+		str = malloc(60 * sizeof(char));
+		sprintf(str, "{\"%s_%s\":%s}", allData[i].dataName, allData[i].deviceId, allData[i].dataValue);
+		printf("%s\n", str);
+		if(db_list_insert_after(dataInfo, i-1, str) != 0)
+			printf_debug("db_list_insert_after() %s error\n", str);
+	}
 
 	//数据内存释放
 	freePollDataInformation(allData);
@@ -225,7 +236,9 @@ void DataBaseTest(void)
 {
 	int ret = NO_ERROR;
 	char *tableName = "deviceTable";
+	db_list_t *list = NULL;
 	DataInformation *dataInfo = NULL;
+	db_lnode_t* current;
 	dataInfo = (DataInformation *)malloc(sizeof(DataInformation));
 	if (dataInfo == NULL)
 	{
@@ -236,7 +249,6 @@ void DataBaseTest(void)
 	if (ret != NO_ERROR)
 	{
 		printf("CreateDataFile error\r\n");
-		return;
 	}
 	printf("InsertData\r\n");
 	strcpy(dataInfo->dataName, "temp");
@@ -269,6 +281,7 @@ void DataBaseTest(void)
 	{
 		return;
 	}
+
 	printf("SelectData\r\n");
 	ret = SelectTableData(tableName, dataInfo);
 	if (ret != NO_ERROR)
@@ -299,5 +312,16 @@ void DataBaseTest(void)
 	{
 		return;
 	}
+
+	printf("PollData\r\n");
+	PollData(tableName, &list);
+	int i = 0;
+	for(current = list->head;i++ < list->limit_size;current = current->next)
+	{
+		printf("%s\n", (char*)current->data);
+	}
+	printf("db_list_destory\n");
+	db_list_destory(list);
+
 }
 

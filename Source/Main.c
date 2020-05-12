@@ -27,6 +27,7 @@
 #include "Config.h"
 
 
+
 static void TrsptTrsmsParamConfig(EdgeGatewayConfig *configInfo, int *processNum, int type[], UartInfo *uart[], NetworkInfo *eth[]);
 static void ModbusParamConfig(EdgeGatewayConfig *configInfo, int *processNum, char *username[], UartInfo *uart[], int deviceNum[], int *deviceId[], int sersorType);
 static void MqttParamConfig(EdgeGatewayConfig *configInfo, int *processNum, char *username[]);
@@ -121,7 +122,7 @@ int main(int argc, char *argv[])
 			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 			printf("TransparentTransmission (pid:%d) creat\n", getpid());
-			//TransparentTransmission(trsptTrsmsType[i], trsptTrsmsUart[i], trsptTrsmsEth[i]);		//透传功能
+			TransparentTransmission(trsptTrsmsType[i], trsptTrsmsUart[i], trsptTrsmsEth[i]);		//透传功能
 			printf("TransparentTransmission (pid:%d) exit\n", getpid());
 
 			return 0;
@@ -136,7 +137,7 @@ int main(int argc, char *argv[])
 			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 			printf("NoiseSensor (pid:%d) creat\n", getpid());
-			//NoiseSensor(noiseUart[i], noiseDeviceId[i], noiseDeviceNum[i], noiseUsername[i]);
+			NoiseSensor(noiseUart[i], noiseDeviceId[i], noiseDeviceNum[i], noiseUsername[i]);
 			printf("NoiseSensor (pid:%d) exit\n", getpid());
 
 			return 0;
@@ -151,7 +152,7 @@ int main(int argc, char *argv[])
 			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 			printf("AirQualitySensor (pid:%d) creat\n", getpid());
-			//AirQualitySensor(airQualitySensor[i], airQualityDeviceId[i], airQualityDeviceNum[i], airQualityUsername[i]);
+			AirQualitySensor(airQualitySensor[i], airQualityDeviceId[i], airQualityDeviceNum[i], airQualityUsername[i]);
 			printf("AirQualitySensor (pid:%d) exit\n", getpid());
 
 			return 0;
@@ -166,7 +167,7 @@ int main(int argc, char *argv[])
 			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 			printf("TemperatureRelay (pid:%d) creat\n", getpid());
-			//TemperatureRelay(sojoRelaySensor[i], sojoRelayDeviceId[i], sojoRelayDeviceNum[i], sojoRelayUsername[i]);
+			TemperatureRelay(sojoRelaySensor[i], sojoRelayDeviceId[i], sojoRelayDeviceNum[i], sojoRelayUsername[i]);
 			printf("TemperatureRelay (pid:%d) exit\n", getpid());
 
 			return 0;
@@ -181,7 +182,7 @@ int main(int argc, char *argv[])
 			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 			printf("MqttPublish (pid:%d) creat\n", getpid());
-			//MqttPublish(userName[i]);							//MQTT发布信息
+			MqttPublish(userName[i]);							//MQTT发布信息
 			printf("MqttPublish (pid:%d) exit\n", getpid());
 
 			return 0;

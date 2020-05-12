@@ -13,7 +13,7 @@
 #define _MQTT_PUBLISH_H_
 
 
-#define MQTT_PUBLISH_INTERVAL	10			//MQTT发布消息时间间隔
+#define MQTT_PUBLISH_INTERVAL	60			//MQTT发布消息时间间隔
 #define ADDRESS     "iot.shangshan.info"			//MQTT代理服务器地址
 #define CLIENTID    "0"								//客户端ID
 #define TOPIC       "v1/devices/me/telemetry"		//信息主题

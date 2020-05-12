@@ -16,7 +16,7 @@
 
 #define NOISE_REGISTERS_ADDRESS			0x00		//保持寄存器地址
 #define NOISE_REGISTERS_NUMBER			1			//保持寄存器个数
-#define NOISE_MODBUS_INTERVAL			5			//噪声传感器Modbus通信时间间隔
+#define NOISE_MODBUS_INTERVAL			60			//噪声传感器Modbus通信时间间隔
 
 
 int NoiseSensor(UartInfo *uartInfo, int deviceId[], int deviceNum, char *filename);

@@ -24,7 +24,6 @@
 
 static void MqttPublishMessage(MQTTClient *client, char *payload, int payloadLenth);
 static int MqttInit(MQTTClient *client, char *accessUser);
-static int ReadDataPoll(char *filename, char *payload);
 
 
 
@@ -36,27 +35,39 @@ static int ReadDataPoll(char *filename, char *payload);
 int MqttPublish(char *accessUser)
 {
     MQTTClient client;
-    char payload[128] = {0};
 	int semId = 0;
-	int ret = 0;
+	int ret = 0, i = 0;
+	db_list_t *payList = NULL;
+	db_lnode_t* current;
 
     MqttInit(&client, accessUser);
 
     semId = semget((key_t)SEMAPHORE_KEY, 1, 0666 | IPC_CREAT);
+
+    CreateDataFile(accessUser);
 
     while(1)
     {
 		/* 读取出数据 */
 		if(Semaphore_P(semId) == NO_ERROR)
 		{
-			printf("MQTT: Semaphore_P success\n");
-	    	ret = ReadDataPoll(accessUser, payload);
-			if(Semaphore_V(semId) == NO_ERROR)
-				printf("MQTT: Semaphore_V success\n");
+	    	ret = PollData(accessUser, &payList);
+			if(Semaphore_V(semId) != NO_ERROR)
+				printf_debug("MQTT: Semaphore_V error\n");
 		}
+		else
+			printf_debug("MQTT: Semaphore_P error\n");
 
 		if(0 == ret)
-			MqttPublishMessage(&client, payload, strlen(payload));
+		{
+			i = 0;
+			for(current = payList->head; i++ < payList->limit_size; current = current->next)
+			{
+				printf("%s - payload : %s\n", accessUser, (char*)current->data);
+				MqttPublishMessage(&client, current->data, strlen(current->data));
+			}
+		}
+		db_list_destory(payList);
 
 		sleep(MQTT_PUBLISH_INTERVAL);
     }
@@ -123,43 +134,5 @@ static void MqttPublishMessage(MQTTClient *client, char *payload, int payloadLen
 }
 
 
-/**
- * @breif 轮询读取数据
- * @param filename 数据文件名
- * @param payload 负载消息
- * @param payloadLenth 消息长度
- * @return 成功：0 失败 -1
- */
-static int ReadDataPoll(char *filename, char *payload)
-{
-	int ret = NO_ERROR;
-	DataInformation dataInfo;
-
-	if(0 == PollData(filename, &dataInfo))
-	{
-		switch (dataInfo.dataType)
-		{
-		case BIT_TYPE:
-			sprintf(payload, "{\"%s_%d\":%s}", dataInfo.dataName, dataInfo.deviceId, (dataInfo.bitData?"true":"flase"));
-			break;
-		case INT_TYPE:
-			sprintf(payload, "{\"%s_%d\":%d}", dataInfo.dataName, dataInfo.deviceId, dataInfo.intData);
-			break;
-		case FLOAT_TYPE:
-			sprintf(payload, "{\"%s_%d\":%.3f}", dataInfo.dataName, dataInfo.deviceId, dataInfo.floatData);
-			break;
-		default:
-			printf_debug("dataInfo.dataType value error\n");
-			ret = FUNCTION_FAIL;
-			break;
-		}
-	}
-	else
-	{
-		printf_debug("PollData error\n");
-		ret = FUNCTION_FAIL;
-	}
-	return ret;
-}
 
 

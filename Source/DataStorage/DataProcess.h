@@ -13,6 +13,7 @@
 #define _DATA_PROCESS_H_
 
 #include <stdbool.h>
+#include "../db_linklist/db_linklist.h"
 
 #define DATA_NAME_STRING_LENTH	32
 #define TIME_STRING_LENTH		32
@@ -50,7 +51,7 @@ int CreateDataFile(char *filename);
 int SaveData(char *filename, DataInformation *dataInfo);
 int DeleteData(char *filename, DataInformation *dataInfo);
 int ReadData(char *filename, DataInformation *dataInfo);
-int PollData(char *filename, DataInformation *dataInfo);
+int PollData(char *filename, db_list_t **dataInfo);
 int GetTimeStr(char *timeStr);
 
 #endif

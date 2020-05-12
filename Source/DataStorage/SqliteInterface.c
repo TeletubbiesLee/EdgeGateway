@@ -322,10 +322,10 @@ int selectRecord(char *tableName, DataInformation *dataInfo)
  * @param rowNum 行数
  * @return void
  */
-int pollAllRecord(char *tableName, PollDataInformation *allData, int *rowNum)
+int pollAllRecord(char *tableName, PollDataInformation **allData, int *rowNum)
 {
 	int nrow = 0,ncolumn = 0;
-	int i, j;
+	int i;
 	char **azResult=0;
 	char sql[SQL_SIZE] = "";
 	char *zErrMsg;
@@ -339,24 +339,23 @@ int pollAllRecord(char *tableName, PollDataInformation *allData, int *rowNum)
 	{
 		printf("operate failed: %s\n",zErrMsg);
 	}
-	allData = (PollDataInformation *)malloc(nrow * sizeof(PollDataInformation));
-	if (allData == NULL)
+	*allData = (PollDataInformation *)malloc((nrow+1) * sizeof(PollDataInformation));
+	if (*allData == NULL)
 	{
 		printf("PollDataInformation malloc fail!\n");
 		return SQLITE_ERROR;
 	}
-	memset(allData, 0, nrow * sizeof(PollDataInformation));
-	*rowNum = nrow;
-	for (i = 0; i < nrow; i++)
+	memset(*allData, 0, (nrow+1) * sizeof(PollDataInformation));
+	*rowNum = nrow+1;
+	for (i = 0; i < nrow+1; i++)
 	{
-		strncpy(allData[i].dataName, azResult[ncolumn*i], strlen(azResult[ncolumn*i]) + 1);
-		strncpy(allData[i].deviceId, azResult[ncolumn*i+1], strlen(azResult[ncolumn*i+1]) + 1);
-		strncpy(allData[i].dataType, azResult[ncolumn*i+2], strlen(azResult[ncolumn*i+2]) + 1);
-		strncpy(allData[i].bitData, azResult[ncolumn*i+3], strlen(azResult[ncolumn*i+3]) + 1);
-		strncpy(allData[i].intData, azResult[ncolumn*i+4], strlen(azResult[ncolumn*i+4]) + 1);
-		strncpy(allData[i].floatData, azResult[ncolumn*i+5], strlen(azResult[ncolumn*i+5]) + 1);
-		strncpy(allData[i].updateTime, azResult[ncolumn*i+6], strlen(azResult[ncolumn*i+6]) + 1);
-		strncpy(allData[i].mqttUserName, azResult[ncolumn*i+7], strlen(azResult[ncolumn*i+7]) + 1);
+		strncpy((*allData)[i].id, azResult[ncolumn*i], strlen(azResult[ncolumn*i]) + 1);
+		strncpy((*allData)[i].dataName, azResult[ncolumn*i+1], strlen(azResult[ncolumn*i+1]) + 1);
+		strncpy((*allData)[i].deviceId, azResult[ncolumn*i+2], strlen(azResult[ncolumn*i+2]) + 1);
+		strncpy((*allData)[i].dataType, azResult[ncolumn*i+3], strlen(azResult[ncolumn*i+3]) + 1);
+		strncpy((*allData)[i].dataValue, azResult[ncolumn*i+4], strlen(azResult[ncolumn*i+4]) + 1);
+		strncpy((*allData)[i].updateTime, azResult[ncolumn*i+5], strlen(azResult[ncolumn*i+5]) + 1);
+		strncpy((*allData)[i].mqttUserName, azResult[ncolumn*i+6], strlen(azResult[ncolumn*i+6]) + 1);
 	}
 	sqlite3_free_table(azResult);
 	return SQLITE_OK;
