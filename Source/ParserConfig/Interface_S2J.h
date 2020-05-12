@@ -12,6 +12,7 @@
 #ifndef _INTERFACE_S2J_H_
 #define _INTERFACE_S2J_H_
 
+#define SLAVE_MAX_NUM 3
 
 /*
  * 边缘网关系统信息
@@ -59,9 +60,23 @@ typedef struct TagModbusConfig{
 typedef struct TagIEC101Config{
 	char uartName[20];
 	int bandrate;
+	int parity;
 	int uartType;
+
+	int balanMode;
+	int sourceAddr;
+	int linkAddrSize;
+	int ASDUCotSize;
+	int ASDUAddr;
+	int ASDUAddrSize;
+	int infoAddrSize;
+
 	int slaveNumber;
-	int slaveID[256];
+	int sModuleId[256];
+	int sMstate;
+	int sMsourceAddr[256];
+	int sMportNo;
+
 	char dataFilename[30];
 }IEC101Config;
 
@@ -71,13 +86,23 @@ typedef struct TagIEC101Config{
  */
 typedef struct TagIEC104Config{
 	char localIP[20];
-	int localPort;
+	int balanMode;
+	int sourceAddr;
+	int linkAddrSize;
+	int ASDUCotSize;
+	int ASDUAddr;
+	int ASDUAddrSize;
+	int infoAddrSize;
+
 	int slaveNumber;
-	char slaveIP1[20];
-	char slaveIP2[20];
-	char slaveIP3[20];
-	char slaveIP4[20];
-	char slaveIP5[20];
+	int sModuleId[SLAVE_MAX_NUM];
+	int sMstate;
+	int sMsourceAddr[SLAVE_MAX_NUM];
+	int sMnetEn;
+	char sMip1[20];
+	char sMip2[20];
+	char sMip3[20];
+
 }IEC104Config;
 
 

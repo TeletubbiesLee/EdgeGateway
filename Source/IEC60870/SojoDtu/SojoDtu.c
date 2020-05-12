@@ -26,8 +26,9 @@ int SojoDtu_IEC101(void)
 {
 	float num = 0.0;
 	int deviceNumber = 2;
+	Configure101 info101;
 
-	iec_startup(IEC101, deviceNumber);
+	iec101_startup(&info101);
 
 	/* TODO:通过101协议读取设备数据，并解析保存到数据库中 */
 	while(1)
@@ -56,8 +57,9 @@ int SojoDtu_IEC104(void)
 {
 	float num = 0.0;
 	int deviceNumber = 2;
+	Configure101 info104;
 
-	iec_startup(IEC104, deviceNumber);
+	iec104_startup(&info104);
 
 	/* TODO:通过104协议读取设备数据，并解析保存到数据库中 */
 	while(1)

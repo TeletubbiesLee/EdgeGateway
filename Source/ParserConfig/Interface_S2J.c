@@ -349,9 +349,20 @@ JSON_RES:
 #define J2S_IEC101(struct_obj,json_obj) do{		\
 	s2j_struct_get_basic_element(struct_obj, json_obj, string, uartName);		\
 	s2j_struct_get_basic_element(struct_obj, json_obj, int, bandrate);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, parity);			\
 	s2j_struct_get_basic_element(struct_obj, json_obj, int, uartType);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, balanMode);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, sourceAddr);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, linkAddrSize);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, ASDUCotSize);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, ASDUAddr);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, ASDUAddrSize);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, infoAddrSize);		\
 	s2j_struct_get_basic_element(struct_obj, json_obj, int, slaveNumber);		\
-	s2j_struct_get_array_element(struct_obj, json_obj, int, slaveID);			\
+	s2j_struct_get_array_element(struct_obj, json_obj, int, sModuleId);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, sMstate);			\
+	s2j_struct_get_array_element(struct_obj, json_obj, int, sMsourceAddr);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, sMportNo);			\
 	s2j_struct_get_basic_element(struct_obj, json_obj, string, dataFilename);	\
 }while(0)
 
@@ -362,13 +373,21 @@ JSON_RES:
  */
 #define J2S_IEC104(struct_obj,json_obj) do{		\
 	s2j_struct_get_basic_element(struct_obj, json_obj, string, localIP);	\
-	s2j_struct_get_basic_element(struct_obj, json_obj, int, localPort);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, balanMode);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, sourceAddr);	\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, linkAddrSize);	\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, ASDUCotSize);	\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, ASDUAddr);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, ASDUAddrSize);	\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, infoAddrSize);	\
 	s2j_struct_get_basic_element(struct_obj, json_obj, int, slaveNumber);	\
-	s2j_struct_get_basic_element(struct_obj, json_obj, string, slaveIP1);	\
-	s2j_struct_get_basic_element(struct_obj, json_obj, string, slaveIP2);	\
-	s2j_struct_get_basic_element(struct_obj, json_obj, string, slaveIP3);	\
-	s2j_struct_get_basic_element(struct_obj, json_obj, string, slaveIP4);	\
-	s2j_struct_get_basic_element(struct_obj, json_obj, string, slaveIP5);	\
+	s2j_struct_get_array_element(struct_obj, json_obj, int, sModuleId);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, sMstate);		\
+	s2j_struct_get_array_element(struct_obj, json_obj, int, sMsourceAddr);	\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, sMnetEn);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip1);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip2);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip3);		\
 }while(0)
 
 
@@ -519,12 +538,23 @@ static void *json_to_struct(cJSON* json_obj)
  * IEC101Config结构体
  */
 #define S2J_IEC101(json_obj,struct_obj) do{		\
-	s2j_json_set_basic_element(json_obj, struct_obj, string, uartName);		\
-	s2j_json_set_basic_element(json_obj, struct_obj, int, bandrate);		\
-	s2j_json_set_basic_element(json_obj, struct_obj, int, uartType);		\
-	s2j_json_set_basic_element(json_obj, struct_obj, int, slaveNumber);		\
-	s2j_json_set_array_element(json_obj, struct_obj, int, slaveID, 256);	\
-	s2j_json_set_basic_element(json_obj, struct_obj, string, dataFilename);	\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, uartName);			\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, bandrate);			\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, parity);				\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, uartType);			\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, balanMode);			\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, sourceAddr);			\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, linkAddrSize);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, ASDUCotSize);			\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, ASDUAddr);			\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, ASDUAddrSize);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, infoAddrSize);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, slaveNumber);			\
+	s2j_json_set_array_element(json_obj, struct_obj, int, sModuleId, 256);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, sMstate);				\
+	s2j_json_set_array_element(json_obj, struct_obj, int, sMsourceAddr, 256);	\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, sMportNo);			\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, dataFilename);		\
 }while(0)
 
 
@@ -533,14 +563,22 @@ static void *json_to_struct(cJSON* json_obj)
  * IEC104Config结构体
  */
 #define S2J_IEC104(json_obj,struct_obj) do{		\
-	s2j_json_set_basic_element(json_obj, struct_obj, string, localIP);		\
-	s2j_json_set_basic_element(json_obj, struct_obj, int, localPort);		\
-	s2j_json_set_basic_element(json_obj, struct_obj, int, slaveNumber);		\
-	s2j_json_set_basic_element(json_obj, struct_obj, string, slaveIP1);		\
-	s2j_json_set_basic_element(json_obj, struct_obj, string, slaveIP2);	\
-	s2j_json_set_basic_element(json_obj, struct_obj, string, slaveIP3);	\
-	s2j_json_set_basic_element(json_obj, struct_obj, string, slaveIP4);	\
-	s2j_json_set_basic_element(json_obj, struct_obj, string, slaveIP5);	\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, localIP);			\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, balanMode);			\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, sourceAddr);			\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, linkAddrSize);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, ASDUCotSize);			\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, ASDUAddr);			\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, ASDUAddrSize);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, infoAddrSize);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, slaveNumber);			\
+	s2j_json_set_array_element(json_obj, struct_obj, int, sModuleId, 256);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, sMstate);				\
+	s2j_json_set_array_element(json_obj, struct_obj, int, sMsourceAddr, 256);	\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, sMnetEn);				\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip1);			\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip2);			\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip3);			\
 }while(0)
 
 
