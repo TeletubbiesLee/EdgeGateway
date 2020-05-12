@@ -11,10 +11,12 @@
 #ifndef	_SOJO_INTERFACE_H_
 #define _SOJO_INTERFACE_H_
 
-#include "sojo_point_table_enum.h"
 #include "stdint.h"
+#include "sojo_point_table_enum.h"
+#include "..\iec60870\iec60870_configure.h"
 
-void iec_startup(IECType iecType, uint8_t num);
+void iec101_startup(Configure101 *para);
+void iec104_startup(Configure104 *para);
 
 float ReadDataYc(uint8_t id, IECType iecType, YcDataType ycType);
 

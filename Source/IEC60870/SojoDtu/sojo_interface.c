@@ -15,28 +15,32 @@
 
 /**
   * @brief :
-  * @param : iecType 选择101 104协议
-  * @param : num 从机个数
+  * @param : para 101配置参数结构体
   * @return:
   * @updata:
   */
-void iec_startup(IECType iecType, uint8_t num)
+void iec101_startup(Configure101 *para)
 {
-	ParameterConfiguration *para = NULL;
-	if(iecType == IEC101)
+	if (para == NULL)
 	{
-		iec101_init(para);
+		return;
 	}
-	else if(iecType == IEC104)
-	{
-		iec104_init(para);
-	}
-	else
-	{
-		printf("startup fail!\r\n");
-	}
+	iec101_init(para);
 }
-
+/**
+  * @brief :
+  * @param : para 104配置参数结构体
+  * @return:
+  * @updata:
+  */
+void iec104_startup(Configure104 *para)
+{
+	if (para == NULL)
+	{
+		return;
+	}
+	iec104_init(para);
+}
 /**
   * @brief :
   * @param : id 从机id
