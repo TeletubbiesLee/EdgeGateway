@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 
 	/* IEC104协议需要的配置信息 */
 	Configure104 info104;
-	for(int i = 0; i < SLAVE_MAX_NUM; i++)
+	for(int i = 0; i < IEC104_SLAVE_MAX; i++)
 	{
 		info104.sMip[i] = malloc(sizeof(char) * 20);
 	}

@@ -31,58 +31,59 @@ EdgeGatewayConfig g_DefaultConfig = {
 	.systemInfo.firmwareVersion = "v1.0",
 	.systemInfo.bootloaderVersion = "v1.0",
 
-	.uartToNetNumber = 2,
+	.uartToNetNumber = 1,
 	.uartToNet1.ProtocolType = TCP_SERVER_TO_UART,
 	.uartToNet1.uartName = "/dev/ttymxc1",
 	.uartToNet1.bandrate = 115200,
 	.uartToNet1.uartType = RS232_TYPE,
 	.uartToNet1.localIP = "192.168.10.10",
 	.uartToNet1.localPort = 5555,
-	.uartToNet1.remoteIP = "iot.shangshan.info",
-	.uartToNet1.remotePort = 4321,
-
-	.uartToNet2.ProtocolType = UDP_TO_UART,
-	.uartToNet2.uartName = "/dev/ttymxc2",
-	.uartToNet2.bandrate = 9600,
-	.uartToNet2.uartType = RS232_TYPE,
-	.uartToNet2.localIP = "192.168.10.10",
-	.uartToNet2.localPort = 6666,
-	.uartToNet2.remoteIP = "192.168.10.11",
-	.uartToNet2.remotePort = 4444,
+	.uartToNet1.remoteIP = "192.168.10.11",
+	.uartToNet1.remotePort = 3333,
 
 	.noiseNumber = 1,
 	.noiseSersor1.uartName = "/dev/ttymxc3",
 	.noiseSersor1.bandrate = 9600,
 	.noiseSersor1.uartType = RS485_TYPE,
-	.noiseSersor1.slaveNumber = 4,
-	.noiseSersor1.slaveID = {1, 2, 3, 4},
-	.noiseSersor1.dataFilename = "A1_TEST_TOKEN",
+	.noiseSersor1.slaveNumber = 1,
+	.noiseSersor1.slaveID = {1},
+	.noiseSersor1.dataFilename = "NOISE_TOKEN",
 
 	.airNumber = 1,
 	.airSersor1.uartName = "/dev/ttymxc4",
 	.airSersor1.bandrate = 9600,
 	.airSersor1.uartType = RS485_TYPE,
-	.airSersor1.slaveNumber = 4,
-	.airSersor1.slaveID = {1, 2, 3, 4},
-	.airSersor1.dataFilename = "A1_TEST_TOKEN",
+	.airSersor1.slaveNumber = 1,
+	.airSersor1.slaveID = {1},
+	.airSersor1.dataFilename = "AIR_TOKEN",
 
 	.tempNumber = 1,
 	.tempSersor1.uartName = "/dev/ttymxc5",
 	.tempSersor1.bandrate = 115200,
 	.tempSersor1.uartType = RS232_TYPE,
-	.tempSersor1.slaveNumber = 256,
+	.tempSersor1.slaveNumber = 4,
 	.tempSersor1.slaveID = {1, 2, 3, 4},
-	.tempSersor1.dataFilename = "A1_TEST_TOKEN",
+	.tempSersor1.dataFilename = "TEMP_TOKEN",
 
-	.iec104.localIP = "192.168.1.100",
+	.iec101.uartName = "/dev/ttymxc2",
+	.iec101.bandrate = 115200,
+	.iec101.parity = 0,
+	.iec101.uartType = RS232_TYPE,
+	.iec101.slaveNumber = 2,
+	.iec101.sModuleId = {1, 2},
+	.iec101.dataFilename = "IEC101_TOKEN",
+
+	.iec104.localIP = "192.168.1.103",
 	.iec104.slaveNumber = 2,
+	.iec104.sModuleId = {1, 2},
 	.iec104.sMip1 = "192.168.1.101",
 	.iec104.sMip2 = "192.168.1.102",
 
 	.mqttAccess.mqttNumber = 2,
 	.mqttAccess.clondIP = "iot.shangshan.info",
-	.mqttAccess.username1 = "A1_TEST_TOKEN",
-	.mqttAccess.username2 = "ACCESS_TEST",
+	.mqttAccess.username1 = "NOISE_TOKEN",
+	.mqttAccess.username2 = "AIR_TOKEN",
+	.mqttAccess.username3 = "TEMP_TOKEN",
 };
 
 
@@ -386,6 +387,8 @@ JSON_RES:
 	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip1);		\
 	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip2);		\
 	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip3);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip4);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip5);		\
 }while(0)
 
 
@@ -561,22 +564,24 @@ static void *json_to_struct(cJSON* json_obj)
  * IEC104Config结构体
  */
 #define S2J_IEC104(json_obj,struct_obj) do{		\
-	s2j_json_set_basic_element(json_obj, struct_obj, string, localIP);			\
-	s2j_json_set_basic_element(json_obj, struct_obj, int, balanMode);			\
-	s2j_json_set_basic_element(json_obj, struct_obj, int, sourceAddr);			\
-	s2j_json_set_basic_element(json_obj, struct_obj, int, linkAddrSize);		\
-	s2j_json_set_basic_element(json_obj, struct_obj, int, ASDUCotSize);			\
-	s2j_json_set_basic_element(json_obj, struct_obj, int, ASDUAddr);			\
-	s2j_json_set_basic_element(json_obj, struct_obj, int, ASDUAddrSize);		\
-	s2j_json_set_basic_element(json_obj, struct_obj, int, infoAddrSize);		\
-	s2j_json_set_basic_element(json_obj, struct_obj, int, slaveNumber);			\
-	s2j_json_set_array_element(json_obj, struct_obj, int, sModuleId, 256);		\
-	s2j_json_set_basic_element(json_obj, struct_obj, int, sMstate);				\
-	s2j_json_set_array_element(json_obj, struct_obj, int, sMsourceAddr, 256);	\
-	s2j_json_set_basic_element(json_obj, struct_obj, int, sMnetEn);				\
-	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip1);			\
-	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip2);			\
-	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip3);			\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, localIP);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, balanMode);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, sourceAddr);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, linkAddrSize);	\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, ASDUCotSize);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, ASDUAddr);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, ASDUAddrSize);	\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, infoAddrSize);	\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, slaveNumber);		\
+	s2j_json_set_array_element(json_obj, struct_obj, int, sModuleId, 5);	\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, sMstate);			\
+	s2j_json_set_array_element(json_obj, struct_obj, int, sMsourceAddr, 5);	\
+	s2j_json_set_basic_element(json_obj, struct_obj, int, sMnetEn);			\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip1);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip2);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip3);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip4);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip5);		\
 }while(0)
 
 

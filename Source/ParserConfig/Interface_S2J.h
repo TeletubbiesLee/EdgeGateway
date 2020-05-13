@@ -12,6 +12,7 @@
 #ifndef _INTERFACE_S2J_H_
 #define _INTERFACE_S2J_H_
 
+#define IEC104_SLAVE_MAX 5
 
 /*
  * 边缘网关系统信息
@@ -94,13 +95,15 @@ typedef struct TagIEC104Config{
 	int infoAddrSize;
 
 	int slaveNumber;
-	int sModuleId[3];
+	int sModuleId[IEC104_SLAVE_MAX];
 	int sMstate;
-	int sMsourceAddr[3];
+	int sMsourceAddr[IEC104_SLAVE_MAX];
 	int sMnetEn;
 	char sMip1[20];
 	char sMip2[20];
 	char sMip3[20];
+	char sMip4[20];
+	char sMip5[20];
 
 }IEC104Config;
 
