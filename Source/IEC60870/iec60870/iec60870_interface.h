@@ -15,8 +15,8 @@
 #include "../SojoDtu/sojo_point_table_enum.h"
 #include "iec60870_configure.h"
 
-void iec101_init(ParameterConfiguration *para);
-void iec104_init(ParameterConfiguration *para);
+void iec101_init(Configure101 *para);
+void iec104_init(Configure104 *para);
 float ReadYcData(uint8_t id, IECType iecType, YcDataType ycType);
 
 #endif

@@ -11,7 +11,7 @@
 #ifndef	_IEC60870_CONDIFURE_H_
 #define _IEC60870_CONDIFURE_H_
 
-#include "stdint.h"
+#include <stdint.h>
 
 //从机最多个数
 #define SLAVE_MAX_NUM  16
@@ -42,7 +42,7 @@ typedef struct TagConfigure101{
 typedef struct TagConfigure104{
 	uint8_t  num;								//从机个数
 
-	char     *ip;           					/*IP地址(点分十进制)*/
+	char     ip[20];           					/*IP地址(点分十进制)*/
 	uint8_t  balanMode;							/*平衡or非平衡 1平衡*/
 	uint16_t sourceAddr; 						/*链路地址*/
 	uint8_t  linkAddrSize;						/*链路地址长度 1 2*/

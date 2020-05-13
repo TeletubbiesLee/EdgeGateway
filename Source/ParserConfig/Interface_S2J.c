@@ -75,10 +75,9 @@ EdgeGatewayConfig g_DefaultConfig = {
 	.tempSersor1.dataFilename = "A1_TEST_TOKEN",
 
 	.iec104.localIP = "192.168.1.100",
-	.iec104.localPort = 1234,
 	.iec104.slaveNumber = 2,
-	.iec104.slaveIP1 = "192.168.1.101",
-	.iec104.slaveIP2 = "192.168.1.102",
+	.iec104.sMip1 = "192.168.1.101",
+	.iec104.sMip2 = "192.168.1.102",
 
 	.mqttAccess.mqttNumber = 2,
 	.mqttAccess.clondIP = "iot.shangshan.info",
@@ -147,10 +146,9 @@ void ConfigPrintf(EdgeGatewayConfig *edgeGatewayConfig)
 
 
 	printf("EdgeGatewayConfig.iec104.localIP = %s\n", edgeGatewayConfig->iec104.localIP);
-	printf("EdgeGatewayConfig.iec104.localPort = %d\n", edgeGatewayConfig->iec104.localPort);
 	printf("EdgeGatewayConfig.iec104.slaveNumber = %d\n", edgeGatewayConfig->iec104.slaveNumber);
-	printf("EdgeGatewayConfig.iec104.slaveIP1 = %s\n", edgeGatewayConfig->iec104.slaveIP1);
-	printf("EdgeGatewayConfig.iec104.slaveIP2 = %s\n", edgeGatewayConfig->iec104.slaveIP2);
+	printf("EdgeGatewayConfig.iec104.sMip1 = %s\n", edgeGatewayConfig->iec104.sMip1);
+	printf("EdgeGatewayConfig.iec104.sMip2 = %s\n", edgeGatewayConfig->iec104.sMip2);
 
 	printf("EdgeGatewayConfig.mqttAccess.mqttNumber = %d\n", edgeGatewayConfig->mqttAccess.mqttNumber);
 	printf("EdgeGatewayConfig.mqttAccess.clondIP = %s\n", edgeGatewayConfig->mqttAccess.clondIP);

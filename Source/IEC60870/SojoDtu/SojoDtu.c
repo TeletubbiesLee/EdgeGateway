@@ -22,13 +22,12 @@
  * @param void
  * @return 成功：0 失败：-1
  */
-int SojoDtu_IEC101(void)
+int SojoDtu_IEC101(Configure101 *info101)
 {
 	float num = 0.0;
 	int deviceNumber = 2;
-	Configure101 info101;
 
-	iec101_startup(&info101);
+	iec101_startup(info101);
 
 	/* TODO:通过101协议读取设备数据，并解析保存到数据库中 */
 	while(1)
@@ -53,13 +52,12 @@ int SojoDtu_IEC101(void)
  * @param void
  * @return 成功：0 失败：-1
  */
-int SojoDtu_IEC104(void)
+int SojoDtu_IEC104(Configure104 *info104)
 {
 	float num = 0.0;
 	int deviceNumber = 2;
-	Configure101 info104;
 
-	iec104_startup(&info104);
+	iec104_startup(info104);
 
 	/* TODO:通过104协议读取设备数据，并解析保存到数据库中 */
 	while(1)

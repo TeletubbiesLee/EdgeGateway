@@ -25,12 +25,15 @@
 #include "ProcessCommunication/Semaphore.h"
 #include "DataStruct.h"
 #include "Config.h"
+#include "IEC60870/SojoDtu/SojoDtu.h"
 
 
 
 static void TrsptTrsmsParamConfig(EdgeGatewayConfig *configInfo, int *processNum, int type[], UartInfo *uart[], NetworkInfo *eth[]);
 static void ModbusParamConfig(EdgeGatewayConfig *configInfo, int *processNum, char *username[], UartInfo *uart[], int deviceNum[], int *deviceId[], int sersorType);
 static void MqttParamConfig(EdgeGatewayConfig *configInfo, int *processNum, char *username[]);
+static void IEC101ParamConfig(EdgeGatewayConfig *configInfo, Configure101 *info101);
+static void IEC104ParamConfig(EdgeGatewayConfig *configInfo, Configure104 *info104);
 
 
 /**
@@ -99,6 +102,15 @@ int main(int argc, char *argv[])
 		userName[i] = malloc(sizeof(char) * 30);
 	}
 
+	/* IEC101协议需要的配置信息 */
+	Configure101 info101;
+
+	/* IEC104协议需要的配置信息 */
+	Configure104 info104;
+	for(int i = 0; i < SLAVE_MAX_NUM; i++)
+	{
+		info104.sMip[i] = malloc(sizeof(char) * 20);
+	}
 
 	/* 解析配置文件，获取配置信息  */
 	GetJsonFile(JSON_CONFIG_FILENAME, &g_EdgeGatewayConfig);
@@ -109,6 +121,8 @@ int main(int argc, char *argv[])
 	ModbusParamConfig(g_EdgeGatewayConfig, &airQualityProcessNum, airQualityUsername, airQualitySensor, airQualityDeviceNum, airQualityDeviceId, AIR_QUALITY_SERSOR);
 	ModbusParamConfig(g_EdgeGatewayConfig, &sojoRelayProcessNum, sojoRelayUsername, sojoRelaySensor, sojoRelayDeviceNum, sojoRelayDeviceId, SOJO_RELAY);
 	MqttParamConfig(g_EdgeGatewayConfig, &mqttProcessNum, userName);
+	IEC101ParamConfig(g_EdgeGatewayConfig, &info101);
+	IEC104ParamConfig(g_EdgeGatewayConfig, &info104);
 
 	/* 初始化信号量 */
 	semId = semget((key_t)SEMAPHORE_KEY, 1, 0666 | IPC_CREAT);
@@ -195,7 +209,7 @@ int main(int argc, char *argv[])
 		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 		printf("IEC101 (pid:%d) creat\n", getpid());
-		/* TODO:在此处添加101的对外接口函数 */
+		SojoDtu_IEC101(&info101);
 		printf("IEC101 (pid:%d) exit\n", getpid());
 
 		return 0;
@@ -207,7 +221,7 @@ int main(int argc, char *argv[])
 		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 		printf("IEC104 (pid:%d) creat\n", getpid());
-		/* TODO:在此处添加104协议的对外接口函数 */
+		SojoDtu_IEC104(&info104);
 		printf("IEC104 (pid:%d) exit\n", getpid());
 
 		return 0;
@@ -423,7 +437,88 @@ static void MqttParamConfig(EdgeGatewayConfig *configInfo, int *processNum, char
 }
 
 
+/**
+ * @brief 101协议参数配置
+ * @param configInfo 从配置文件获取到的配置信息
+ * @param info101 101参数结构体指针
+ * @return void
+ */
+static void IEC101ParamConfig(EdgeGatewayConfig *configInfo, Configure101 *info101)
+{
+	info101->num = configInfo->iec101.slaveNumber;
 
+	if(strcmp("/dev/ttymxc2", configInfo->iec101.uartName))
+		info101->portNo = 0;
+	else if(strcmp("/dev/ttymxc3", configInfo->iec101.uartName))
+		info101->portNo = 1;
+	else if(strcmp("/dev/ttymxc4", configInfo->iec101.uartName))
+		info101->portNo = 2;
+
+	if(2400 == configInfo->iec101.bandrate)
+		info101->baudRate = 0;
+	else if(4800 == configInfo->iec101.bandrate)
+		info101->baudRate = 1;
+	else if(9600 == configInfo->iec101.bandrate)
+		info101->baudRate = 2;
+	else if(38400 == configInfo->iec101.bandrate)
+		info101->baudRate = 3;
+	else if(115200 == configInfo->iec101.bandrate)
+		info101->baudRate = 4;
+
+	info101->parity = configInfo->iec101.parity;
+	info101->balanMode = configInfo->iec101.balanMode;
+	info101->sourceAddr = configInfo->iec101.sourceAddr;
+	info101->linkAddrSize = configInfo->iec101.linkAddrSize;
+	info101->ASDUCotSize = configInfo->iec101.ASDUCotSize;
+	info101->ASDUAddr = configInfo->iec101.ASDUAddr;
+	info101->ASDUAddrSize = configInfo->iec101.ASDUAddrSize;
+	info101->InfoAddrSize = configInfo->iec101.infoAddrSize;
+
+	for(int i = 0; i < info101->num; i++)
+	{
+		info101->sModuleId[i] = configInfo->iec101.sModuleId[i];
+	}
+	info101->sMstate = configInfo->iec101.sMstate;
+	for(int i = 0; i < info101->num; i++)
+	{
+		info101->sMsourceAddr[i] = configInfo->iec101.sMsourceAddr[i];
+	}
+	info101->sMportNo = configInfo->iec101.sMportNo;
+}
+
+
+/**
+ * @brief 104协议参数配置
+ * @param configInfo 从配置文件获取到的配置信息
+ * @param info101 101参数结构体指针
+ * @return void
+ */
+static void IEC104ParamConfig(EdgeGatewayConfig *configInfo, Configure104 *info104)
+{
+	info104->num = configInfo->iec104.slaveNumber;
+	strcpy(info104->ip, configInfo->iec104.localIP);
+	info104->balanMode = configInfo->iec104.balanMode;
+	info104->sourceAddr = configInfo->iec104.sourceAddr;
+	info104->linkAddrSize = configInfo->iec104.linkAddrSize;
+	info104->ASDUCotSize = configInfo->iec104.ASDUCotSize;
+	info104->ASDUAddr = configInfo->iec104.ASDUAddr;
+	info104->ASDUAddrSize = configInfo->iec104.ASDUAddrSize;
+	info104->InfoAddrSize = configInfo->iec104.infoAddrSize;
+
+	for(int i = 0; i < info104->num; i++)
+	{
+		info104->sModuleId[i] = configInfo->iec104.sModuleId[i];
+	}
+	info104->sMstate = configInfo->iec104.sMstate;
+	for(int i = 0; i < info104->num; i++)
+	{
+		info104->sMsourceAddr[i] = configInfo->iec104.sMsourceAddr[i];
+	}
+	info104->sMnetEn = configInfo->iec104.sMnetEn;
+	strcpy(info104->sMip[0], configInfo->iec104.sMip1);
+	strcpy(info104->sMip[1], configInfo->iec104.sMip2);
+	strcpy(info104->sMip[2], configInfo->iec104.sMip3);
+}
 
 
 
