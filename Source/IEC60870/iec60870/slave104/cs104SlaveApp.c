@@ -15,6 +15,7 @@
 //#include "encrypt_disk.h"
 #include "string.h"
 #include <time.h>
+#include <stdlib.h>
 //#include "elog.h"
 //#include "channel_monitor.h"
 /* PRIVATE VARIABLES ----------------------------------------------------------*/

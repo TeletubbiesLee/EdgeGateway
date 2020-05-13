@@ -37,11 +37,11 @@ long int startTime;
 
 int getCurrentTime(ds_privateTime_t pTime);
 
-static const char *ipAddr[] =
-{
-	"192.168.1.221",
-	"192.168.1.222",
-};
+//static const char *ipAddr[] =
+//{
+//	"192.168.1.221",
+//	"192.168.1.222",
+//};
 
 void iec101_init(Configure101 *para)
 {
@@ -238,6 +238,7 @@ float ReadYcData(uint8_t id, IECType iecType, YcDataType ycType)
 	else
 	{
 		printf("read YC error\r\n");
+		return -1;
 	}
 }
 
@@ -259,4 +260,5 @@ int getCurrentTime(ds_privateTime_t pTime)
 	pTime->time_cp56.minute = (uint8_t)pTM->tm_min;
 	pTime->time_cp56.msecondH = (uint8_t)pTM->tm_sec;
 	pTime->time_cp56.msecondL = (uint8_t)(tv.tv_usec / 1000);
+	return 0;
 }

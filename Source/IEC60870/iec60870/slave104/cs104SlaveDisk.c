@@ -10,6 +10,7 @@
 #define LOG_TAG    "CS104_Slave_Disk"
 /* INCLUDE FILES -------------------------------------------------------------*/
 #include <string.h>
+#include <stdlib.h>
 #include <math.h>
 #include <sys/time.h>
 #include <time.h>
@@ -83,15 +84,13 @@ uint16_t CS104_Slave_Read_drv(uint8_t port, uint8_t *pbuf, uint16_t count)
   * @updata: [YYYY-MM-DD][NAME][BRIEF]
   */
 uint16_t CS104_Slave_Write_drv(uint8_t port, uint8_t *pbuf, uint16_t count)
-{          
-    uint16_t i; 
-    
+{
     ethernet_server_put(port, pbuf, count);
 
     if(count)
     {
 //    	log_w("write %d data",count);
-//    	for(i=0;i<count;i++)
+//    	for(uint16_t i=0;i<count;i++)
 //    	{
 //    		printf("%02x ",pbuf[i]);
 //    	}
@@ -319,7 +318,7 @@ static uint8_t CS104_Slave_CheckCtlRemoteCfg(uint8_t pdrv, uint8_t *pbuf,tagCtlR
   */
 void CS104_SLAVE_HandleCtrlProcess(uint8_t pdrv, uint8_t *pbuf)
 {
-	static uint8_t reinfo = 0;
+//	static uint8_t reinfo = 0;
 	struct tagCtlRomteCfg tmp;//临时结构体
 //	struct tagControlRemoteCfg ykCmd;												TXL注释
 
@@ -522,7 +521,7 @@ uint8_t CS104_Slave_DZ_RevokeOperation(uint8_t pdrv)
 void CS104_SLAVE_FixedParaProcess(uint8_t pdrv, uint8_t *pbuf)//定值操作
 {
 	uint16_t i = 0;
-	uint8_t size = 0;
+//	uint8_t size = 0;
 	uint16_t addr = 0;/*地址*/
 	uint16_t num;/*数量*/
 	uint16_t sendNum = 0;/*发送给主站数量*/
@@ -848,7 +847,7 @@ uint8_t CS104_Slave_C_YX(uint8_t pdrv)
 	uint8_t value = 0;
 	uint8_t negate = 0;
 	uint8_t upTypeCos = 0;
-	uint8_t upCos;
+	uint8_t upCos = 0;
 //	struct ds_privateTime nowtime;																				TXL注释
 //
 //	allInfoDisk->fun.get_currentTime_info(&nowtime);
@@ -969,6 +968,7 @@ uint8_t CS104_SLAVE_H_SOE(uint8_t pdrv)//判断是否有soe
 //		return(TRUE);
 //	}
 //	return (FALSE);
+	return 0;
 }
 
 /**
@@ -980,13 +980,13 @@ uint8_t CS104_SLAVE_H_SOE(uint8_t pdrv)//判断是否有soe
   */
 void CS104_SLAVE_R_SOE(uint8_t pdrv, uint8_t *pbuf)//读soe
 {
-	uint16_t addr = 0;
+//	uint16_t addr = 0;
 	uint8_t sendnum = 0;
-	uint8_t value = 0;
-	uint8_t negate = 0;
-	uint8_t upTypeCos = 0;
+//	uint8_t value = 0;
+//	uint8_t negate = 0;
+//	uint8_t upTypeCos = 0;
 	uint8_t upTypeSoe = 0;
-	uint8_t upSoe;
+//	uint8_t upSoe;
 
 //	for(; CS104SlaveDisk[pdrv].SoeOut != *allInfoDisk->var.changeSoe.in;)										TXL注释
 //	{
@@ -1065,7 +1065,7 @@ uint8_t CS104_Slave_C_YC(uint8_t pdrv)
 
 	float tempf = 0;
 	uint8_t  IsDeadZone = 0; // 上送类型
-	float	overValue;
+	float	overValue = 0;
 
 //	maxnum = allInfoDisk->var.telemetry.maxNum;															TXL注释
 	for(i=0; i<maxnum; i++)
@@ -1307,7 +1307,7 @@ uint16_t CS104_SLAVE_ReadYcData(uint8_t pdrv, uint16_t addr, uint16_t num, uint8
 	uint8_t  sendnum = 0;
 	int16_t  tempu = 0;
 	uint8_t  upType = 0; // 上送类型
-	float 	 Rate,value = 0;
+	float 	 Rate = 0,value = 0;
 //	log_i("CS104_SLAVE_ReadYcData读遥测数量:%d",num);
 	upType = 9;	// 测量值，归一化值
 	for(i=0; i<num; i++)
@@ -1606,6 +1606,7 @@ void CS104_SLAVE_IdleProcess(uint8_t pdrv, uint8_t *pbuf)//发送空闲回调函
 uint8_t CS104_SLAVE_H_Encrypt(uint8_t pdrv)//判断是否有加密数据发送
 {
 //	return(Encrypt_CheckSend(CS104_Slave_Pad[pdrv].Port));										TXL注释
+	return 0;
 }
 
 /**

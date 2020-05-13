@@ -71,7 +71,7 @@ void *thread_client(void *arg)
   struct timeval tv;
   fd_set fdsr;
   struct sockaddr_in servaddr;
-  static uint16_t i = 0;
+//  static uint16_t i = 0;
   struct client_cfg cfg;
 
   strcpy(cfg.ip,((struct client_cfg*)arg)->ip);
@@ -191,7 +191,8 @@ void *thread_client(void *arg)
             
           if (ex_api.queue_write_block != NULL)
           {
-        	  ex_api.queue_write_block(&s_ethernet_client_rxcb[cfg.client_no], &socket_rxbuffer[cfg.client_no], recv_size[cfg.client_no]);
+//        	  ex_api.queue_write_block(&s_ethernet_client_rxcb[cfg.client_no], &socket_rxbuffer[cfg.client_no], recv_size[cfg.client_no]);
+        	  ex_api.queue_write_block(&s_ethernet_client_rxcb[cfg.client_no], socket_rxbuffer[cfg.client_no], recv_size[cfg.client_no]);
           }
         }
       }

@@ -4,6 +4,7 @@
 #include "../serial/serial.h"
 #include <unistd.h>
 #include <errno.h>
+#include <stdlib.h>
 #include <memory.h>
 #include <pthread.h>
 #include "../list/slist.h"
@@ -27,11 +28,10 @@ static int cs101_master_read_data_port(int fd, uint8_t *buff, uint32_t len)
 {
     int read_len = 0;
     read_len = SerialPort_readByte(fd, buff, len);
-    int i = 0;
     if(read_len)
     {
 // 	   	printf("read:  ");
-// 		for(i=0;i<read_len;i++)
+// 		for(int i=0;i<read_len;i++)
 // 		{
 // 			printf("%02x ",buff[i]);
 // 		}
@@ -50,12 +50,11 @@ static int cs101_master_read_data_port(int fd, uint8_t *buff, uint32_t len)
 static void cs101_master_write_data_port(int fd, uint8_t *buff, uint32_t len)
 {
     SerialPort_write(fd, buff, 0, len);
-    int i = 0;
     if(len)
     {
 //    	log_w("(%d)write %d data",port,count);
 //    	printf("write: ");
-//    	for(i=0;i<len;i++)
+//    	for(int i=0;i<len;i++)
 //    	{
 //    		printf("%02x ",buff[i]);
 //    	}
@@ -252,8 +251,8 @@ static int cs101_master_timer_compare(CS101_MASTER_TIMER_t *timer)
   */
  static void cs101_master_write_YXdata(uint16_t module_id, CS101_MASTER_YX_DATA_t *yx_data)
  {
-    struct snode *p_temp_node = NULL;
-    uint16_t deviation_addr = 0;
+//    struct snode *p_temp_node = NULL;
+//    uint16_t deviation_addr = 0;
     /* 查找模块ID */
 //    p_temp_node = s_appdata_101master_List.head;
 //    while (p_temp_node != NULL)
@@ -280,9 +279,9 @@ static int cs101_master_timer_compare(CS101_MASTER_TIMER_t *timer)
   */
  static void cs101_master_write_SOEdata(uint16_t module_id, CS101_MASTER_SOE_DATA_t *SOE_data)
  {
-    struct snode *p_temp_node = NULL;
-    uint16_t deviation_addr = 0;
-    struct tagSoeCfg point;
+//    struct snode *p_temp_node = NULL;
+//    uint16_t deviation_addr = 0;
+//    struct tagSoeCfg point;
     /* 查找模块ID */
 //    p_temp_node = s_appdata_101master_List.head;
 //    while (p_temp_node != NULL)
@@ -319,7 +318,7 @@ static int cs101_master_timer_compare(CS101_MASTER_TIMER_t *timer)
  static int cs101_master_write_comm_state(uint16_t module_id, uint8_t state, CS101_MASTER_CP56Time2a_t *p_CP56Time2a)
  {
     struct snode *p_temp_node = NULL;
-    struct tagSoeCfg point;
+//    struct tagSoeCfg point;
     /* 查找模块ID */
     p_temp_node = s_appdata_101master_List.head;
     while (p_temp_node != NULL)
@@ -328,15 +327,15 @@ static int cs101_master_timer_compare(CS101_MASTER_TIMER_t *timer)
         {
             if (*((CS101_MASTER_APPDATA_t*)(p_temp_node->data))->communication_state.pValue != state)
             {
-                point.addr = ((CS101_MASTER_APPDATA_t*)(p_temp_node->data))->communication_state.addr;
-                point.value = state;
-                point.time.msecondL = p_CP56Time2a->milliseconds_L;
-                point.time.msecondH = p_CP56Time2a->milliseconds_H;
-                point.time.minute = p_CP56Time2a->minutes;
-                point.time.hour = p_CP56Time2a->hours;
-                point.time.dayofWeek = p_CP56Time2a->day_of_week;	// WEEK(D7-D5)day(D4-D0)
-                point.time.month = p_CP56Time2a->months;
-                point.time.year = p_CP56Time2a->years;
+//                point.addr = ((CS101_MASTER_APPDATA_t*)(p_temp_node->data))->communication_state.addr;
+//                point.value = state;
+//                point.time.msecondL = p_CP56Time2a->milliseconds_L;
+//                point.time.msecondH = p_CP56Time2a->milliseconds_H;
+//                point.time.minute = p_CP56Time2a->minutes;
+//                point.time.hour = p_CP56Time2a->hours;
+//                point.time.dayofWeek = p_CP56Time2a->day_of_week;	// WEEK(D7-D5)day(D4-D0)
+//                point.time.month = p_CP56Time2a->months;
+//                point.time.year = p_CP56Time2a->years;
 //                moduleCascadeWriteSoe(&point);
                 return 0;
             }

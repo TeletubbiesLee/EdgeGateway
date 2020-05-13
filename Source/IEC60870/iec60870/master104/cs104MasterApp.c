@@ -14,6 +14,7 @@
 #include "../common/common.h"
 #include "string.h"
 #include <time.h>
+#include <stdlib.h>
 //#include "elog.h"
 #include "../port/iec_interface.h"
 //#include "channel_monitor.h"

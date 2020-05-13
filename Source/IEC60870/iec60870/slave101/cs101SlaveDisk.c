@@ -13,6 +13,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <math.h>
+#include <stdlib.h>
 #include <pthread.h>
 #include "../port/iec_interface.h"
 #include "cs101SlaveApp.h"
@@ -98,7 +99,6 @@ uint16_t CS101_Slave_Read_drv(uint8_t port, uint8_t *pbuf, uint16_t count)
 uint16_t CS101_Slave_Write_drv(uint8_t port, uint8_t *pbuf, uint16_t count)
 {
     uint8_t pdrv;
-    uint16_t i;
 
     for(pdrv=0;pdrv<CS101_SLAVE_DISK_VOLUMES;pdrv++)
     {
@@ -110,7 +110,7 @@ uint16_t CS101_Slave_Write_drv(uint8_t port, uint8_t *pbuf, uint16_t count)
    if(count)
    {
 //   	log_w("write %d data",count);
-//   	for(i=0;i<count;i++)
+//   	for(uint16_t i=0;i<count;i++)
 //   	{
 //   		printf("%02x ",pbuf[i]);
 //   	}
@@ -171,7 +171,7 @@ uint16_t CS101_Slave_WriteData(uint8_t pdrv, uint8_t *pbuf, uint16_t count)
                 case CS101_SLAVE_C_WS_NA_1:
 				case CS101_SLAVE_F_SR_NA_1:
 					return (0);						//TXL添加
-//					if((pbuf[4+1+CS101_Slave_Pad[pdrv].LinkAddrSize+1+1+CS101_Slave_Pad[pdrv].ASDUCotSize+CS101_Slave_Pad[pdrv].ASDUAddrSize+2]&0x80)&&\
+//					if((pbuf[4+1+CS101_Slave_Pad[pdrv].LinkAddrSize+1+1+CS101_Slave_Pad[pdrv].ASDUCotSize+CS101_Slave_Pad[pdrv].ASDUAddrSize+2]&0x80)&&
 //                        (pbuf[4+1+CS101_Slave_Pad[pdrv].LinkAddrSize+1+1]==CS101_SLAVE_COT_ACTCON))
 //                    {return(Encrypt_WriteX(pbuf, count, 0x82, CS101_Slave_Pad[pdrv].Port));}	//启动确认
 //                    else
@@ -284,7 +284,7 @@ static uint8_t CS101_Slave_CheckCtlRemoteCfg(uint8_t pdrv, uint8_t *pbuf,tagCtlR
 void CS101_Slave_C_SC(uint8_t pdrv, uint8_t *pbuf)//遥控							//解析主端
 {//LENTH/Lock_ID/TypeID/VSQ/COT_L/COT_H/PubAddr_L/PubAddr_H/InfoAddr_L/InfoAddr_H/DCO_L/DCO_H
 
-	static uint8_t reinfo = 0;
+//	static uint8_t reinfo = 0;
 	struct tagCtlRomteCfg tmp;//临时结构体
 //	struct tagControlRemoteCfg ykCmd;														TXL注释
 
@@ -422,6 +422,7 @@ uint64_t CS101_Slave_getAlarmOfMs(uint8_t pdrv)
 //	struct ds_privateTime getTime;											TXL注释
 //	allInfoDisk->fun.get_currentTime_info(&getTime);						TXL注释
 //	return(getTime.time_ms);												TXL注释
+	return 0;
 }
 
 /**
@@ -499,9 +500,9 @@ void CS101_Slave_C_SR(uint8_t pdrv, uint8_t *pbuf)//定值参数					//解析主
 {
 	uint8_t j = 0;
 	uint16_t i = 0;
-	uint8_t size = 0;
+//	uint8_t size = 0;
 	uint16_t addr = 0;/*地址*/
-	uint16_t num;/*数量*/
+	uint16_t num = 0;/*数量*/
 	uint16_t sendNum = 0;/*发送给主站数量*/
 	uint16_t sendNumGroup = 0;/*发送给主站数量*/
 	uint8_t areaCode;/*区号*/
@@ -783,7 +784,7 @@ uint8_t CS101_Slave_C_YX(uint8_t pdrv)
 	uint8_t value = 0;
 	uint8_t negate = 0;
 	uint8_t upTypeCos = 0;
-	uint8_t upCos;
+	uint8_t upCos = 0;
 //	struct ds_privateTime nowtime;											TXL注释
 
 //	allInfoDisk->fun.get_currentTime_info(&nowtime);															TXL注释
@@ -905,6 +906,7 @@ uint8_t CS101_Slave_H_SOE(uint8_t pdrv)//判断是否有soe
 //		return(TRUE);
 //	}
 //	return (FALSE);
+	return 0;
 }
 
 /**
@@ -916,13 +918,13 @@ uint8_t CS101_Slave_H_SOE(uint8_t pdrv)//判断是否有soe
   */
 void CS101_Slave_R_SOE(uint8_t pdrv, uint8_t *pbuf)//读soe
 {
-	uint16_t addr = 0;
+//	uint16_t addr = 0;
 	uint8_t sendnum = 0;
 	uint8_t value = 0;
 	uint8_t negate = 0;
 	uint8_t upTypeCos = 0;
 	uint8_t upTypeSoe = 0;
-	uint8_t upSoe;
+//	uint8_t upSoe;
 
 //	for(; CS101SlaveDisk[pdrv].SoeOut != *allInfoDisk->var.changeSoe.in;)									TXL注释
 //	{
@@ -994,7 +996,7 @@ uint8_t CS101_Slave_C_YC(uint8_t pdrv)
 
 	float tempf = 0;
 	uint8_t  IsDeadZone = 0; // 上送类型
-	float	overValue;
+	float	overValue = 0;
 //	maxnum = allInfoDisk->var.telemetry.maxNum;																TXL注释
 
 	for(i=0; i<maxnum; i++)
@@ -1222,7 +1224,7 @@ uint16_t CS101_Slave_R_YCDATA(uint8_t pdrv,uint16_t addr,uint16_t num, uint8_t *
 	uint8_t  sendnum = 0;
 	int16_t  tempu = 0;
 	uint8_t  upType = 0; // 上送类型
-	float 	 Rate,value = 0;
+	float 	 Rate = 0,value = 0;
 
 //	log_i("read YCDATA addr:%x,num:%d",addr,num);
 
@@ -1479,6 +1481,7 @@ void CS101_Slave_R_IDLE(uint8_t pdrv, uint8_t *pbuf)//发送空闲回调函数
 uint8_t CS101_Slave_H_Encrypt(uint8_t pdrv)//判断是否有加密数据发送
 {
 //	return(Encrypt_CheckSend(CS101_Slave_Pad[pdrv].Port));
+	return 0;
 }
 
 /**
@@ -1604,7 +1607,7 @@ static void CS101_Slave_DiskInit(uint8_t pdrv)
 	memset(CS101SlaveDisk[pdrv].TelesignalCosRep,0,sizeof(CS101SlaveDisk[pdrv].TelesignalCosRep));
 	CS101SlaveDisk[pdrv].TelesignalCosIn = CS101SlaveDisk[pdrv].TelesignalCosRep;
 	CS101SlaveDisk[pdrv].TelesignalCosOut = CS101SlaveDisk[pdrv].TelesignalCosRep;
-	int i = 0;
+//	int i = 0;
 
 	memset(CS101SlaveDisk[pdrv].TelemetryNVARep,0,sizeof(CS101SlaveDisk[pdrv].TelemetryNVARep));
 	CS101SlaveDisk[pdrv].TelemetryNVAIn = CS101SlaveDisk[pdrv].TelemetryNVARep;

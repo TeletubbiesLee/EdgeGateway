@@ -10,6 +10,7 @@
  #define LOG_TAG    "CS104_Master_Disk"
 /* INCLUDE FILES -------------------------------------------------------------*/
 #include <string.h>
+#include <stdlib.h>
 #include <math.h>
 #include <sys/time.h>
 #include <time.h>
@@ -43,7 +44,6 @@ static uint8_t disk[CS104_MASTER_VOLUMES];
 uint16_t CS104_Master_Read_drv(uint8_t port, uint8_t *pbuf, uint16_t count)
 {
 	uint16_t len=0;
-	uint16_t i;
 
 	len = ethernet_client_get(port, pbuf, count);
 
@@ -51,7 +51,7 @@ uint16_t CS104_Master_Read_drv(uint8_t port, uint8_t *pbuf, uint16_t count)
    {
 //		log_w("(%d)read %d data",port,len);
 //	   	printf("read:  ");
-//		for(i=0;i<len;i++)
+//		for(uint16_t i=0;i<len;i++)
 //		{
 //			printf("%02x ",pbuf[i]);
 //		}
@@ -70,15 +70,13 @@ uint16_t CS104_Master_Read_drv(uint8_t port, uint8_t *pbuf, uint16_t count)
   */
 uint16_t CS104_Master_Write_drv(uint8_t port, uint8_t *pbuf, uint16_t count)
 {
-    uint16_t i; 
-    
     ethernet_client_put(port, pbuf, count);
 
     if(count)
     {
 //    	log_w("(%d)write %d data",port,count);
 //    	printf("write: ");
-//    	for(i=0;i<count;i++)
+//    	for(uint16_t i=0;i<count;i++)
 //    	{
 //    		printf("%02x ",pbuf[i]);
 //    	}
@@ -261,7 +259,7 @@ uint8_t CS104_Master_ReadRemoteCtlProcess(uint8_t pdrv, uint8_t *pbuf)
   */
 uint8_t CS104_Master_getRemoteCtlInfo(uint8_t pdrv, uint8_t *pbuf)
 {//LENTH/Lock_ID/TypeID/VSQ/COT_L/COT_H/PubAddr_L/PubAddr_H/Array
-  uint16_t addr;
+  uint16_t addr = 0;
   uint8_t value;
   tagControlRemoteCfg_t ykCmd;
 //  log_w("CS104_Master_getRemoteCtlInfo(%d)",pdrv);
