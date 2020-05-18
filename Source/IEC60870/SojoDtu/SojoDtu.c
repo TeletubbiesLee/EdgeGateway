@@ -31,10 +31,12 @@ int SojoDtu_IEC101(Configure101 *info101)
 	/* TODO:通过101协议读取设备数据，并解析保存到数据库中 */
 	while(1)
 	{
-		for(int i = 0; i < info101->num; i++)
+		for(int i = 1; i <= info101->num; i++)
 		{
 			sleep(30);
+			printf("sleep end\n");
 			num = ReadDataYc(i, IEC101, YCDATA_DC1);
+			printf("ReadDataYc end\n");
 			printf("IEC101: device %d : YCDATA_DC1 = %f\n", i, num);
 			num = ReadDataYc(i, IEC101, YCDATA_DC2);
 			printf("IEC101: device %d : YCDATA_DC2 = %f\n", i, num);
@@ -60,7 +62,7 @@ int SojoDtu_IEC104(Configure104 *info104)
 	/* TODO:通过104协议读取设备数据，并解析保存到数据库中 */
 	while(1)
 	{
-		for(int i = 0; i < info104->num; i++)
+		for(int i = 1; i <= info104->num; i++)
 		{
 			sleep(30);
 			num = ReadDataYc(i, IEC104, YCDATA_DC1);

@@ -69,13 +69,33 @@ EdgeGatewayConfig g_DefaultConfig = {
 	.iec101.bandrate = 115200,
 	.iec101.parity = 0,
 	.iec101.uartType = RS232_TYPE,
+	.iec101.balanMode = 0,
+	.iec101.sourceAddr = 1,
+	.iec101.linkAddrSize = 2,
+	.iec101.ASDUCotSize = 2,
+	.iec101.ASDUAddr = 1,
+	.iec101.ASDUAddrSize = 2,
+	.iec101.infoAddrSize = 2,
 	.iec101.slaveNumber = 2,
 	.iec101.sModuleId = {1, 2},
+	.iec101.sMstate = 1,
+	.iec101.sMsourceAddr = {1, 2},
+	.iec101.sMportNo = 2,
 	.iec101.dataFilename = "IEC101_TOKEN",
 
 	.iec104.localIP = "192.168.1.103",
+	.iec104.balanMode = 1,
+	.iec104.sourceAddr = 1,
+	.iec104.linkAddrSize = 2,
+	.iec104.ASDUCotSize = 2,
+	.iec104.ASDUAddr = 1,
+	.iec104.ASDUAddrSize = 2,
+	.iec104.infoAddrSize = 3,
 	.iec104.slaveNumber = 2,
 	.iec104.sModuleId = {1, 2},
+	.iec104.sMstate = 1,
+	.iec104.sMsourceAddr = {1, 2},
+	.iec104.sMnetEn = 1,
 	.iec104.sMip1 = "192.168.1.101",
 	.iec104.sMip2 = "192.168.1.102",
 
@@ -371,24 +391,25 @@ JSON_RES:
  * IEC104Config结构体
  */
 #define J2S_IEC104(struct_obj,json_obj) do{		\
-	s2j_struct_get_basic_element(struct_obj, json_obj, string, localIP);	\
-	s2j_struct_get_basic_element(struct_obj, json_obj, int, balanMode);		\
-	s2j_struct_get_basic_element(struct_obj, json_obj, int, sourceAddr);	\
-	s2j_struct_get_basic_element(struct_obj, json_obj, int, linkAddrSize);	\
-	s2j_struct_get_basic_element(struct_obj, json_obj, int, ASDUCotSize);	\
-	s2j_struct_get_basic_element(struct_obj, json_obj, int, ASDUAddr);		\
-	s2j_struct_get_basic_element(struct_obj, json_obj, int, ASDUAddrSize);	\
-	s2j_struct_get_basic_element(struct_obj, json_obj, int, infoAddrSize);	\
-	s2j_struct_get_basic_element(struct_obj, json_obj, int, slaveNumber);	\
-	s2j_struct_get_array_element(struct_obj, json_obj, int, sModuleId);		\
-	s2j_struct_get_basic_element(struct_obj, json_obj, int, sMstate);		\
-	s2j_struct_get_array_element(struct_obj, json_obj, int, sMsourceAddr);	\
-	s2j_struct_get_basic_element(struct_obj, json_obj, int, sMnetEn);		\
-	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip1);		\
-	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip2);		\
-	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip3);		\
-	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip4);		\
-	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip5);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, localIP);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, balanMode);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, sourceAddr);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, linkAddrSize);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, ASDUCotSize);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, ASDUAddr);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, ASDUAddrSize);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, infoAddrSize);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, slaveNumber);		\
+	s2j_struct_get_array_element(struct_obj, json_obj, int, sModuleId);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, sMstate);			\
+	s2j_struct_get_array_element(struct_obj, json_obj, int, sMsourceAddr);		\
+	s2j_struct_get_basic_element(struct_obj, json_obj, int, sMnetEn);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip1);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip2);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip3);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip4);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip5);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, dataFilename);	\
 }while(0)
 
 
@@ -582,6 +603,7 @@ static void *json_to_struct(cJSON* json_obj)
 	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip3);		\
 	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip4);		\
 	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip5);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, dataFilename);	\
 }while(0)
 
 

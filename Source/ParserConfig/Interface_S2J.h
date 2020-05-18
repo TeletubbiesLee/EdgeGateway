@@ -105,6 +105,7 @@ typedef struct TagIEC104Config{
 	char sMip4[20];
 	char sMip5[20];
 
+	char dataFilename[30];
 }IEC104Config;
 
 

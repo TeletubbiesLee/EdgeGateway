@@ -209,7 +209,8 @@ int main(int argc, char *argv[])
 		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 		printf("IEC101 (pid:%d) creat\n", getpid());
-		SojoDtu_IEC101(&info101);
+		if(info101.num > 0)
+			SojoDtu_IEC101(&info101);
 		printf("IEC101 (pid:%d) exit\n", getpid());
 
 		return 0;
@@ -221,7 +222,8 @@ int main(int argc, char *argv[])
 		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 		printf("IEC104 (pid:%d) creat\n", getpid());
-		SojoDtu_IEC104(&info104);
+		if(info104.num > 0)
+			SojoDtu_IEC104(&info104);
 		printf("IEC104 (pid:%d) exit\n", getpid());
 
 		return 0;
@@ -447,12 +449,12 @@ static void IEC101ParamConfig(EdgeGatewayConfig *configInfo, Configure101 *info1
 {
 	info101->num = configInfo->iec101.slaveNumber;
 
-	if(strcmp("/dev/ttymxc2", configInfo->iec101.uartName))
-		info101->portNo = 0;
-	else if(strcmp("/dev/ttymxc3", configInfo->iec101.uartName))
+	if(strcmp("/dev/ttymxc2", configInfo->iec101.uartName) == 0)
 		info101->portNo = 1;
-	else if(strcmp("/dev/ttymxc4", configInfo->iec101.uartName))
+	else if(strcmp("/dev/ttymxc3", configInfo->iec101.uartName) == 0)
 		info101->portNo = 2;
+	else if(strcmp("/dev/ttymxc4", configInfo->iec101.uartName) == 0)
+		info101->portNo = 3;
 
 	if(2400 == configInfo->iec101.bandrate)
 		info101->baudRate = 0;
