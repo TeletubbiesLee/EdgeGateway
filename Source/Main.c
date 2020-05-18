@@ -32,8 +32,8 @@
 static void TrsptTrsmsParamConfig(EdgeGatewayConfig *configInfo, int *processNum, int type[], UartInfo *uart[], NetworkInfo *eth[]);
 static void ModbusParamConfig(EdgeGatewayConfig *configInfo, int *processNum, char *username[], UartInfo *uart[], int deviceNum[], int *deviceId[], int sersorType);
 static void MqttParamConfig(EdgeGatewayConfig *configInfo, int *processNum, char *username[]);
-static void IEC101ParamConfig(EdgeGatewayConfig *configInfo, Configure101 *info101);
-static void IEC104ParamConfig(EdgeGatewayConfig *configInfo, Configure104 *info104);
+static void IEC101ParamConfig(EdgeGatewayConfig *configInfo, Configure101 *info101, char *filename);
+static void IEC104ParamConfig(EdgeGatewayConfig *configInfo, Configure104 *info104, char *filename);
 
 
 /**
@@ -104,9 +104,11 @@ int main(int argc, char *argv[])
 
 	/* IEC101协议需要的配置信息 */
 	Configure101 info101;
+	char iec101Filename[30] = {0};
 
 	/* IEC104协议需要的配置信息 */
 	Configure104 info104;
+	char iec104Filename[30] = {0};
 	for(int i = 0; i < IEC104_SLAVE_MAX; i++)
 	{
 		info104.sMip[i] = malloc(sizeof(char) * 20);
@@ -121,8 +123,8 @@ int main(int argc, char *argv[])
 	ModbusParamConfig(g_EdgeGatewayConfig, &airQualityProcessNum, airQualityUsername, airQualitySensor, airQualityDeviceNum, airQualityDeviceId, AIR_QUALITY_SERSOR);
 	ModbusParamConfig(g_EdgeGatewayConfig, &sojoRelayProcessNum, sojoRelayUsername, sojoRelaySensor, sojoRelayDeviceNum, sojoRelayDeviceId, SOJO_RELAY);
 	MqttParamConfig(g_EdgeGatewayConfig, &mqttProcessNum, userName);
-	IEC101ParamConfig(g_EdgeGatewayConfig, &info101);
-	IEC104ParamConfig(g_EdgeGatewayConfig, &info104);
+	IEC101ParamConfig(g_EdgeGatewayConfig, &info101, iec101Filename);
+	IEC104ParamConfig(g_EdgeGatewayConfig, &info104, iec104Filename);
 
 	/* 初始化信号量 */
 	semId = semget((key_t)SEMAPHORE_KEY, 1, 0666 | IPC_CREAT);
@@ -210,7 +212,7 @@ int main(int argc, char *argv[])
 
 		printf("IEC101 (pid:%d) creat\n", getpid());
 		if(info101.num > 0)
-			SojoDtu_IEC101(&info101);
+			SojoDtu_IEC101(&info101, iec101Filename);
 		printf("IEC101 (pid:%d) exit\n", getpid());
 
 		return 0;
@@ -223,7 +225,7 @@ int main(int argc, char *argv[])
 
 		printf("IEC104 (pid:%d) creat\n", getpid());
 		if(info104.num > 0)
-			SojoDtu_IEC104(&info104);
+			SojoDtu_IEC104(&info104, iec104Filename);
 		printf("IEC104 (pid:%d) exit\n", getpid());
 
 		return 0;
@@ -445,7 +447,7 @@ static void MqttParamConfig(EdgeGatewayConfig *configInfo, int *processNum, char
  * @param info101 101参数结构体指针
  * @return void
  */
-static void IEC101ParamConfig(EdgeGatewayConfig *configInfo, Configure101 *info101)
+static void IEC101ParamConfig(EdgeGatewayConfig *configInfo, Configure101 *info101, char *filename)
 {
 	info101->num = configInfo->iec101.slaveNumber;
 
@@ -486,6 +488,8 @@ static void IEC101ParamConfig(EdgeGatewayConfig *configInfo, Configure101 *info1
 		info101->sMsourceAddr[i] = configInfo->iec101.sMsourceAddr[i];
 	}
 	info101->sMportNo = configInfo->iec101.sMportNo;
+
+	strcpy(filename, configInfo->iec101.dataFilename);
 }
 
 
@@ -495,7 +499,7 @@ static void IEC101ParamConfig(EdgeGatewayConfig *configInfo, Configure101 *info1
  * @param info101 101参数结构体指针
  * @return void
  */
-static void IEC104ParamConfig(EdgeGatewayConfig *configInfo, Configure104 *info104)
+static void IEC104ParamConfig(EdgeGatewayConfig *configInfo, Configure104 *info104, char *filename)
 {
 	info104->num = configInfo->iec104.slaveNumber;
 	strcpy(info104->ip, configInfo->iec104.localIP);
@@ -520,6 +524,8 @@ static void IEC104ParamConfig(EdgeGatewayConfig *configInfo, Configure104 *info1
 	strcpy(info104->sMip[0], configInfo->iec104.sMip1);
 	strcpy(info104->sMip[1], configInfo->iec104.sMip2);
 	strcpy(info104->sMip[2], configInfo->iec104.sMip3);
+
+	strcpy(filename, configInfo->iec104.dataFilename);
 }
 
 

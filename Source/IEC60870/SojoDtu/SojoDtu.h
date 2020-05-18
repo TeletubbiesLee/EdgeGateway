@@ -17,8 +17,8 @@
 #define IEC101_INTERVAL		10
 #define IEC104_INTERVAL		10
 
-int SojoDtu_IEC101(Configure101 *info101);
-int SojoDtu_IEC104(Configure104 *info104);
+int SojoDtu_IEC101(Configure101 *info101, char *filename);
+int SojoDtu_IEC104(Configure104 *info104, char *filename);
 
 
 #endif
