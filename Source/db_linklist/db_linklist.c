@@ -199,7 +199,7 @@ void db_list_destory(db_list_t* list_head){
 	}
 	current=pos=list_head->head;
 	if(list_head->limit_size!=0){
-		for(int i=0;i<=list_head->limit_size;i++){
+		for(int i=0;i<list_head->limit_size;i++){
 			current=current->next;
 			free(pos);
 			pos=current;

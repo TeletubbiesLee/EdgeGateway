@@ -120,8 +120,8 @@ int main(int argc, char *argv[])
 	/* 将获取的配置信息进行赋值 */
 	TrsptTrsmsParamConfig(g_EdgeGatewayConfig, &trsptTrsmsProcessNum, trsptTrsmsType, trsptTrsmsUart, trsptTrsmsEth);
 	ModbusParamConfig(g_EdgeGatewayConfig, &noiseProcessNum, noiseUsername, noiseUart, noiseDeviceNum, noiseDeviceId, NOISE_SERSOR);
-	ModbusParamConfig(g_EdgeGatewayConfig, &airQualityProcessNum, airQualityUsername, airQualitySensor, airQualityDeviceNum, airQualityDeviceId, AIR_QUALITY_SERSOR);
 	ModbusParamConfig(g_EdgeGatewayConfig, &sojoRelayProcessNum, sojoRelayUsername, sojoRelaySensor, sojoRelayDeviceNum, sojoRelayDeviceId, SOJO_RELAY);
+	ModbusParamConfig(g_EdgeGatewayConfig, &airQualityProcessNum, airQualityUsername, airQualitySensor, airQualityDeviceNum, airQualityDeviceId, AIR_QUALITY_SERSOR);
 	MqttParamConfig(g_EdgeGatewayConfig, &mqttProcessNum, userName);
 	IEC101ParamConfig(g_EdgeGatewayConfig, &info101, iec101Filename);
 	IEC104ParamConfig(g_EdgeGatewayConfig, &info104, iec104Filename);
@@ -347,16 +347,17 @@ static void ModbusParamConfig(EdgeGatewayConfig *configInfo, int *processNum, ch
 	{
 	case NOISE_SERSOR:
 		modbusInfo = &noiseInfo;
+		*processNum = configInfo->noiseNumber;
 		break;
 	case AIR_QUALITY_SERSOR:
 		modbusInfo = &airQulityInfo;
+		*processNum = configInfo->airNumber;
 		break;
 	case SOJO_RELAY:
 		modbusInfo = &sojoRelay;
+		*processNum = configInfo->tempNumber;
 		break;
 	}
-
-	*processNum = configInfo->noiseNumber;
 
 	for(int i = 0; i < *processNum; i++)
 	{
