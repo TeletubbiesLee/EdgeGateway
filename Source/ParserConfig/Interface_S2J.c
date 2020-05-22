@@ -102,7 +102,7 @@ EdgeGatewayConfig g_DefaultConfig = {
 
 	.mqttAccess.mqttNumber = 3,
 	.mqttAccess.clondIP = "iot.shangshan.info",
-	.mqttAccess.username1 = "NOISE_TOKEN",
+	.mqttAccess.username1 = "IEC104_TOKEN",
 	.mqttAccess.username2 = "AIR_TOKEN",
 	.mqttAccess.username3 = "TEMP_TOKEN",
 };
