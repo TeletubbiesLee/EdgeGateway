@@ -115,7 +115,6 @@ int TemperatureRelay(UartInfo *uartInfo, int deviceId[], int deviceNum, char *fi
 static void SOJO_TemperatureDataProcess(uint16_t registerData[], int arrayNumber, int deviceId, char *filename)
 {
 	int i = 0;
-	int tempValue = 0;				//存放临时值
 	float temperature = 0.0;
 	char tempString[20] = {0};
 	DataInformation dataInfo;
@@ -124,16 +123,18 @@ static void SOJO_TemperatureDataProcess(uint16_t registerData[], int arrayNumber
 
 	for(i = 0; i < arrayNumber; i++)
 	{
-		if(registerData[i] & (1 << 15))
+		if(0 <= registerData[i] && registerData[i] < 2000)
 		{
-			tempValue = ~registerData[i] + 1;
-			tempValue &= (1 << 15);
+			temperature = registerData[i] / 10.0;
+		}
+		else if(2000 <= registerData[i] && registerData[i] <= 2500)
+		{
+			temperature = (registerData[i] - 2000) / -10.0;
 		}
 		else
 		{
-			tempValue = registerData[i];
+			temperature = registerData[i];
 		}
-		temperature = tempValue / 10.0;
 		printf("temperature[%d] = %.2f\n", i, temperature);
 
 		/* 保存数据 */

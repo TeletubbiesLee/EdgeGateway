@@ -26,6 +26,18 @@ void GetConfig(void)
 
 
 /**
+ * @fn StructFree
+ * @brief 释放g_EdgeGatewayConfig分配的内存空间
+ * @param void
+ * @return void
+ */
+void StructFree(void)
+{
+	S2J_StructFree(g_EdgeGatewayConfig);
+}
+
+
+/**
  * @fn SaveUart2NetConfig
  * @brief 保存串口转网口的透传功能的配置信息到文件
  * @param uart2NetInfo 透传功能的配置信息的指针

@@ -29,6 +29,7 @@ typedef struct TagModbusInfo
 }ModbusInfo;
 
 void GetConfig(void);
+void StructFree(void);
 void SaveUart2NetConfig(Uart2NetInfo *uart2NetInfo);
 void SaveNoiseConfig(ModbusInfo *noiseInfo);
 void SaveAirConfig(ModbusInfo *airInfo);

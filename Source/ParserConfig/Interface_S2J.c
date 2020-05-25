@@ -301,6 +301,11 @@ int GetJsonFile(char *filename, EdgeGatewayConfig **edgeGatewayStruct)
         goto JSON_RES;
     }
 
+    if(*edgeGatewayStruct != NULL)
+    {
+    	S2J_StructFree(*edgeGatewayStruct);
+    	*edgeGatewayStruct = NULL;
+    }
     *edgeGatewayStruct = json_to_struct(readJson);
 
     if(readJson != NULL)
