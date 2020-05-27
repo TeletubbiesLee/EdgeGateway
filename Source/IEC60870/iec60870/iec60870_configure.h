@@ -14,7 +14,7 @@
 #include <stdint.h>
 
 //从机最多个数
-#define SLAVE_MAX_NUM  16
+#define SLAVE_MAX_NUM  20
 
 //101配置结构体
 typedef struct TagConfigure101{

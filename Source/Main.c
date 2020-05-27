@@ -51,8 +51,16 @@ int main(int argc, char *argv[])
 	NetworkInfo *trsptTrsmsEth[PROTOCOL_MAX_PROCESS] = {0};
 	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
 	{
-		trsptTrsmsUart[i] = malloc(sizeof(UartInfo));
-		trsptTrsmsEth[i] = malloc(sizeof(NetworkInfo));
+		if((trsptTrsmsUart[i] = malloc(sizeof(UartInfo))) == NULL)
+		{
+			printf_debug("trsptTrsmsUart[%d] malloc error\n", i);
+			break;
+		}
+		if((trsptTrsmsEth[i] = malloc(sizeof(NetworkInfo))) == NULL)
+		{
+			printf_debug("trsptTrsmsEth[%d] malloc error\n", i);
+			break;
+		}
 	}
 
 	/* 噪声传感器需要的配置信息 */
@@ -63,9 +71,21 @@ int main(int argc, char *argv[])
 	int *noiseDeviceId[PROTOCOL_MAX_PROCESS] = {0};
 	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
 	{
-		noiseUsername[i] = malloc(sizeof(char) * 30);
-		noiseUart[i] = malloc(sizeof(UartInfo));
-		noiseDeviceId[i] = malloc(sizeof(int) * SLAVE_MAX_NUMBER);
+		if((noiseUsername[i] = malloc(sizeof(char) * 30)) == NULL)
+		{
+			printf_debug("noiseUsername[%d] malloc error\n", i);
+			break;
+		}
+		if((noiseUart[i] = malloc(sizeof(UartInfo))) == NULL)
+		{
+			printf_debug("noiseUart[%d] malloc error\n", i);
+			break;
+		}
+		if((noiseDeviceId[i] = malloc(sizeof(int) * SLAVE_MAX_NUMBER)) == NULL)
+		{
+			printf_debug("noiseDeviceId[%d] malloc error\n", i);
+			break;
+		}
 	}
 
 	/* 六合一空气质量传感器需要的配置信息 */
@@ -76,9 +96,21 @@ int main(int argc, char *argv[])
 	int *airQualityDeviceId[PROTOCOL_MAX_PROCESS] = {0};
 	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
 	{
-		airQualityUsername[i] = malloc(sizeof(char) * 30);
-		airQualitySensor[i] = malloc(sizeof(UartInfo));
-		airQualityDeviceId[i] = malloc(sizeof(int) * SLAVE_MAX_NUMBER);
+		if((airQualityUsername[i] = malloc(sizeof(char) * 30)) == NULL)
+		{
+			printf_debug("airQualityUsername[%d] malloc error\n", i);
+			break;
+		}
+		if((airQualitySensor[i] = malloc(sizeof(UartInfo))) == NULL)
+		{
+			printf_debug("airQualitySensor[%d] malloc error\n", i);
+			break;
+		}
+		if((airQualityDeviceId[i] = malloc(sizeof(int) * SLAVE_MAX_NUMBER)) == NULL)
+		{
+			printf_debug("airQualityDeviceId[%d] malloc error\n", i);
+			break;
+		}
 	}
 
 	/* 双杰测温中继需要的配置信息 */
@@ -89,9 +121,21 @@ int main(int argc, char *argv[])
 	int *sojoRelayDeviceId[PROTOCOL_MAX_PROCESS] = {0};
 	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
 	{
-		sojoRelayUsername[i] = malloc(sizeof(char) * 30);
-		sojoRelaySensor[i] = malloc(sizeof(UartInfo));
-		sojoRelayDeviceId[i] = malloc(sizeof(int) * SLAVE_MAX_NUMBER);
+		if((sojoRelayUsername[i] = malloc(sizeof(char) * 30)) == NULL)
+		{
+			printf_debug("sojoRelayUsername[%d] malloc error\n", i);
+			break;
+		}
+		if((sojoRelaySensor[i] = malloc(sizeof(UartInfo))) == NULL)
+		{
+			printf_debug("sojoRelaySensor[%d] malloc error\n", i);
+			break;
+		}
+		if((sojoRelayDeviceId[i] = malloc(sizeof(int) * SLAVE_MAX_NUMBER)) == NULL)
+		{
+			printf_debug("sojoRelayDeviceId[%d] malloc error\n", i);
+			break;
+		}
 	}
 
 	/* MQTT发布数据需要的配置信息 */
@@ -99,7 +143,11 @@ int main(int argc, char *argv[])
 	char *userName[PROTOCOL_MAX_PROCESS] = {0};
 	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
 	{
-		userName[i] = malloc(sizeof(char) * 30);
+		if((userName[i] = malloc(sizeof(char) * 30)) == NULL)
+		{
+			printf_debug("userName[%d] malloc error\n", i);
+			break;
+		}
 	}
 
 	/* IEC101协议需要的配置信息 */
@@ -111,7 +159,11 @@ int main(int argc, char *argv[])
 	char iec104Filename[30] = {0};
 	for(int i = 0; i < IEC104_SLAVE_MAX; i++)
 	{
-		info104.sMip[i] = malloc(sizeof(char) * 20);
+		if((info104.sMip[i] = malloc(sizeof(char) * 20)) == NULL)
+		{
+			printf_debug("info104.sMip[%d] malloc error\n", i);
+			break;
+		}
 	}
 
 	/* 解析配置文件，获取配置信息  */
@@ -237,7 +289,7 @@ int main(int argc, char *argv[])
 		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 		printf("Web (pid:%d) creat\n", getpid());
-		/* TODO:在此处添加嵌入式网页的对外接口函数 */
+		system("./GoAhead/bin/goahead -v --home ./GoAhead/bin/ /home/root/GoAhead 192.168.10.10");
 		printf("Web (pid:%d) exit\n", getpid());
 
 		return 0;
@@ -482,13 +534,10 @@ static void IEC101ParamConfig(EdgeGatewayConfig *configInfo, Configure101 *info1
 	for(int i = 0; i < info101->num; i++)
 	{
 		info101->sModuleId[i] = configInfo->iec101.sModuleId[i];
+		info101->sMsourceAddr[i] = configInfo->iec101.sModuleId[i];
 	}
-	info101->sMstate = configInfo->iec101.sMstate;
-	for(int i = 0; i < info101->num; i++)
-	{
-		info101->sMsourceAddr[i] = configInfo->iec101.sMsourceAddr[i];
-	}
-	info101->sMportNo = configInfo->iec101.sMportNo;
+	info101->sMstate = 1;
+	info101->sMportNo = info101->portNo;
 
 	strcpy(filename, configInfo->iec101.dataFilename);
 }
@@ -504,7 +553,7 @@ static void IEC104ParamConfig(EdgeGatewayConfig *configInfo, Configure104 *info1
 {
 	info104->num = configInfo->iec104.slaveNumber;
 	strcpy(info104->ip, configInfo->iec104.localIP);
-	info104->balanMode = configInfo->iec104.balanMode;
+	info104->balanMode = 1;
 	info104->sourceAddr = configInfo->iec104.sourceAddr;
 	info104->linkAddrSize = configInfo->iec104.linkAddrSize;
 	info104->ASDUCotSize = configInfo->iec104.ASDUCotSize;
@@ -515,16 +564,15 @@ static void IEC104ParamConfig(EdgeGatewayConfig *configInfo, Configure104 *info1
 	for(int i = 0; i < info104->num; i++)
 	{
 		info104->sModuleId[i] = configInfo->iec104.sModuleId[i];
+		info104->sMsourceAddr[i] = configInfo->iec104.sModuleId[i];
 	}
-	info104->sMstate = configInfo->iec104.sMstate;
-	for(int i = 0; i < info104->num; i++)
-	{
-		info104->sMsourceAddr[i] = configInfo->iec104.sMsourceAddr[i];
-	}
-	info104->sMnetEn = configInfo->iec104.sMnetEn;
+	info104->sMstate = 1;
+	info104->sMnetEn = 1;
 	strcpy(info104->sMip[0], configInfo->iec104.sMip1);
 	strcpy(info104->sMip[1], configInfo->iec104.sMip2);
 	strcpy(info104->sMip[2], configInfo->iec104.sMip3);
+	strcpy(info104->sMip[3], configInfo->iec104.sMip4);
+	strcpy(info104->sMip[4], configInfo->iec104.sMip5);
 
 	strcpy(filename, configInfo->iec104.dataFilename);
 }

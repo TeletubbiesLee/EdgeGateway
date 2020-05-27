@@ -418,6 +418,21 @@ void SaveIec104Config(IEC104Config *iec104)
 	strcpy(g_EdgeGatewayConfig->iec104.sMip3, iec104->sMip3);
 	strcpy(g_EdgeGatewayConfig->iec104.sMip4, iec104->sMip4);
 	strcpy(g_EdgeGatewayConfig->iec104.sMip5, iec104->sMip5);
+	strcpy(g_EdgeGatewayConfig->iec104.sMip6, iec104->sMip6);
+	strcpy(g_EdgeGatewayConfig->iec104.sMip7, iec104->sMip7);
+	strcpy(g_EdgeGatewayConfig->iec104.sMip8, iec104->sMip8);
+	strcpy(g_EdgeGatewayConfig->iec104.sMip9, iec104->sMip9);
+	strcpy(g_EdgeGatewayConfig->iec104.sMip10, iec104->sMip10);
+	strcpy(g_EdgeGatewayConfig->iec104.sMip11, iec104->sMip11);
+	strcpy(g_EdgeGatewayConfig->iec104.sMip12, iec104->sMip12);
+	strcpy(g_EdgeGatewayConfig->iec104.sMip13, iec104->sMip13);
+	strcpy(g_EdgeGatewayConfig->iec104.sMip14, iec104->sMip14);
+	strcpy(g_EdgeGatewayConfig->iec104.sMip15, iec104->sMip15);
+	strcpy(g_EdgeGatewayConfig->iec104.sMip16, iec104->sMip16);
+	strcpy(g_EdgeGatewayConfig->iec104.sMip17, iec104->sMip17);
+	strcpy(g_EdgeGatewayConfig->iec104.sMip18, iec104->sMip18);
+	strcpy(g_EdgeGatewayConfig->iec104.sMip19, iec104->sMip19);
+	strcpy(g_EdgeGatewayConfig->iec104.sMip20, iec104->sMip20);
 
 	strcpy(g_EdgeGatewayConfig->iec104.dataFilename, iec104->dataFilename);
 

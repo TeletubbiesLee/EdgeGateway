@@ -12,7 +12,8 @@
 #ifndef _INTERFACE_S2J_H_
 #define _INTERFACE_S2J_H_
 
-#define IEC104_SLAVE_MAX 5
+#define IEC101_SLAVE_MAX 20
+#define IEC104_SLAVE_MAX 20
 
 /*
  * 边缘网关系统信息
@@ -72,9 +73,9 @@ typedef struct TagIEC101Config{
 	int infoAddrSize;
 
 	int slaveNumber;
-	int sModuleId[256];
+	int sModuleId[IEC101_SLAVE_MAX];
 	int sMstate;
-	int sMsourceAddr[256];
+	int sMsourceAddr[IEC101_SLAVE_MAX];
 	int sMportNo;
 
 	char dataFilename[30];
@@ -104,6 +105,21 @@ typedef struct TagIEC104Config{
 	char sMip3[20];
 	char sMip4[20];
 	char sMip5[20];
+	char sMip6[20];
+	char sMip7[20];
+	char sMip8[20];
+	char sMip9[20];
+	char sMip10[20];
+	char sMip11[20];
+	char sMip12[20];
+	char sMip13[20];
+	char sMip14[20];
+	char sMip15[20];
+	char sMip16[20];
+	char sMip17[20];
+	char sMip18[20];
+	char sMip19[20];
+	char sMip20[20];
 
 	char dataFilename[30];
 }IEC104Config;
@@ -157,7 +173,7 @@ typedef struct TagEdgeGatewayConfig{
 	MqttConfig mqttAccess;
 }EdgeGatewayConfig;
 
-#define JSON_CONFIG_FILENAME "EdgeGateway.json"
+#define JSON_CONFIG_FILENAME "./GoAhead/bin/EdgeGateway.json"
 
 extern EdgeGatewayConfig *g_EdgeGatewayConfig;
 extern EdgeGatewayConfig g_DefaultConfig;

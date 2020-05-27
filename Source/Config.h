@@ -18,6 +18,7 @@
 #define printf_debug(fmt,...) do{printf("%s: %s[line %d]: "fmt, __FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__);}while(0)
 
 
+
 #define PROTOCOL_MAX_PROCESS	5			//每种协议最大支持数
 #define SLAVE_MAX_NUMBER		256			//从机最大数
 

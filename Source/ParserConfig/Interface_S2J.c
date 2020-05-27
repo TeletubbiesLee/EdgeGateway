@@ -578,9 +578,9 @@ static void *json_to_struct(cJSON* json_obj)
 	s2j_json_set_basic_element(json_obj, struct_obj, int, ASDUAddrSize);		\
 	s2j_json_set_basic_element(json_obj, struct_obj, int, infoAddrSize);		\
 	s2j_json_set_basic_element(json_obj, struct_obj, int, slaveNumber);			\
-	s2j_json_set_array_element(json_obj, struct_obj, int, sModuleId, 256);		\
+	s2j_json_set_array_element(json_obj, struct_obj, int, sModuleId, IEC101_SLAVE_MAX);		\
 	s2j_json_set_basic_element(json_obj, struct_obj, int, sMstate);				\
-	s2j_json_set_array_element(json_obj, struct_obj, int, sMsourceAddr, 256);	\
+	s2j_json_set_array_element(json_obj, struct_obj, int, sMsourceAddr, IEC101_SLAVE_MAX);	\
 	s2j_json_set_basic_element(json_obj, struct_obj, int, sMportNo);			\
 	s2j_json_set_basic_element(json_obj, struct_obj, string, dataFilename);		\
 }while(0)
@@ -600,15 +600,30 @@ static void *json_to_struct(cJSON* json_obj)
 	s2j_json_set_basic_element(json_obj, struct_obj, int, ASDUAddrSize);	\
 	s2j_json_set_basic_element(json_obj, struct_obj, int, infoAddrSize);	\
 	s2j_json_set_basic_element(json_obj, struct_obj, int, slaveNumber);		\
-	s2j_json_set_array_element(json_obj, struct_obj, int, sModuleId, 5);	\
+	s2j_json_set_array_element(json_obj, struct_obj, int, sModuleId, IEC104_SLAVE_MAX);	\
 	s2j_json_set_basic_element(json_obj, struct_obj, int, sMstate);			\
-	s2j_json_set_array_element(json_obj, struct_obj, int, sMsourceAddr, 5);	\
+	s2j_json_set_array_element(json_obj, struct_obj, int, sMsourceAddr, IEC104_SLAVE_MAX);	\
 	s2j_json_set_basic_element(json_obj, struct_obj, int, sMnetEn);			\
 	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip1);		\
 	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip2);		\
 	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip3);		\
 	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip4);		\
 	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip5);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip6);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip7);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip8);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip9);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip10);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip11);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip12);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip13);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip14);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip15);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip16);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip17);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip18);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip19);		\
+	s2j_json_set_basic_element(json_obj, struct_obj, string, sMip20);		\
 	s2j_json_set_basic_element(json_obj, struct_obj, string, dataFilename);	\
 }while(0)
 
