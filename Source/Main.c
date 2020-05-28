@@ -16,6 +16,7 @@
 #include <string.h>
 #include <sys/sem.h>
 #include "Led/Led.h"
+#include "TransparentTransmission/Net.h"
 #include "ProcessSignal/ProcessSignal.h"
 #include "TransparentTransmission/TransparentTransmission.h"
 #include "DeviceApp/NoiseSensor/NoiseSensor.h"
@@ -554,20 +555,22 @@ static int CreatIec104Process(void)
  */
 static int CreatWebProcess(void)
 {
-	if(g_EdgeGatewayConfig == NULL)
-	{
-		printf_debug("g_EdgeGatewayConfig is NULL!\n");
-		return POINT_NULL;
-	}
-
 	/* 创建嵌入式网页进程 */
 	pid_t pid = 0;
+	char *eth = "eth1";
+	char ipAddress[20] = {0};
+	char webCmdString[100] = "./GoAhead/bin/goahead -v --home ./GoAhead/bin/ /home/root/GoAhead ";
+
+	GetIpAddress(eth, ipAddress);
+	strcat(webCmdString, ipAddress);
+
 	if((pid = fork()) == 0)
 	{
 		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
 		printf("Web (pid:%d) creat\n", getpid());
-		system("./GoAhead/bin/goahead -v --home ./GoAhead/bin/ /home/root/GoAhead 192.168.10.10");
+		printf("system(\"%s\")\n", webCmdString);
+		system(webCmdString);
 		printf("Web (pid:%d) exit\n", getpid());
 
 		return NO_ERROR;

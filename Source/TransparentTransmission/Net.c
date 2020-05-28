@@ -14,8 +14,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <sys/socket.h>
 #include <arpa/inet.h>
+#include <ifaddrs.h>
 #include <netdb.h>
 #include <strings.h>
 #include "Net.h"
@@ -200,6 +200,46 @@ void SetRemoteAddress(char *ipAddress, int port, struct sockaddr_in *remoteAddr)
 }
 
 
+/**
+ * @fn GetIpAddress
+ * @brief 获取本地网卡interfaces的IP地址等信息ipAddress，IP地址为v4orv6类型(IPv4或IPv6)
+ * @param interfaces 网卡字符串名称
+ * @param ipAddress 存放IP地址的字符串地址
+ * @return 成功:0 错误:1
+ */
+int GetIpAddress(char *interfaces, char *ipAddress)
+{
+	struct ifaddrs *ifAddrStruct = NULL;
+	struct ifaddrs *ifa = NULL;
+	void *tmpAddrPtr = NULL;
+
+	getifaddrs(&ifAddrStruct);
+
+	for(ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
+	{
+		if(!ifa->ifa_addr)
+		{
+			continue;
+		}
+		if(ifa->ifa_addr->sa_family == AF_INET) // check it is IP4
+		{
+			// is a valid IP4 Address
+			tmpAddrPtr = &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
+			char addressBuffer[INET_ADDRSTRLEN];
+			inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+			if(!strcmp(interfaces, ifa->ifa_name))
+			{
+				strncpy(ipAddress, addressBuffer, strlen(addressBuffer));
+			}
+		}
+	}
+	if(ifAddrStruct != NULL)
+	{
+		freeifaddrs(ifAddrStruct);
+	}
+
+    return NO_ERROR;
+}
 
 
 

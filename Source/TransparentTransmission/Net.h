@@ -12,6 +12,7 @@
 #ifndef _NET_H_
 #define _NET_H_
 
+#include <sys/socket.h>
 
 #define BACKLOG		10		//最大客户端连接数
 
@@ -22,5 +23,6 @@ int TCP_CloseConnect(int *sockfd);
 int UDP_NetConnect(int serverPort);
 void SetNetNonBlock(int sockfd);
 void SetRemoteAddress(char *ipAddress, int port, struct sockaddr_in *remoteAddr);
+int GetIpAddress(char *interfaces, char *ipAddress);
 
 #endif
