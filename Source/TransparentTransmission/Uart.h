@@ -19,6 +19,5 @@
 int UartInit(char *device, int bandrate, int type);
 int OpenDevice(char *dev);
 int SetPort(int fd, int nSpeed, int nBits, char nEvent, int nStop);
-void PrintUartUsage();
 
 #endif

@@ -10,6 +10,9 @@
  */
 
 
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include "Led.h"
@@ -36,10 +39,14 @@ void IndicatorLedRunning(void)
  */
 void IndicatorLedOnOrOff(bool onOrOff)
 {
+	int fd = open(LED130_GPIO_VAL, O_RDWR);
+
 	if(LED_ON == onOrOff)
-		system("echo \"0\" > /sys/class/gpio/gpio130/value");
+		write(fd, "0", sizeof("0"));
 	else if(LED_OFF == onOrOff)
-		system("echo \"1\" > /sys/class/gpio/gpio130/value");
+		write(fd, "1", sizeof("1"));
+
+	close(fd);
 }
 
 

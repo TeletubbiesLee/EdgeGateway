@@ -19,6 +19,8 @@
 
 #define LED_DELAY_INTERVAL		1	//LED灯闪烁延时间隔，单位：s
 
+#define LED130_GPIO_VAL              "/sys/class/gpio/gpio130/value"
+
 void IndicatorLedRunning(void);
 void IndicatorLedOnOrOff(bool onOrOff);
 

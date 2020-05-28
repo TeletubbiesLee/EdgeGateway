@@ -261,17 +261,3 @@ int SetPort(int fd, int nSpeed, int nBits, char nEvent, int nStop)
 }
 
 
-/**
- * @brief 打印串口的使用方法
- * @return void
- */
-void PrintUartUsage()
-{
-    printf("Usage: program_name option [ dev... ] \n");
-    printf("\t-h  --help     Display this usage information.\n"
-            "\t-d  --device   The device ttyS[0-3] or ttySCMA[0-1]\n"
-	    	"\t-b  --baudrate Set the baud rate you can select\n"
-	    	"\t               [230400, 115200, 57600, 38400, 19200, 9600, 4800, 2400, 1200, 300]\n"
-            "\t-s  --string   Write the device data\n");
-    return;
-}
