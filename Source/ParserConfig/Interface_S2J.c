@@ -415,6 +415,21 @@ JSON_RES:
 	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip3);			\
 	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip4);			\
 	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip5);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip6);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip7);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip8);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip9);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip10);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip11);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip12);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip13);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip14);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip15);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip16);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip17);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip18);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip19);			\
+	s2j_struct_get_basic_element(struct_obj, json_obj, string, sMip20);			\
 	s2j_struct_get_basic_element(struct_obj, json_obj, string, dataFilename);	\
 }while(0)
 

@@ -9,6 +9,7 @@
  * @version ver 1.0
  */
 #include <stdlib.h>
+#include <stdbool.h>
 #include <math.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -29,6 +30,15 @@
 
 
 
+static void FreePointArray(void *pointArray[], int num);
+static int CreatNet2UartProcess(void);
+static int CreatNoiseProcess(void);
+static int CreatAirQualityProcess(void);
+static int CreatSojoRelayProcess(void);
+static int CreatMqttProcess(void);
+static int CreatIec101Process(void);
+static int CreatIec104Process(void);
+static int CreatWebProcess(void);
 static void TrsptTrsmsParamConfig(EdgeGatewayConfig *configInfo, int *processNum, int type[], UartInfo *uart[], NetworkInfo *eth[]);
 static void ModbusParamConfig(EdgeGatewayConfig *configInfo, int *processNum, char *username[], UartInfo *uart[], int deviceNum[], int *deviceId[], int sersorType);
 static void MqttParamConfig(EdgeGatewayConfig *configInfo, int *processNum, char *username[]);
@@ -41,259 +51,31 @@ static void IEC104ParamConfig(EdgeGatewayConfig *configInfo, Configure104 *info1
  */
 int main(int argc, char *argv[])
 {
-	pid_t pid = 0;			//子进程的进程ID号
 	int semId = 0;
-
-	/* 透传功能需要的配置信息 */
-	int trsptTrsmsProcessNum = 0;			//透传功能进程数
-	int trsptTrsmsType[PROTOCOL_MAX_PROCESS] = {0};
-	UartInfo *trsptTrsmsUart[PROTOCOL_MAX_PROCESS] = {0};
-	NetworkInfo *trsptTrsmsEth[PROTOCOL_MAX_PROCESS] = {0};
-	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
-	{
-		if((trsptTrsmsUart[i] = malloc(sizeof(UartInfo))) == NULL)
-		{
-			printf_debug("trsptTrsmsUart[%d] malloc error\n", i);
-			break;
-		}
-		if((trsptTrsmsEth[i] = malloc(sizeof(NetworkInfo))) == NULL)
-		{
-			printf_debug("trsptTrsmsEth[%d] malloc error\n", i);
-			break;
-		}
-	}
-
-	/* 噪声传感器需要的配置信息 */
-	int noiseProcessNum = 0;
-	char *noiseUsername[PROTOCOL_MAX_PROCESS] = {0};
-	UartInfo *noiseUart[PROTOCOL_MAX_PROCESS] = {0};
-	int noiseDeviceNum[PROTOCOL_MAX_PROCESS] = {0};
-	int *noiseDeviceId[PROTOCOL_MAX_PROCESS] = {0};
-	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
-	{
-		if((noiseUsername[i] = malloc(sizeof(char) * 30)) == NULL)
-		{
-			printf_debug("noiseUsername[%d] malloc error\n", i);
-			break;
-		}
-		if((noiseUart[i] = malloc(sizeof(UartInfo))) == NULL)
-		{
-			printf_debug("noiseUart[%d] malloc error\n", i);
-			break;
-		}
-		if((noiseDeviceId[i] = malloc(sizeof(int) * SLAVE_MAX_NUMBER)) == NULL)
-		{
-			printf_debug("noiseDeviceId[%d] malloc error\n", i);
-			break;
-		}
-	}
-
-	/* 六合一空气质量传感器需要的配置信息 */
-	int airQualityProcessNum = 0;
-	char *airQualityUsername[PROTOCOL_MAX_PROCESS] = {0};
-	UartInfo *airQualitySensor[PROTOCOL_MAX_PROCESS] = {0};
-	int airQualityDeviceNum[PROTOCOL_MAX_PROCESS] = {0};
-	int *airQualityDeviceId[PROTOCOL_MAX_PROCESS] = {0};
-	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
-	{
-		if((airQualityUsername[i] = malloc(sizeof(char) * 30)) == NULL)
-		{
-			printf_debug("airQualityUsername[%d] malloc error\n", i);
-			break;
-		}
-		if((airQualitySensor[i] = malloc(sizeof(UartInfo))) == NULL)
-		{
-			printf_debug("airQualitySensor[%d] malloc error\n", i);
-			break;
-		}
-		if((airQualityDeviceId[i] = malloc(sizeof(int) * SLAVE_MAX_NUMBER)) == NULL)
-		{
-			printf_debug("airQualityDeviceId[%d] malloc error\n", i);
-			break;
-		}
-	}
-
-	/* 双杰测温中继需要的配置信息 */
-	int sojoRelayProcessNum = 0;
-	char *sojoRelayUsername[PROTOCOL_MAX_PROCESS] = {0};
-	UartInfo *sojoRelaySensor[PROTOCOL_MAX_PROCESS] = {0};
-	int sojoRelayDeviceNum[PROTOCOL_MAX_PROCESS] = {0};
-	int *sojoRelayDeviceId[PROTOCOL_MAX_PROCESS] = {0};
-	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
-	{
-		if((sojoRelayUsername[i] = malloc(sizeof(char) * 30)) == NULL)
-		{
-			printf_debug("sojoRelayUsername[%d] malloc error\n", i);
-			break;
-		}
-		if((sojoRelaySensor[i] = malloc(sizeof(UartInfo))) == NULL)
-		{
-			printf_debug("sojoRelaySensor[%d] malloc error\n", i);
-			break;
-		}
-		if((sojoRelayDeviceId[i] = malloc(sizeof(int) * SLAVE_MAX_NUMBER)) == NULL)
-		{
-			printf_debug("sojoRelayDeviceId[%d] malloc error\n", i);
-			break;
-		}
-	}
-
-	/* MQTT发布数据需要的配置信息 */
-	int mqttProcessNum = 0;
-	char *userName[PROTOCOL_MAX_PROCESS] = {0};
-	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
-	{
-		if((userName[i] = malloc(sizeof(char) * 30)) == NULL)
-		{
-			printf_debug("userName[%d] malloc error\n", i);
-			break;
-		}
-	}
-
-	/* IEC101协议需要的配置信息 */
-	Configure101 info101;
-	char iec101Filename[30] = {0};
-
-	/* IEC104协议需要的配置信息 */
-	Configure104 info104;
-	char iec104Filename[30] = {0};
-	for(int i = 0; i < IEC104_SLAVE_MAX; i++)
-	{
-		if((info104.sMip[i] = malloc(sizeof(char) * 20)) == NULL)
-		{
-			printf_debug("info104.sMip[%d] malloc error\n", i);
-			break;
-		}
-	}
 
 	/* 解析配置文件，获取配置信息  */
 	GetJsonFile(JSON_CONFIG_FILENAME, &g_EdgeGatewayConfig);
-
-	/* 将获取的配置信息进行赋值 */
-	TrsptTrsmsParamConfig(g_EdgeGatewayConfig, &trsptTrsmsProcessNum, trsptTrsmsType, trsptTrsmsUart, trsptTrsmsEth);
-	ModbusParamConfig(g_EdgeGatewayConfig, &noiseProcessNum, noiseUsername, noiseUart, noiseDeviceNum, noiseDeviceId, NOISE_SERSOR);
-	ModbusParamConfig(g_EdgeGatewayConfig, &sojoRelayProcessNum, sojoRelayUsername, sojoRelaySensor, sojoRelayDeviceNum, sojoRelayDeviceId, SOJO_RELAY);
-	ModbusParamConfig(g_EdgeGatewayConfig, &airQualityProcessNum, airQualityUsername, airQualitySensor, airQualityDeviceNum, airQualityDeviceId, AIR_QUALITY_SERSOR);
-	MqttParamConfig(g_EdgeGatewayConfig, &mqttProcessNum, userName);
-	IEC101ParamConfig(g_EdgeGatewayConfig, &info101, iec101Filename);
-	IEC104ParamConfig(g_EdgeGatewayConfig, &info104, iec104Filename);
 
 	/* 初始化信号量 */
 	semId = semget((key_t)SEMAPHORE_KEY, 1, 0666 | IPC_CREAT);
 	SetSemValue(semId);
 
-	/* 创建透传功能进程 */
-	for(int i = 0; i < trsptTrsmsProcessNum; i++)
-	{
-		if((pid = fork()) == 0)
-		{
-			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
 
-			printf("TransparentTransmission (pid:%d) creat\n", getpid());
-			TransparentTransmission(trsptTrsmsType[i], trsptTrsmsUart[i], trsptTrsmsEth[i]);		//透传功能
-			printf("TransparentTransmission (pid:%d) exit\n", getpid());
+	CreatNet2UartProcess();
 
-			return 0;
-		}
-	}
+	CreatNoiseProcess();
 
-	/* 创建噪声传感器通信进程 */
-	for(int i = 0; i < noiseProcessNum; i++)
-	{
-		if((pid = fork()) == 0)
-		{
-			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+	CreatAirQualityProcess();
 
-			printf("NoiseSensor (pid:%d) creat\n", getpid());
-			NoiseSensor(noiseUart[i], noiseDeviceId[i], noiseDeviceNum[i], noiseUsername[i]);
-			printf("NoiseSensor (pid:%d) exit\n", getpid());
+	CreatSojoRelayProcess();
 
-			return 0;
-		}
-	}
+	CreatMqttProcess();
 
-	/* 创建六合一空气质量传感器通信进程 */
-	for(int i = 0; i < airQualityProcessNum; i++)
-	{
-		if((pid = fork()) == 0)
-		{
-			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+	CreatIec101Process();
 
-			printf("AirQualitySensor (pid:%d) creat\n", getpid());
-			AirQualitySensor(airQualitySensor[i], airQualityDeviceId[i], airQualityDeviceNum[i], airQualityUsername[i]);
-			printf("AirQualitySensor (pid:%d) exit\n", getpid());
+	CreatIec104Process();
 
-			return 0;
-		}
-	}
-
-	/* 创建双杰测温中继通信进程 */
-	for(int i = 0; i < sojoRelayProcessNum; i++)
-	{
-		if((pid = fork()) == 0)
-		{
-			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
-
-			printf("TemperatureRelay (pid:%d) creat\n", getpid());
-			TemperatureRelay(sojoRelaySensor[i], sojoRelayDeviceId[i], sojoRelayDeviceNum[i], sojoRelayUsername[i]);
-			printf("TemperatureRelay (pid:%d) exit\n", getpid());
-
-			return 0;
-		}
-	}
-
-	/* 创建MQTT通信进程 */
-	for(int i = 0; i < mqttProcessNum; i++)
-	{
-		if((pid = fork()) == 0)
-		{
-			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
-
-			printf("MqttPublish (pid:%d) creat\n", getpid());
-			MqttPublish(userName[i]);							//MQTT发布信息
-			printf("MqttPublish (pid:%d) exit\n", getpid());
-
-			return 0;
-		}
-	}
-
-	/* 创建101进程 */
-	if((pid = fork()) == 0)
-	{
-		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
-
-		printf("IEC101 (pid:%d) creat\n", getpid());
-		if(info101.num > 0)
-			SojoDtu_IEC101(&info101, iec101Filename);
-		printf("IEC101 (pid:%d) exit\n", getpid());
-
-		return 0;
-	}
-
-	/* 创建104进程 */
-	if((pid = fork()) == 0)
-	{
-		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
-
-		printf("IEC104 (pid:%d) creat\n", getpid());
-		if(info104.num > 0)
-			SojoDtu_IEC104(&info104, iec104Filename);
-		printf("IEC104 (pid:%d) exit\n", getpid());
-
-		return 0;
-	}
-
-	/* 创建嵌入式网页进程 */
-	if((pid = fork()) == 0)
-	{
-		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
-
-		printf("Web (pid:%d) creat\n", getpid());
-		system("./GoAhead/bin/goahead -v --home ./GoAhead/bin/ /home/root/GoAhead 192.168.10.10");
-		printf("Web (pid:%d) exit\n", getpid());
-
-		return 0;
-	}
+	CreatWebProcess();
 
 	/* 创建其他功能的进程 */
 
@@ -309,26 +91,488 @@ int main(int argc, char *argv[])
 	IndicatorLedOnOrOff(LED_OFF);	//程序退出，灯关闭
 	printf("EdgeGateway (pid:%d) exit\n", getpid());
 
-	/* 释放内存空间 */
-	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
-	{
-		free(trsptTrsmsUart[i]);
-		free(trsptTrsmsEth[i]);
-		free(noiseUsername[i]);
-		free(noiseUart[i]);
-		free(noiseDeviceId[i]);
-		free(airQualityUsername[i]);
-		free(airQualitySensor[i]);
-		free(airQualityDeviceId[i]);
-		free(sojoRelayUsername[i]);
-		free(sojoRelaySensor[i]);
-		free(sojoRelayDeviceId[i]);
-		free(userName[i]);
-	}
+	S2J_StructFree(g_EdgeGatewayConfig);
 	DelSemValue(semId);
 
 
 	return 0;
+}
+
+
+/**
+ * @brief 释放指针数组中的空间
+ * @param void
+ * @return v
+ */
+static void FreePointArray(void *pointArray[], int num)
+{
+	for(int i = 0; i < num; i++)
+	{
+		if(pointArray[i] != NULL)
+		{
+			free(pointArray[i]);
+			pointArray[i] = NULL;
+		}
+	}
+}
+
+
+/**
+ * @brief 创建透传进程
+ * @param void
+ * @return 成功：0 失败：其他
+ */
+static int CreatNet2UartProcess(void)
+{
+	if(g_EdgeGatewayConfig == NULL)
+	{
+		printf_debug("g_EdgeGatewayConfig is NULL!\n");
+		return POINT_NULL;
+	}
+
+	/* 透传功能需要的配置信息 */
+	bool isError = true;
+	pid_t pid = 0;
+	int trsptTrsmsProcessNum = 0;			//透传功能进程数
+	int trsptTrsmsType[PROTOCOL_MAX_PROCESS] = {0};
+	UartInfo *trsptTrsmsUart[PROTOCOL_MAX_PROCESS] = {0};
+	NetworkInfo *trsptTrsmsEth[PROTOCOL_MAX_PROCESS] = {0};
+	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
+	{
+		if((trsptTrsmsUart[i] = malloc(sizeof(UartInfo))) == NULL)
+		{
+			printf_debug("trsptTrsmsUart[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+		if((trsptTrsmsEth[i] = malloc(sizeof(NetworkInfo))) == NULL)
+		{
+			printf_debug("trsptTrsmsEth[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+	}
+
+	if(false == isError)
+	{
+		FreePointArray((void**)trsptTrsmsUart, PROTOCOL_MAX_PROCESS);
+		FreePointArray((void**)trsptTrsmsEth, PROTOCOL_MAX_PROCESS);
+		return MALLOC_FAIL;
+	}
+
+	TrsptTrsmsParamConfig(g_EdgeGatewayConfig, &trsptTrsmsProcessNum, trsptTrsmsType, trsptTrsmsUart, trsptTrsmsEth);
+	/* 创建透传功能进程 */
+	for(int i = 0; i < trsptTrsmsProcessNum; i++)
+	{
+		if((pid = fork()) == 0)
+		{
+			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+			printf("TransparentTransmission (pid:%d) creat\n", getpid());
+			TransparentTransmission(trsptTrsmsType[i], trsptTrsmsUart[i], trsptTrsmsEth[i]);		//透传功能
+			printf("TransparentTransmission (pid:%d) exit\n", getpid());
+
+			return NO_ERROR;
+		}
+	}
+
+	FreePointArray((void**)trsptTrsmsUart, PROTOCOL_MAX_PROCESS);
+	FreePointArray((void**)trsptTrsmsEth, PROTOCOL_MAX_PROCESS);
+	return NO_ERROR;
+}
+
+
+/**
+ * @brief 创建噪声传感器进程
+ * @param void
+ * @return 成功：0 失败：其他
+ */
+static int CreatNoiseProcess(void)
+{
+	if(g_EdgeGatewayConfig == NULL)
+	{
+		printf_debug("g_EdgeGatewayConfig is NULL!\n");
+		return POINT_NULL;
+	}
+
+	/* 噪声传感器需要的配置信息 */
+	bool isError = true;
+	pid_t pid = 0;
+	int noiseProcessNum = 0;
+	char *noiseUsername[PROTOCOL_MAX_PROCESS] = {0};
+	UartInfo *noiseUart[PROTOCOL_MAX_PROCESS] = {0};
+	int noiseDeviceNum[PROTOCOL_MAX_PROCESS] = {0};
+	int *noiseDeviceId[PROTOCOL_MAX_PROCESS] = {0};
+	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
+	{
+		if((noiseUsername[i] = malloc(sizeof(char) * 30)) == NULL)
+		{
+			printf_debug("noiseUsername[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+		if((noiseUart[i] = malloc(sizeof(UartInfo))) == NULL)
+		{
+			printf_debug("noiseUart[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+		if((noiseDeviceId[i] = malloc(sizeof(int) * SLAVE_MAX_NUMBER)) == NULL)
+		{
+			printf_debug("noiseDeviceId[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+	}
+
+	if(false == isError)
+	{
+		FreePointArray((void**)noiseUsername, PROTOCOL_MAX_PROCESS);
+		FreePointArray((void**)noiseUart, PROTOCOL_MAX_PROCESS);
+		FreePointArray((void**)noiseDeviceId, PROTOCOL_MAX_PROCESS);
+		return MALLOC_FAIL;
+	}
+
+	ModbusParamConfig(g_EdgeGatewayConfig, &noiseProcessNum, noiseUsername, noiseUart, noiseDeviceNum, noiseDeviceId, NOISE_SERSOR);
+	/* 创建噪声传感器通信进程 */
+	for(int i = 0; i < noiseProcessNum; i++)
+	{
+		if((pid = fork()) == 0)
+		{
+			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+			printf("NoiseSensor (pid:%d) creat\n", getpid());
+			NoiseSensor(noiseUart[i], noiseDeviceId[i], noiseDeviceNum[i], noiseUsername[i]);
+			printf("NoiseSensor (pid:%d) exit\n", getpid());
+
+			return NO_ERROR;
+		}
+	}
+	FreePointArray((void**)noiseUsername, PROTOCOL_MAX_PROCESS);
+	FreePointArray((void**)noiseUart, PROTOCOL_MAX_PROCESS);
+	FreePointArray((void**)noiseDeviceId, PROTOCOL_MAX_PROCESS);
+	return NO_ERROR;
+}
+
+
+/**
+ * @brief 创建空气质量传感器进程
+ * @param void
+ * @return 成功：0 失败：其他
+ */
+static int CreatAirQualityProcess(void)
+{
+	if(g_EdgeGatewayConfig == NULL)
+	{
+		printf_debug("g_EdgeGatewayConfig is NULL!\n");
+		return POINT_NULL;
+	}
+
+	/* 六合一空气质量传感器需要的配置信息 */
+	bool isError = true;
+	pid_t pid = 0;
+	int airQualityProcessNum = 0;
+	char *airQualityUsername[PROTOCOL_MAX_PROCESS] = {0};
+	UartInfo *airQualitySensor[PROTOCOL_MAX_PROCESS] = {0};
+	int airQualityDeviceNum[PROTOCOL_MAX_PROCESS] = {0};
+	int *airQualityDeviceId[PROTOCOL_MAX_PROCESS] = {0};
+	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
+	{
+		if((airQualityUsername[i] = malloc(sizeof(char) * 30)) == NULL)
+		{
+			printf_debug("airQualityUsername[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+		if((airQualitySensor[i] = malloc(sizeof(UartInfo))) == NULL)
+		{
+			printf_debug("airQualitySensor[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+		if((airQualityDeviceId[i] = malloc(sizeof(int) * SLAVE_MAX_NUMBER)) == NULL)
+		{
+			printf_debug("airQualityDeviceId[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+	}
+
+	if(false == isError)
+	{
+		FreePointArray((void**)airQualityUsername, PROTOCOL_MAX_PROCESS);
+		FreePointArray((void**)airQualitySensor, PROTOCOL_MAX_PROCESS);
+		FreePointArray((void**)airQualityDeviceId, PROTOCOL_MAX_PROCESS);
+		return MALLOC_FAIL;
+	}
+
+	ModbusParamConfig(g_EdgeGatewayConfig, &airQualityProcessNum, airQualityUsername, airQualitySensor, airQualityDeviceNum, airQualityDeviceId, AIR_QUALITY_SERSOR);
+	/* 创建六合一空气质量传感器通信进程 */
+	for(int i = 0; i < airQualityProcessNum; i++)
+	{
+		if((pid = fork()) == 0)
+		{
+			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+			printf("AirQualitySensor (pid:%d) creat\n", getpid());
+			AirQualitySensor(airQualitySensor[i], airQualityDeviceId[i], airQualityDeviceNum[i], airQualityUsername[i]);
+			printf("AirQualitySensor (pid:%d) exit\n", getpid());
+
+			return NO_ERROR;
+		}
+	}
+	FreePointArray((void**)airQualityUsername, PROTOCOL_MAX_PROCESS);
+	FreePointArray((void**)airQualitySensor, PROTOCOL_MAX_PROCESS);
+	FreePointArray((void**)airQualityDeviceId, PROTOCOL_MAX_PROCESS);
+	return NO_ERROR;
+}
+
+
+/**
+ * @brief 创建测温接收中继进程
+ * @param void
+ * @return 成功：0 失败：其他
+ */
+static int CreatSojoRelayProcess(void)
+{
+	if(g_EdgeGatewayConfig == NULL)
+	{
+		printf_debug("g_EdgeGatewayConfig is NULL!\n");
+		return POINT_NULL;
+	}
+
+	/* 双杰测温中继需要的配置信息 */
+	bool isError = true;
+	pid_t pid = 0;
+	int sojoRelayProcessNum = 0;
+	char *sojoRelayUsername[PROTOCOL_MAX_PROCESS] = {0};
+	UartInfo *sojoRelaySensor[PROTOCOL_MAX_PROCESS] = {0};
+	int sojoRelayDeviceNum[PROTOCOL_MAX_PROCESS] = {0};
+	int *sojoRelayDeviceId[PROTOCOL_MAX_PROCESS] = {0};
+	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
+	{
+		if((sojoRelayUsername[i] = malloc(sizeof(char) * 30)) == NULL)
+		{
+			printf_debug("sojoRelayUsername[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+		if((sojoRelaySensor[i] = malloc(sizeof(UartInfo))) == NULL)
+		{
+			printf_debug("sojoRelaySensor[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+		if((sojoRelayDeviceId[i] = malloc(sizeof(int) * SLAVE_MAX_NUMBER)) == NULL)
+		{
+			printf_debug("sojoRelayDeviceId[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+	}
+
+	if(false == isError)
+	{
+		FreePointArray((void**)sojoRelayUsername, PROTOCOL_MAX_PROCESS);
+		FreePointArray((void**)sojoRelaySensor, PROTOCOL_MAX_PROCESS);
+		FreePointArray((void**)sojoRelayDeviceId, PROTOCOL_MAX_PROCESS);
+		return MALLOC_FAIL;
+	}
+
+	ModbusParamConfig(g_EdgeGatewayConfig, &sojoRelayProcessNum, sojoRelayUsername, sojoRelaySensor, sojoRelayDeviceNum, sojoRelayDeviceId, SOJO_RELAY);
+	/* 创建双杰测温中继通信进程 */
+	for(int i = 0; i < sojoRelayProcessNum; i++)
+	{
+		if((pid = fork()) == 0)
+		{
+			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+			printf("TemperatureRelay (pid:%d) creat\n", getpid());
+			TemperatureRelay(sojoRelaySensor[i], sojoRelayDeviceId[i], sojoRelayDeviceNum[i], sojoRelayUsername[i]);
+			printf("TemperatureRelay (pid:%d) exit\n", getpid());
+
+			return NO_ERROR;
+		}
+	}
+	FreePointArray((void**)sojoRelayUsername, PROTOCOL_MAX_PROCESS);
+	FreePointArray((void**)sojoRelaySensor, PROTOCOL_MAX_PROCESS);
+	FreePointArray((void**)sojoRelayDeviceId, PROTOCOL_MAX_PROCESS);
+	return NO_ERROR;
+}
+
+
+/**
+ * @brief 创建Mqtt上传数据的进程
+ * @param void
+ * @return 成功：0 失败：其他
+ */
+static int CreatMqttProcess(void)
+{
+	if(g_EdgeGatewayConfig == NULL)
+	{
+		printf_debug("g_EdgeGatewayConfig is NULL!\n");
+		return POINT_NULL;
+	}
+
+	/* MQTT发布数据需要的配置信息 */
+	bool isError = true;
+	pid_t pid = 0;
+	int mqttProcessNum = 0;
+	char *userName[PROTOCOL_MAX_PROCESS] = {0};
+	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
+	{
+		if((userName[i] = malloc(sizeof(char) * 30)) == NULL)
+		{
+			printf_debug("userName[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+	}
+
+	if(false == isError)
+	{
+		FreePointArray((void**)userName, PROTOCOL_MAX_PROCESS);
+		return MALLOC_FAIL;
+	}
+
+	MqttParamConfig(g_EdgeGatewayConfig, &mqttProcessNum, userName);
+	/* 创建MQTT通信进程 */
+	for(int i = 0; i < mqttProcessNum; i++)
+	{
+		if((pid = fork()) == 0)
+		{
+			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+			printf("MqttPublish (pid:%d) creat\n", getpid());
+			MqttPublish(userName[i]);							//MQTT发布信息
+			printf("MqttPublish (pid:%d) exit\n", getpid());
+
+			for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
+			{
+				if(userName[i] != NULL)
+				{
+					free(userName[i]);
+					userName[i] = NULL;
+				}
+			}
+			return NO_ERROR;
+		}
+	}
+	FreePointArray((void**)userName, PROTOCOL_MAX_PROCESS);
+	return NO_ERROR;
+}
+
+
+/**
+ * @brief 创建101协议的进程
+ * @param void
+ * @return 成功：0 失败：其他
+ */
+static int CreatIec101Process(void)
+{
+	if(g_EdgeGatewayConfig == NULL)
+	{
+		printf_debug("g_EdgeGatewayConfig is NULL!\n");
+		return POINT_NULL;
+	}
+
+	/* IEC101协议需要的配置信息 */
+	pid_t pid = 0;
+	Configure101 info101;
+	char iec101Filename[30] = {0};
+	IEC101ParamConfig(g_EdgeGatewayConfig, &info101, iec101Filename);
+	/* 创建101进程 */
+	if(info101.num > 0 && (pid = fork()) == 0)
+	{
+		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+		printf("IEC101 (pid:%d) creat\n", getpid());
+		SojoDtu_IEC101(&info101, iec101Filename);
+		printf("IEC101 (pid:%d) exit\n", getpid());
+
+		return NO_ERROR;
+	}
+	return NO_ERROR;
+}
+
+
+/**
+ * @brief 创建104协议的进程
+ * @param void
+ * @return 成功：0 失败：其他
+ */
+static int CreatIec104Process(void)
+{
+	if(g_EdgeGatewayConfig == NULL)
+	{
+		printf_debug("g_EdgeGatewayConfig is NULL!\n");
+		return POINT_NULL;
+	}
+
+	/* IEC104协议需要的配置信息 */
+	bool isError = true;
+	pid_t pid = 0;
+	Configure104 info104;
+	char iec104Filename[30] = {0};
+	for(int i = 0; i < IEC104_SLAVE_MAX; i++)
+	{
+		if((info104.sMip[i] = malloc(sizeof(char) * 20)) == NULL)
+		{
+			printf_debug("info104.sMip[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+	}
+
+	if(false == isError)
+	{
+		FreePointArray((void**)info104.sMip, PROTOCOL_MAX_PROCESS);
+		return MALLOC_FAIL;
+	}
+
+	IEC104ParamConfig(g_EdgeGatewayConfig, &info104, iec104Filename);
+	/* 创建104进程 */
+	if(info104.num > 0 && (pid = fork()) == 0)
+	{
+		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+		printf("IEC104 (pid:%d) creat\n", getpid());
+		SojoDtu_IEC104(&info104, iec104Filename);
+		printf("IEC104 (pid:%d) exit\n", getpid());
+
+		return NO_ERROR;
+	}
+	FreePointArray((void**)info104.sMip, PROTOCOL_MAX_PROCESS);
+	return NO_ERROR;
+}
+
+
+/**
+ * @brief 创建Web网页的进程
+ * @param void
+ * @return 成功：0 失败：其他
+ */
+static int CreatWebProcess(void)
+{
+	if(g_EdgeGatewayConfig == NULL)
+	{
+		printf_debug("g_EdgeGatewayConfig is NULL!\n");
+		return POINT_NULL;
+	}
+
+	/* 创建嵌入式网页进程 */
+	pid_t pid = 0;
+	if((pid = fork()) == 0)
+	{
+		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+		printf("Web (pid:%d) creat\n", getpid());
+		system("./GoAhead/bin/goahead -v --home ./GoAhead/bin/ /home/root/GoAhead 192.168.10.10");
+		printf("Web (pid:%d) exit\n", getpid());
+
+		return NO_ERROR;
+	}
+	return NO_ERROR;
 }
 
 
