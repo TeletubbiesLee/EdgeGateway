@@ -19,6 +19,7 @@
 #define NOISE_MODBUS_INTERVAL			60			//噪声传感器Modbus通信时间间隔
 
 
+int CreatNoiseProcess(void);
 int NoiseSensor(UartInfo *uartInfo, int deviceId[], int deviceNum, char *filename);
 
 #endif

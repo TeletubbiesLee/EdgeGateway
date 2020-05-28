@@ -19,9 +19,85 @@
 #include "../../Config.h"
 #include "../../Modbus/ModbusInit.h"
 #include "../../DataStorage/DataProcess.h"
-#include "../../ProcessCommunication/Semaphore.h"
+#include "../../ProcessCommunication/ProcessSignal.h"
+#include "../DeviceParamConfig.h"
+
 
 static void NoiseDataParse(uint16_t *tabRegisters, int deviceId, char *filename);
+
+
+/**
+ * @brief 创建噪声传感器进程
+ * @param void
+ * @return 成功：0 失败：其他
+ */
+int CreatNoiseProcess(void)
+{
+	if(g_EdgeGatewayConfig == NULL)
+	{
+		printf_debug("g_EdgeGatewayConfig is NULL!\n");
+		return POINT_NULL;
+	}
+
+	/* 噪声传感器需要的配置信息 */
+	bool isError = true;
+	pid_t pid = 0;
+	int noiseProcessNum = 0;
+	char *noiseUsername[PROTOCOL_MAX_PROCESS] = {0};
+	UartInfo *noiseUart[PROTOCOL_MAX_PROCESS] = {0};
+	int noiseDeviceNum[PROTOCOL_MAX_PROCESS] = {0};
+	int *noiseDeviceId[PROTOCOL_MAX_PROCESS] = {0};
+	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
+	{
+		if((noiseUsername[i] = malloc(sizeof(char) * 30)) == NULL)
+		{
+			printf_debug("noiseUsername[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+		if((noiseUart[i] = malloc(sizeof(UartInfo))) == NULL)
+		{
+			printf_debug("noiseUart[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+		if((noiseDeviceId[i] = malloc(sizeof(int) * SLAVE_MAX_NUMBER)) == NULL)
+		{
+			printf_debug("noiseDeviceId[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+	}
+
+	if(false == isError)
+	{
+		FreePointArray((void**)noiseUsername, PROTOCOL_MAX_PROCESS);
+		FreePointArray((void**)noiseUart, PROTOCOL_MAX_PROCESS);
+		FreePointArray((void**)noiseDeviceId, PROTOCOL_MAX_PROCESS);
+		return MALLOC_FAIL;
+	}
+
+	ModbusParamConfig(g_EdgeGatewayConfig, &noiseProcessNum, noiseUsername, noiseUart, noiseDeviceNum, noiseDeviceId, NOISE_SERSOR);
+	/* 创建噪声传感器通信进程 */
+	for(int i = 0; i < noiseProcessNum; i++)
+	{
+		if((pid = fork()) == 0)
+		{
+			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+			printf("NoiseSensor (pid:%d) creat\n", getpid());
+			NoiseSensor(noiseUart[i], noiseDeviceId[i], noiseDeviceNum[i], noiseUsername[i]);
+			printf("NoiseSensor (pid:%d) exit\n", getpid());
+
+			return NO_ERROR;
+		}
+	}
+	FreePointArray((void**)noiseUsername, PROTOCOL_MAX_PROCESS);
+	FreePointArray((void**)noiseUart, PROTOCOL_MAX_PROCESS);
+	FreePointArray((void**)noiseDeviceId, PROTOCOL_MAX_PROCESS);
+	return NO_ERROR;
+}
+
 
 /**
  * @breif 噪声传感器modbus通信函数

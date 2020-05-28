@@ -1,5 +1,5 @@
 /**
- * @file Semaphore.c
+ * @file ProcessSignal.c
  * @brief 进程间信号量操作程序文件
  * @copyright Copyright (c) 2020 Beijing SOJO Electric CO., LTD.
  * @company  SOJO
@@ -11,6 +11,10 @@
 
 #include <stdio.h>
 #include <sys/sem.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/prctl.h>
 #include "Semaphore.h"
 #include "../Config.h"
 
@@ -21,6 +25,9 @@ union semun
 	struct semid_ds *buf;
 	unsigned short *array;
 };
+
+
+static void HandleSignal(int signalNum);
 
 
 /**
@@ -101,4 +108,35 @@ int Semaphore_V(int semId)
 	}
 	return NO_ERROR;
 }
+
+
+/**
+ * @breif 设置进程关闭信号
+ * @param void
+ * @return void
+ */
+void SetProcessCloseSignal(void)
+{
+	signal(SIGINT, HandleSignal);			//父进程收到Ctrl C时，子进程会收到此信号
+	prctl(PR_SET_PDEATHSIG, SIGINT);
+	signal(SIGHUP, HandleSignal);			//父进程退出时，子进程会收到此信号
+	prctl(PR_SET_PDEATHSIG, SIGHUP);
+}
+
+
+/**
+ * @breif 信号处理函数
+ * @param signalNum 信号值
+ * @return void
+ */
+static void HandleSignal(int signalNum)
+{
+	if(signalNum == SIGINT || signalNum == SIGHUP)
+	{
+		printf("Process (pid:%d) recv SIGHUP or SIGINT, exit\n", getpid());
+		exit(0);
+	}
+}
+
+
 

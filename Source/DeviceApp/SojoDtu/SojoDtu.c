@@ -18,10 +18,95 @@
 #include "SojoDtu.h"
 #include "../../Config.h"
 #include "../../DataStorage/DataProcess.h"
-#include "../../ProcessCommunication/Semaphore.h"
+#include "../../ProcessCommunication/ProcessSignal.h"
+#include "../DeviceParamConfig.h"
 
 
 static void SojoDtu_SaveData(char *filename, IECType iecType, int id);
+
+
+/**
+ * @brief 创建101协议的进程
+ * @param void
+ * @return 成功：0 失败：其他
+ */
+int CreatIec101Process(void)
+{
+	if(g_EdgeGatewayConfig == NULL)
+	{
+		printf_debug("g_EdgeGatewayConfig is NULL!\n");
+		return POINT_NULL;
+	}
+
+	/* IEC101协议需要的配置信息 */
+	pid_t pid = 0;
+	Configure101 info101;
+	char iec101Filename[30] = {0};
+	IEC101ParamConfig(g_EdgeGatewayConfig, &info101, iec101Filename);
+	/* 创建101进程 */
+	if(info101.num > 0 && (pid = fork()) == 0)
+	{
+		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+		printf("IEC101 (pid:%d) creat\n", getpid());
+		SojoDtu_IEC101(&info101, iec101Filename);
+		printf("IEC101 (pid:%d) exit\n", getpid());
+
+		return NO_ERROR;
+	}
+	return NO_ERROR;
+}
+
+
+/**
+ * @brief 创建104协议的进程
+ * @param void
+ * @return 成功：0 失败：其他
+ */
+int CreatIec104Process(void)
+{
+	if(g_EdgeGatewayConfig == NULL)
+	{
+		printf_debug("g_EdgeGatewayConfig is NULL!\n");
+		return POINT_NULL;
+	}
+
+	/* IEC104协议需要的配置信息 */
+	bool isError = true;
+	pid_t pid = 0;
+	Configure104 info104;
+	char iec104Filename[30] = {0};
+	for(int i = 0; i < IEC104_SLAVE_MAX; i++)
+	{
+		if((info104.sMip[i] = malloc(sizeof(char) * 20)) == NULL)
+		{
+			printf_debug("info104.sMip[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+	}
+
+	if(false == isError)
+	{
+		FreePointArray((void**)info104.sMip, PROTOCOL_MAX_PROCESS);
+		return MALLOC_FAIL;
+	}
+
+	IEC104ParamConfig(g_EdgeGatewayConfig, &info104, iec104Filename);
+	/* 创建104进程 */
+	if(info104.num > 0 && (pid = fork()) == 0)
+	{
+		SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+		printf("IEC104 (pid:%d) creat\n", getpid());
+		SojoDtu_IEC104(&info104, iec104Filename);
+		printf("IEC104 (pid:%d) exit\n", getpid());
+
+		return NO_ERROR;
+	}
+	FreePointArray((void**)info104.sMip, PROTOCOL_MAX_PROCESS);
+	return NO_ERROR;
+}
 
 
 /**

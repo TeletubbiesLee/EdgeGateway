@@ -17,6 +17,8 @@
 #define IEC101_INTERVAL		10
 #define IEC104_INTERVAL		10
 
+int CreatIec101Process(void);
+int CreatIec104Process(void);
 int SojoDtu_IEC101(Configure101 *info101, char *filename);
 int SojoDtu_IEC104(Configure104 *info104, char *filename);
 

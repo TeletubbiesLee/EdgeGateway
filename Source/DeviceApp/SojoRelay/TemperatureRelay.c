@@ -19,10 +19,84 @@
 #include "../../Config.h"
 #include "../../Modbus/ModbusInit.h"
 #include "../../DataStorage/DataProcess.h"
-#include "../../ProcessCommunication/Semaphore.h"
+#include "../../ProcessCommunication/ProcessSignal.h"
+#include "../DeviceParamConfig.h"
 
 
 static void SOJO_TemperatureDataProcess(uint16_t registerData[], int arrayNumber, int deviceId, char *filename);
+
+
+/**
+ * @brief 创建测温接收中继进程
+ * @param void
+ * @return 成功：0 失败：其他
+ */
+int CreatSojoRelayProcess(void)
+{
+	if(g_EdgeGatewayConfig == NULL)
+	{
+		printf_debug("g_EdgeGatewayConfig is NULL!\n");
+		return POINT_NULL;
+	}
+
+	/* 双杰测温中继需要的配置信息 */
+	bool isError = true;
+	pid_t pid = 0;
+	int sojoRelayProcessNum = 0;
+	char *sojoRelayUsername[PROTOCOL_MAX_PROCESS] = {0};
+	UartInfo *sojoRelaySensor[PROTOCOL_MAX_PROCESS] = {0};
+	int sojoRelayDeviceNum[PROTOCOL_MAX_PROCESS] = {0};
+	int *sojoRelayDeviceId[PROTOCOL_MAX_PROCESS] = {0};
+	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
+	{
+		if((sojoRelayUsername[i] = malloc(sizeof(char) * 30)) == NULL)
+		{
+			printf_debug("sojoRelayUsername[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+		if((sojoRelaySensor[i] = malloc(sizeof(UartInfo))) == NULL)
+		{
+			printf_debug("sojoRelaySensor[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+		if((sojoRelayDeviceId[i] = malloc(sizeof(int) * SLAVE_MAX_NUMBER)) == NULL)
+		{
+			printf_debug("sojoRelayDeviceId[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+	}
+
+	if(false == isError)
+	{
+		FreePointArray((void**)sojoRelayUsername, PROTOCOL_MAX_PROCESS);
+		FreePointArray((void**)sojoRelaySensor, PROTOCOL_MAX_PROCESS);
+		FreePointArray((void**)sojoRelayDeviceId, PROTOCOL_MAX_PROCESS);
+		return MALLOC_FAIL;
+	}
+
+	ModbusParamConfig(g_EdgeGatewayConfig, &sojoRelayProcessNum, sojoRelayUsername, sojoRelaySensor, sojoRelayDeviceNum, sojoRelayDeviceId, SOJO_RELAY);
+	/* 创建双杰测温中继通信进程 */
+	for(int i = 0; i < sojoRelayProcessNum; i++)
+	{
+		if((pid = fork()) == 0)
+		{
+			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+			printf("TemperatureRelay (pid:%d) creat\n", getpid());
+			TemperatureRelay(sojoRelaySensor[i], sojoRelayDeviceId[i], sojoRelayDeviceNum[i], sojoRelayUsername[i]);
+			printf("TemperatureRelay (pid:%d) exit\n", getpid());
+
+			return NO_ERROR;
+		}
+	}
+	FreePointArray((void**)sojoRelayUsername, PROTOCOL_MAX_PROCESS);
+	FreePointArray((void**)sojoRelaySensor, PROTOCOL_MAX_PROCESS);
+	FreePointArray((void**)sojoRelayDeviceId, PROTOCOL_MAX_PROCESS);
+	return NO_ERROR;
+}
 
 
 /**

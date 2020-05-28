@@ -21,7 +21,8 @@
 #define TIMEOUT     10000L							//超时时间
 
 
-int MqttPublish(char *accessUser);;
+int CreatMqttProcess(void);
+int MqttPublish(char *accessUser);
 
 #endif
 

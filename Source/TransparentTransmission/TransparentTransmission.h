@@ -13,6 +13,7 @@
 #define _TRANSPARENT_TRANSMISSION_H_
 
 #include "Task.h"
+#include "../ParserConfig/Interface_S2J.h"
 
 /*
  * 透传功能类型枚举
@@ -26,6 +27,8 @@ typedef enum TagUartToNetworkType
 }UartToNetworkType;
 
 
+int CreatNet2UartProcess(void);
+void TrsptTrsmsParamConfig(EdgeGatewayConfig *configInfo, int *processNum, int type[], UartInfo *uart[], NetworkInfo *eth[]);
 int TransparentTransmission(int type, UartInfo *uartInfo, NetworkInfo *networkInfo);
 
 #endif

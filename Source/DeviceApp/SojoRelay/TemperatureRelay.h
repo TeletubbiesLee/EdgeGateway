@@ -20,6 +20,7 @@
 #define TEMP_RELAY_MODBUS_INTERVAL			120			//噪声传感器Modbus通信时间间隔
 
 int TemperatureRelay(UartInfo *uartInfo, int deviceId[], int deviceNum, char *filename);
+int CreatSojoRelayProcess(void);
 
 #endif
 

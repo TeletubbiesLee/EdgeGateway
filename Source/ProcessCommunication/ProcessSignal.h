@@ -1,5 +1,5 @@
 /**
- * @file Semaphore.h
+ * @file ProcessSignal.h
  * @brief 进程间信号量操作程序文件
  * @copyright Copyright (c) 2020 Beijing SOJO Electric CO., LTD.
  * @company  SOJO
@@ -18,5 +18,6 @@ int SetSemValue(int semId);
 int DelSemValue(int semId);
 int Semaphore_P(int semId);
 int Semaphore_V(int semId);
+void SetProcessCloseSignal(void);
 
 #endif

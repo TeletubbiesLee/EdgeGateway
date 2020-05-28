@@ -19,12 +19,74 @@
 #include "MqttPublish.h"
 #include "../Config.h"
 #include "../DataStorage/DataProcess.h"
-#include "../ProcessCommunication/Semaphore.h"
+#include "../ProcessCommunication/ProcessSignal.h"
+#include "../DeviceApp/DeviceParamConfig.h"
 
 
 static void MqttPublishMessage(MQTTClient *client, char *payload, int payloadLenth);
 static int MqttInit(MQTTClient *client, char *accessUser);
 
+
+/**
+ * @brief 创建Mqtt上传数据的进程
+ * @param void
+ * @return 成功：0 失败：其他
+ */
+int CreatMqttProcess(void)
+{
+	if(g_EdgeGatewayConfig == NULL)
+	{
+		printf_debug("g_EdgeGatewayConfig is NULL!\n");
+		return POINT_NULL;
+	}
+
+	/* MQTT发布数据需要的配置信息 */
+	bool isError = true;
+	pid_t pid = 0;
+	int mqttProcessNum = 0;
+	char *userName[PROTOCOL_MAX_PROCESS] = {0};
+	for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
+	{
+		if((userName[i] = malloc(sizeof(char) * 30)) == NULL)
+		{
+			printf_debug("userName[%d] malloc error\n", i);
+			isError = false;
+			break;
+		}
+	}
+
+	if(false == isError)
+	{
+		FreePointArray((void**)userName, PROTOCOL_MAX_PROCESS);
+		return MALLOC_FAIL;
+	}
+
+	MqttParamConfig(g_EdgeGatewayConfig, &mqttProcessNum, userName);
+	/* 创建MQTT通信进程 */
+	for(int i = 0; i < mqttProcessNum; i++)
+	{
+		if((pid = fork()) == 0)
+		{
+			SetProcessCloseSignal();		//父进程关闭之后，子进程也全部关闭
+
+			printf("MqttPublish (pid:%d) creat\n", getpid());
+			MqttPublish(userName[i]);							//MQTT发布信息
+			printf("MqttPublish (pid:%d) exit\n", getpid());
+
+			for(int i = 0; i < PROTOCOL_MAX_PROCESS; i++)
+			{
+				if(userName[i] != NULL)
+				{
+					free(userName[i]);
+					userName[i] = NULL;
+				}
+			}
+			return NO_ERROR;
+		}
+	}
+	FreePointArray((void**)userName, PROTOCOL_MAX_PROCESS);
+	return NO_ERROR;
+}
 
 
 /**
