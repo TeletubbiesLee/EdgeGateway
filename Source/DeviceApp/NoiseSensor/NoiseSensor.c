@@ -14,10 +14,10 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/sem.h>
-#include "../libmodbus/modbus.h"
+#include "../../Modbus/libmodbus/modbus.h"
 #include "NoiseSensor.h"
 #include "../../Config.h"
-#include "../ModbusInit.h"
+#include "../../Modbus/ModbusInit.h"
 #include "../../DataStorage/DataProcess.h"
 #include "../../ProcessCommunication/Semaphore.h"
 

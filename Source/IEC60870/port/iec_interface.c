@@ -26,7 +26,7 @@
 #include "..\master101\101master.h"
 //#include "modbus_master.h"
 #include "..\tcp_socket\tcp_interface.h"
-#include "../../../RS485/RS485.h"
+#include "../../RS485/RS485.h"
 /* PRIVATE VARIABLES ---------------------------------------------------------*/
 static uint8_t 	portNo = 0;
 static int 		baudRate = 9600;

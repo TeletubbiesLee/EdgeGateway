@@ -13,7 +13,7 @@
 
 #include "stdint.h"
 #include "sojo_point_table_enum.h"
-#include "..\iec60870\iec60870_configure.h"
+#include "../../IEC60870/iec60870_configure.h"
 
 void iec101_startup(Configure101 *para);
 void iec104_startup(Configure104 *para);

@@ -9,8 +9,8 @@
   */
 
 #include <stdio.h>
-#include "../iec60870/iec60870_interface.h"
-#include "../iec60870/iec60870_configure.h"
+#include "../../IEC60870/iec60870_interface.h"
+#include "../../IEC60870/iec60870_configure.h"
 #include "sojo_interface.h"
 
 /**

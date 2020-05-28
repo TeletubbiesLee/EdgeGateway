@@ -15,9 +15,9 @@
 #include <stdlib.h>
 #include <sys/sem.h>
 #include "TemperatureRelay.h"
-#include "../libmodbus/modbus.h"
+#include "../../Modbus/libmodbus/modbus.h"
 #include "../../Config.h"
-#include "../ModbusInit.h"
+#include "../../Modbus/ModbusInit.h"
 #include "../../DataStorage/DataProcess.h"
 #include "../../ProcessCommunication/Semaphore.h"
 

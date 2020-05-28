@@ -12,7 +12,7 @@
 #define _IEC60870_INTERFACE_H_
 
 #include "stdint.h"
-#include "../SojoDtu/sojo_point_table_enum.h"
+#include "../DeviceApp/SojoDtu/sojo_point_table_enum.h"
 #include "iec60870_configure.h"
 
 void iec101_init(Configure101 *para);

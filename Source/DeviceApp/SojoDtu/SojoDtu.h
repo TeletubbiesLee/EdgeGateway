@@ -12,7 +12,7 @@
 #ifndef _SOJO_DTU_H_
 #define _SOJO_DTU_H_
 
-#include "../iec60870/iec60870_configure.h"
+#include "../../IEC60870/iec60870_configure.h"
 
 #define IEC101_INTERVAL		10
 #define IEC104_INTERVAL		10

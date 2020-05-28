@@ -18,15 +18,15 @@
 #include "Led/Led.h"
 #include "ProcessSignal/ProcessSignal.h"
 #include "TransparentTransmission/TransparentTransmission.h"
-#include "Modbus/NoiseSensor/NoiseSensor.h"
-#include "Modbus/AirQualitySensor/AirQualitySensor.h"
-#include "Modbus/SojoRelay/TemperatureRelay.h"
+#include "DeviceApp/NoiseSensor/NoiseSensor.h"
+#include "DeviceApp/AirQualitySensor/AirQualitySensor.h"
+#include "DeviceApp/SojoRelay/TemperatureRelay.h"
 #include "MQTT/MqttPublish.h"
 #include "ParserConfig/Interface_S2J.h"
 #include "ProcessCommunication/Semaphore.h"
 #include "DataStruct.h"
 #include "Config.h"
-#include "IEC60870/SojoDtu/SojoDtu.h"
+#include "DeviceApp/SojoDtu/SojoDtu.h"
 
 
 
