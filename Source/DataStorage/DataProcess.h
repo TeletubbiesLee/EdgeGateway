@@ -53,6 +53,7 @@ int DeleteData(char *filename, DataInformation *dataInfo);
 int ReadData(char *filename, DataInformation *dataInfo);
 int PollData(char *filename, db_list_t **dataInfo);
 int GetTimeStr(char *timeStr);
+void BackUpDataFile(void);
 
 #endif
 

@@ -129,6 +129,19 @@ int GetTimeStr(char *timeStr)
 
 
 /**
+ * @breif 备份数据文件
+ * @param void
+ * @return void
+ */
+void BackUpDataFile(void)
+{
+	char filename[50] = DATA_LIB_NAME;
+	strcat(filename, ".backup");
+	rename(DATA_LIB_NAME, filename);
+}
+
+
+/**
  * @breif 创建数据库的表
  * @param tableName 数据库表的名字
  * @return 成功：0 失败：其他

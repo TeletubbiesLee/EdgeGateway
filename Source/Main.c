@@ -26,6 +26,7 @@
 #include "DeviceApp/SojoDtu/SojoDtu.h"
 #include "MQTT/MqttPublish.h"
 #include "Web/WebProcess.h"
+#include "DataStorage/DataProcess.h"
 
 
 
@@ -45,22 +46,23 @@ int main(int argc, char *argv[])
 	semId = semget((key_t)SEMAPHORE_KEY, 1, 0666 | IPC_CREAT);
 	SetSemValue(semId);
 
+	BackUpDataFile();			//备份文件
 
-	CreatNet2UartProcess();
+	CreatNet2UartProcess();		//创建透传进程
 
-	CreatNoiseProcess();
+	CreatNoiseProcess();		//创建噪声传感器进程
 
-	CreatAirQualityProcess();
+	CreatAirQualityProcess();	//创建空气质量传感器进程
 
-	CreatSojoRelayProcess();
+	CreatSojoRelayProcess();	//创建测温接收中继进程
 
-	CreatMqttProcess();
+	CreatMqttProcess();			//创建MQTT发送数据进程
 
-	CreatIec101Process();
+	CreatIec101Process();		//创建101进程
 
-	CreatIec104Process();
+	CreatIec104Process();		//创建104进程
 
-	CreatWebProcess();
+	CreatWebProcess();			//创建Web网页进程
 
 	/* 创建其他功能的进程 */
 
