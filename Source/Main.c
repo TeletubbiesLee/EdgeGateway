@@ -56,11 +56,11 @@ int main(int argc, char *argv[])
 
 	CreatSojoRelayProcess();	//创建测温接收中继进程
 
-	CreatMqttProcess();			//创建MQTT发送数据进程
-
 	CreatIec101Process();		//创建101进程
 
 	CreatIec104Process();		//创建104进程
+
+	CreatMqttProcess();			//创建MQTT发送数据进程
 
 	CreatWebProcess();			//创建Web网页进程
 

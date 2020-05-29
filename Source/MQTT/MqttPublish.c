@@ -106,6 +106,7 @@ int MqttPublish(char *accessUser)
 
     semId = semget((key_t)SEMAPHORE_KEY, 1, 0666 | IPC_CREAT);
 
+    sleep(MQTT_PUBLISH_INTERVAL);
     CreateDataFile(accessUser);
 
     while(1)
