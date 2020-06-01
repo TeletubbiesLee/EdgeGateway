@@ -19,7 +19,7 @@
 #define UART_DATA_BIT       			8			//串口数据位
 #define UART_STOP_BIT       			1			//串口停止位
 
-#define MODBUS_TX_RX_DEBUG				0			//modbus协议发送接收的debug标志
+#define MODBUS_TX_RX_DEBUG				1			//modbus协议发送接收的debug标志
 
 int ModbusInit(modbus_t **ctx, UartInfo *uartInfo);
 

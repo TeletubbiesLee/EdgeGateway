@@ -1,11 +1,23 @@
 /*
  * Copyright © 2001-2011 Stéphane Raimbault <stephane.raimbault@gmail.com>
  *
- * SPDX-License-Identifier: LGPL-2.1+
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef MODBUS_RTU_H
-#define MODBUS_RTU_H
+#ifndef _MODBUS_RTU_H_
+#define _MODBUS_RTU_H_
 
 #include "modbus.h"
 
@@ -16,27 +28,16 @@ MODBUS_BEGIN_DECLS
  */
 #define MODBUS_RTU_MAX_ADU_LENGTH  256
 
-MODBUS_API modbus_t* modbus_new_rtu(const char *device, int baud, char parity,
-                                    int data_bit, int stop_bit);
+modbus_t* modbus_new_rtu(const char *device, int baud, char parity,
+                         int data_bit, int stop_bit);
 
 #define MODBUS_RTU_RS232 0
 #define MODBUS_RTU_RS485 1
-
-MODBUS_API int modbus_rtu_set_serial_mode(modbus_t *ctx, int mode);
-MODBUS_API int modbus_rtu_get_serial_mode(modbus_t *ctx);
-
-#define MODBUS_RTU_RTS_NONE   0
-#define MODBUS_RTU_RTS_UP     1
-#define MODBUS_RTU_RTS_DOWN   2
-
-MODBUS_API int modbus_rtu_set_rts(modbus_t *ctx, int mode);
-MODBUS_API int modbus_rtu_get_rts(modbus_t *ctx);
-
-MODBUS_API int modbus_rtu_set_custom_rts(modbus_t *ctx, void (*set_rts) (modbus_t *ctx, int on));
-
-MODBUS_API int modbus_rtu_set_rts_delay(modbus_t *ctx, int us);
-MODBUS_API int modbus_rtu_get_rts_delay(modbus_t *ctx);
+#define TIOCGRS485 0x542E
+#define TIOCSRS485 0x542F
+int modbus_rtu_set_serial_mode(modbus_t *ctx, int mode);
+int modbus_rtu_get_serial_mode(modbus_t *ctx);
 
 MODBUS_END_DECLS
 
-#endif /* MODBUS_RTU_H */
+#endif /* _MODBUS_RTU_H_ */

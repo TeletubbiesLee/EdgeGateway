@@ -48,21 +48,21 @@ int main(int argc, char *argv[])
 
 	BackUpDataFile();			//备份文件
 
-	CreatNet2UartProcess();		//创建透传进程
-
-	CreatNoiseProcess();		//创建噪声传感器进程
+//	CreatNet2UartProcess();		//创建透传进程
+//
+//	CreatNoiseProcess();		//创建噪声传感器进程
 
 	CreatAirQualityProcess();	//创建空气质量传感器进程
 
-	CreatSojoRelayProcess();	//创建测温接收中继进程
-
-	CreatIec101Process();		//创建101进程
-
-	CreatIec104Process();		//创建104进程
-
-	CreatMqttProcess();			//创建MQTT发送数据进程
-
-	CreatWebProcess();			//创建Web网页进程
+//	CreatSojoRelayProcess();	//创建测温接收中继进程
+//
+//	CreatIec101Process();		//创建101进程
+//
+//	CreatIec104Process();		//创建104进程
+//
+//	CreatMqttProcess();			//创建MQTT发送数据进程
+//
+//	CreatWebProcess();			//创建Web网页进程
 
 	/* 创建其他功能的进程 */
 
